@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using Box2D.XNA;
+using C3.XNA;
 
 namespace Squircle
 {
@@ -18,6 +20,8 @@ namespace Squircle
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        public World World { get; set; }
+        public Body Body { get; set; }
 
         public Game()
         {
@@ -34,6 +38,22 @@ namespace Squircle
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+
+            World = new Box2D.XNA.World(new Vector2(0.0f, 9.81f), false);
+
+            var test = new Box2D.XNA.BodyDef();
+            test.type = BodyType.Dynamic;
+            test.angle = 0;
+            test.position = new Vector2(100, 20);
+
+            Body = World.CreateBody(test);
+
+            var shape = new CircleShape();
+            shape._radius = 50.0f;
+
+            var fixture = new FixtureDef();
+            fixture.shape = shape;
+            Body.CreateFixture(fixture);
 
             base.Initialize();
         }
@@ -66,11 +86,14 @@ namespace Squircle
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
             // TODO: Add your update logic here
+
+            World.Step(deltaTime, 10, 3);
 
             base.Update(gameTime);
         }
@@ -83,7 +106,12 @@ namespace Squircle
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            Console.WriteLine("Body Pos: {0}", Body.GetPosition());
+
             // TODO: Add your drawing code here
+            spriteBatch.Begin();
+            spriteBatch.DrawCircle(Body.Position, 50.0f, 50, Color.Red);
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
