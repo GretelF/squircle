@@ -66,15 +66,21 @@
     <Reference Include="Microsoft.Xna.Framework.GamerServices, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="mscorlib" />
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Net" />
+    <Reference Include="XnaExtensions">
+      <HintPath>..\..\..\thirdparty\XnaExtensions\XnaExtensions.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LevelGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="Vector2Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
@@ -83,13 +89,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\thirdparty\2d-xna-primitives\Primitives2D.csproj">
-      <Project>{39ad1482-1881-4852-a05d-dc61b0d3446a}</Project>
-      <Name>Primitives2D</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\thirdparty\Box2D\Box2D.XNA\Box2D.XNA - windows.csproj">
       <Project>{22791486-e721-4511-aa4b-da26cf5d0f2e}</Project>
       <Name>Box2D.XNA - windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\thirdparty\config-file-net\ConfigFile\ConfigFile.csproj">
+      <Project>{bdebf242-e9ef-4868-bbb9-ff473a1b8a00}</Project>
+      <Name>ConfigFile</Name>
     </ProjectReference>
     <ProjectReference Include="..\SquircleContent\SquircleContent.contentproj">
       <Name>SquircleContent %28Content%29</Name>

@@ -1,0 +1,967 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>XnaExtensions</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Xna.Framework.Graphics.SpriteAnimation">
+            <summary>
+            Animation based on a sprite sheet.
+            
+            This class cannot handle multiple animations in one sprite sheet explicitly.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.SpriteAnimation.#ctor(System.String,System.String,System.Int32,System.Single,System.Nullable{Microsoft.Xna.Framework.DVector2},System.Single,System.Nullable{Microsoft.Xna.Framework.DVector2},System.Single)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="name">Name of this animation.</param>
+            <param name="spriteSheetName">Name or file path of the sprite sheet.</param>
+            <param name="frameCount">The number of frames on the sprite sheet.</param>
+            <param name="framesPerSecond">The speed in which to play the animation in seconds.</param>
+            <param name="origin">The origin of the sprite sheet.</param>
+            <param name="rotation">The rotation value of this animation.</param>
+            <param name="scale">The scale value of this animation.</param>
+            <param name="depth">The layer depth in which to draw this animation in.</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.SpriteAnimation.Load(Microsoft.Xna.Framework.Content.ContentManager)">
+            <summary>
+            Loads the sprite sheet with the supplied content manager.
+            </summary>
+            <param name="contentManager">The content manager.</param>
+            <returns>Will return <c>true</c> if successful, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.SpriteAnimation.UpdateFrame(System.Single)">
+            <summary>
+            Update the animation.
+            </summary>
+            <param name="elapsedSeconds">The number of seconds passed since the last update.</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.SpriteAnimation.DrawFrame(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.DVector2)">
+            <summary>
+            Draws the current frame.
+            </summary>
+            <param name="spriteBatch">The sprite batch to draw the frame on.</param>
+            <param name="screenPosition">The position on the screen to draw the frame on.</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.SpriteAnimation.DrawFrame(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Int32,Microsoft.Xna.Framework.DVector2)">
+            <summary>
+            Draws a specific frame.
+            </summary>
+            <param name="spriteBatch">The sprite batch to draw the frame on.</param>
+            <param name="frame">
+            The index of the frame to draw. Must be greater than or equal to 0 and lower than FrameCount.
+            </param>
+            <param name="screenPosition">The position on the screen to draw the frame on.</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.SpriteAnimation.Reset">
+            <summary>
+            Resets the animation.
+            
+            Sets the current frame and the elapsed time to 0.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.SpriteAnimation.Stop">
+            <summary>
+            Convenience method that calls <c>Pause</c> and then <c>Reset</c>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.SpriteAnimation.Play">
+            <summary>
+            Starts the animation.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.SpriteAnimation.Pause">
+            <summary>
+            Pauses the animation and freezes it at the current frame.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Graphics.SpriteAnimation.FrameCount">
+            <summary>
+            The number of frames on the sprite sheet.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Graphics.SpriteAnimation.SpriteSheet">
+            <summary>
+            The sprite sheet that contains the animation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Graphics.SpriteAnimation.SecondsPerFrame">
+            <summary>
+            The number of seconds used per frame. This is the inverse of frames per second.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Graphics.SpriteAnimation.CurrentFrame">
+            <summary>
+            The currently active frame.
+            
+            Is always lower than FrameCount.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Graphics.SpriteAnimation.TotalElapsedSeconds">
+            <summary>
+            The currently elapsed time during this frame. 
+            Once this number is higher than <c>SecondsPerFrame</c>, the animation will advance to the next frame.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Graphics.SpriteAnimation.Name">
+            <summary>
+            The name of this animation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Graphics.SpriteAnimation.SpriteSheetName">
+            <summary>
+            The name or file path of the sprite sheet.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Graphics.SpriteAnimation.Rotation">
+            <summary>
+            The rotation value of this animation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Graphics.SpriteAnimation.Scale">
+            <summary>
+            The scale value of this animation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Graphics.SpriteAnimation.SpriteEffects">
+            <summary>
+            The sprite effects applied to this animation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Graphics.SpriteAnimation.Depth">
+            <summary>
+            The layer depth in which to draw this animation in.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Graphics.SpriteAnimation.Origin">
+            <summary>
+            The origin of the sprite sheet. Typically (0.0, 0.0).
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Graphics.SpriteAnimation.Bounds">
+            <summary>
+            Outer bounds of the animation. 
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Graphics.SpriteAnimation.Running">
+            <summary>
+            Value indicating whether the animation is currently running/playing or not.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Xna.Framework.Camera2D">
+            <summary>
+            Camera with a fixed position. Position can be changed by using Move or the Position property.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Xna.Framework.Camera2D.MINIMUM_ZOOM_FACTOR">
+            <summary>
+            Can not zoom out beyond this value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Xna.Framework.Camera2D._scale">
+            <summary>
+            Zoom factor, basically.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Xna.Framework.Camera2D._offsetFactor">
+            <summary>
+            No idea what this is.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Camera2D.#ctor(System.Int32,System.Int32,System.Nullable{Microsoft.Xna.Framework.Vector2},System.Single,System.Single,System.Single,System.Single,System.Nullable{Microsoft.Xna.Framework.Rectangle})">
+            <summary>
+            
+            </summary>
+            <param name="screenwidth"></param>
+            <param name="screenheight"></param>
+            <param name="startpos"></param>
+            <param name="scale"></param>
+            <param name="rotation"></param>
+            <param name="degreeOfFreedom"></param>
+            <param name="tightness"></param>
+            <param name="bounds"></param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Camera2D.Update(Microsoft.Xna.Framework.GameTime,Microsoft.Xna.Framework.Vector2)">
+            <summary>
+            
+            </summary>
+            <param name="gametime"></param>
+            <param name="point">If <c>direct</c> is set to <c>true</c>.</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Camera2D.UpdateViewBounds">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Camera2D.Move(System.Single,System.Single)">
+            <summary>
+            
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Camera2D.Move(Microsoft.Xna.Framework.Vector2)">
+            <summary>
+            
+            </summary>
+            <param name="movementDirection"></param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Camera2D.CalculateMatrix">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D.DegreeOfFreedom">
+            <summary>
+            Range: [0.0f;1.0f]
+            0.0f = The camera is fixed on it's target.
+            1.0f = The camera will not follow the target at all.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D.Tightness">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D.Bounds">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D.ViewBounds">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D.TransformationMatrix">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D.ScreenWidth">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D.ScreenHeight">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D.Rotation">
+            <summary>
+            
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:Microsoft.Xna.Framework.Camera2D.ZoomFactor" -->
+        <member name="P:Microsoft.Xna.Framework.Camera2D.Offset">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D.Position">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D.CamOffset">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D.CamDifference">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Microsoft.Xna.Framework.Camera2D_OLD">
+            <summary>
+            A 2D camera that works with XNA 4.0.
+            
+            Greatly inspired by this blog post: http://www.david-amador.com/2009/10/xna-camera-2d-with-zoom-and-rotation/
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Camera2D_OLD.#ctor(System.Nullable{Microsoft.Xna.Framework.Vector2},System.Single,System.Single)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="position">The initial position of this camera.</param>
+            <param name="zoom">The initial zoom value of this camera.</param>
+            <param name="rotation"></param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Camera2D_OLD.Move(Microsoft.Xna.Framework.Vector2)">
+            <summary>
+            Moves the camera by a certain amount.
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Camera2D_OLD.Move(System.Single,System.Single)">
+            <summary>
+            Moves the camera by a certain amount.
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Camera2D_OLD.CalculateTransformation(Microsoft.Xna.Framework.Graphics.Viewport)">
+            <summary>
+            Calculates the transformation matrix from the current properties.
+            </summary>
+            <param name="viewport">Viewport to adjust this camera on.</param>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D_OLD.Position">
+            <summary>
+            Position of the camera.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D_OLD.Zoom">
+            <summary>
+            Zoom value of this camera. Default is 1.0f. Cannot be lower than MIN_ZOOM.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D_OLD.Rotation">
+            <summary>
+            Rotation value of this camera. Default is 0.0f.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.Camera2D_OLD.TransformationMatrix">
+            <summary>
+            The transformation matrix of this camera.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Xna.Framework.Graphics.SpriteAnimationSerializer">
+            <summary>
+            Deserializes SpriteAnimation instances from XML data.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Microsoft.Xna.Framework.Graphics.SpriteAnimationSerializer.Deserialize(System.Xml.Linq.XElement)" -->
+        <member name="T:Microsoft.Xna.Framework.Graphics.SpriteEffectsSerializer">
+            <summary>
+            String -> SamplerState converter.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.SpriteEffectsSerializer.Parse(System.String)">
+            <summary>
+            Parses a string for a predefined SamplerState. Will raise an exception if the format is invalid.
+            </summary>
+            <param name="value">String to parse.</param>
+            <returns>SamplerState instance.</returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.SpriteEffectsSerializer.TryParse(System.String,Microsoft.Xna.Framework.Graphics.SpriteEffects@)">
+            <summary>
+            Parses a string for a predefined SamplerState. Will return <c>false</c> if the format is invalid. 
+            
+            Will not raise an exception.
+            </summary>
+            <param name="value">String to parse.</param>
+            <param name="samplerState">The variable to write the reult in.</param>
+            <returns>Will return <c>true</c> if successful, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.Xna.Framework.DCircle">
+            <summary>
+            A simple circle class with double precision properties.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Xna.Framework.DCircle.Position">
+            <summary>
+            The position (center) of this circle.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Xna.Framework.DCircle.Radius">
+            <summary>
+            The radius of this circle.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DCircle.#ctor(System.Nullable{Microsoft.Xna.Framework.DVector2},System.Double)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="position">The initial position of this circle.</param>
+            <param name="radius">The initial radius of this circle.</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DCircle.#ctor(System.Double,System.Double,System.Double)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="x">X coordinate of the position of this circle.</param>
+            <param name="y">Y coordinate of the position of this circle.</param>
+            <param name="radius">The initial radius of this circle.</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DCircle.GetDiameter">
+            <summary>
+            Calculates (!) the diameter of this circle.
+            </summary>
+            <returns>The diameter of this circle.</returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DCircle.Intersects(Microsoft.Xna.Framework.DCircle)">
+            <summary>
+            Tests whether two circles intersect each other or not.
+            </summary>
+            <param name="other">The other circle to test for intersection with this circle.</param>
+            <returns>Will return <c>true</c> if the circles intersect, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DCircle.Parse(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="circleAsString"></param>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Microsoft.Xna.Framework.DCircle.TryParse(System.String,Microsoft.Xna.Framework.DCircle@)" -->
+        <member name="T:Microsoft.Xna.Framework.DVector2">
+            <summary>
+            Implements a Vector with 2 dimensions, which acts like the Vector2 in the XNA Framework, 
+            but with double precision.
+            
+            Implemented by Marvin Pohl.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Xna.Framework.DVector2.X">
+            <summary>
+            X coordinate of this vector.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Xna.Framework.DVector2.Y">
+            <summary>
+            Y coordinate of this vector.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.#ctor(System.Double)">
+            <summary>
+            Constructor. Initializes both X and Y values with <c>value</c>.
+            </summary>
+            <param name="value">The value to initialize both X and Y with.</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.#ctor(System.Double,System.Double)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="x">X value.</param>
+            <param name="y">Y value.</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.#ctor(Microsoft.Xna.Framework.DVector2)">
+            <summary>
+            Constructor. Copies the values from another DVector2.
+            </summary>
+            <param name="v">The vector to copy.</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.op_Multiply(Microsoft.Xna.Framework.DVector2,Microsoft.Xna.Framework.DVector2)">
+            <summary>
+            Dot product.
+            </summary>
+            <param name="v1"></param>
+            <param name="v2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.op_Explicit(Microsoft.Xna.Framework.DVector2)~Microsoft.Xna.Framework.Vector2">
+            <summary>
+            Casts this instance to a regular Vector2 with single precision.
+            </summary>
+            <param name="v1"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.op_Implicit(Microsoft.Xna.Framework.Vector2)~Microsoft.Xna.Framework.DVector2">
+            <summary>
+            Casts a regular Vector2 with single precision to a DVector2 with double precision.
+            </summary>
+            <param name="v1"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.Length">
+            <summary>
+            Calculates the length of this vector. 
+            </summary>
+            <remarks>
+            It is recommended that you use <c>LengthSquared</c> whenever possible, 
+            because this method uses the costly method <c>Math.Sqrt</c>.
+            </remarks>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.LengthSquared">
+            <summary>
+            Calculates the squared length of this vector. Prefer this method over <c>Length</c> for better performance.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.Normalize">
+            <summary>
+            Normalizes the vector, bringing it's length to 1.0.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.GetRotation">
+            <summary>
+            Returns the Angle of this DVector2.
+            </summary>
+            <returns>The Angle of the DVector2 in Radians</returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.Rotate(System.Double,System.Boolean)">
+            <summary>
+            Rotates the DVector2
+            </summary>
+            <param name="radians">The amount of rotation in radians</param>
+            <param name="relative">
+            When <c>true</c>, the vector will be rotated with the given radians.
+            When <c>false</c>, the vector orientation will be set to the radians.
+            </param>
+            <returns>The rotated Vector</returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.Rotate(System.Double)">
+            <summary>
+            Rotates this DVector2.
+            </summary>
+            <param name="radians">The amount of rotation in radians</param>
+            <returns>The rotated Vector</returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.Dot(Microsoft.Xna.Framework.DVector2,Microsoft.Xna.Framework.DVector2)">
+            <summary>
+            Creates a dot product of 2 DVector2 instances.
+            </summary>
+            <param name="v1">Left vector.</param>
+            <param name="v2">Right vector.</param>
+            <returns>The dot product.</returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.Parse(System.String)">
+            <summary>
+            Parses a string for a DVector2. Will raise an exception if the format is invalid.
+            </summary>
+            <param name="vectorAsString">The string to parse.</param>
+            <returns>The parsed DVector2.</returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DVector2.TryParse(System.String,Microsoft.Xna.Framework.DVector2@)">
+            <summary>
+            Parses a string for a DVector2. Will return <c>false</c> if the format is invalid.
+            
+            Will not throw an exception.
+            </summary>
+            <param name="vectorAsString">The string to parse.</param>
+            <param name="vector">The variable to write the result in.</param>
+            <returns>Will return <c>true</c> if successful, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DVector2.Zero">
+            <summary>
+            Returns a vector with X and Y set to 0.0 respectively.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DVector2.One">
+            <summary>
+            Returns a vector with X and Y set to 1.0 respectively.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DVector2.OneX">
+            <summary>
+            Returns a vector with X and Y set to 1.0 and 0.0 respectively.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DVector2.OneY">
+            <summary>
+            Returns a vector with X and Y set to 0.0 and 1.0 respectively.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Xna.Framework.ColorParser">
+            <summary>
+            String -> Color converter.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.ColorParser.Parse(System.String)">
+            <summary>
+            Parses a string for a color value. Will raise an exception if the format is invalid.
+            
+            Layout: R G B A
+            </summary>
+            <param name="value">The string to parse.</param>
+            <returns>The parsed color.</returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.ColorParser.TryParse(System.String,Microsoft.Xna.Framework.Color@)">
+            <summary>
+            Parses a string for a color value. Will return <c>false</c> if the format is invalid.
+            
+            Layout: R G B A
+            
+            Will not raise an exception.
+            </summary>
+            <param name="value">The string to parse.</param>
+            <param name="color">The parsed color.</param>
+            <returns>Will return <c>true</c> if successful, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.Xna.Framework.Graphics.SamplerStateParser">
+            <summary>
+            String -> SamplerState converter.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.SamplerStateParser.Parse(System.String)">
+            <summary>
+            Parses a string for a predefined SamplerState. Will raise an exception if the format is invalid.
+            </summary>
+            <param name="value">String to parse.</param>
+            <returns>SamplerState instance.</returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.SamplerStateParser.TryParse(System.String,Microsoft.Xna.Framework.Graphics.SamplerState@)">
+            <summary>
+            Parses a string for a predefined SamplerState. Will return <c>false</c> if the format is invalid. 
+            
+            Will not raise an exception.
+            </summary>
+            <param name="value">String to parse.</param>
+            <param name="samplerState">The variable to write the reult in.</param>
+            <returns>Will return <c>true</c> if successful, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.Xna.Framework.Graphics.Primitives2D">
+            <summary>
+            Class used to draw 2D primitives.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawPoints(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Vector2,System.Collections.Generic.List{Microsoft.Xna.Framework.Vector2},Microsoft.Xna.Framework.Color,System.Single)">
+            <summary>
+            Draws a list of connecting points
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            /// <param name="position">Where to position the points</param>
+            <param name="points">The points to connect with lines</param>
+            <param name="color">The color to use</param>
+            <param name="thickness">The thickness of the lines</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.CreateCircle(System.Double,System.Int32)">
+            <summary>
+            Creates a list of vectors that represents a circle
+            </summary>
+            <param name="radius">The radius of the circle</param>
+            <param name="sides">The number of sides to generate</param>
+            <returns>A list of vectors that, if connected, will create a circle</returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.CreateArc(System.Single,System.Int32,System.Single,System.Single)">
+            <summary>
+            Creates a list of vectors that represents an arc
+            </summary>
+            <param name="radius">The radius of the arc</param>
+            <param name="sides">The number of sides to generate in the circle that this will cut out from</param>
+            <param name="startingAngle">The starting angle of arc, 0 being to the east, increasing as you go clockwise</param>
+            <param name="radians">The radians to draw, clockwise from the starting angle</param>
+            <returns>A list of vectors that, if connected, will create an arc</returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.FillRectangle(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Rectangle,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Draws a filled rectangle
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="rect">The rectangle to draw</param>
+            <param name="color">The color to draw the rectangle in</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.FillRectangle(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Rectangle,Microsoft.Xna.Framework.Color,System.Single)">
+            <summary>
+            Draws a filled rectangle
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="rect">The rectangle to draw</param>
+            <param name="color">The color to draw the rectangle in</param>
+            <param name="angle">The angle in radians to draw the rectangle at</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.FillRectangle(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Draws a filled rectangle
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="location">Where to draw</param>
+            <param name="size">The size of the rectangle</param>
+            <param name="color">The color to draw the rectangle in</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.FillRectangle(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Color,System.Single)">
+            <summary>
+            Draws a filled rectangle
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="location">Where to draw</param>
+            <param name="size">The size of the rectangle</param>
+            <param name="angle">The angle in radians to draw the rectangle at</param>
+            <param name="color">The color to draw the rectangle in</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.FillRectangle(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Single,System.Single,System.Single,System.Single,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Draws a filled rectangle
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="x">The X coord of the left side</param>
+            <param name="y">The Y coord of the upper side</param>
+            <param name="w">Width</param>
+            <param name="h">Height</param>
+            <param name="color">The color to draw the rectangle in</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.FillRectangle(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Single,System.Single,System.Single,System.Single,Microsoft.Xna.Framework.Color,System.Single)">
+            <summary>
+            Draws a filled rectangle
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="x">The X coord of the left side</param>
+            <param name="y">The Y coord of the upper side</param>
+            <param name="w">Width</param>
+            <param name="h">Height</param>
+            <param name="color">The color to draw the rectangle in</param>
+            <param name="angle">The angle of the rectangle in radians</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawRectangle(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Rectangle,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Draws a rectangle with the thickness provided
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="rect">The rectangle to draw</param>
+            <param name="color">The color to draw the rectangle in</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawRectangle(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Rectangle,Microsoft.Xna.Framework.Color,System.Single)">
+            <summary>
+            Draws a rectangle with the thickness provided
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="rect">The rectangle to draw</param>
+            <param name="color">The color to draw the rectangle in</param>
+            <param name="thickness">The thickness of the lines</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawRectangle(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Draws a rectangle with the thickness provided
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="location">Where to draw</param>
+            <param name="size">The size of the rectangle</param>
+            <param name="color">The color to draw the rectangle in</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawRectangle(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Color,System.Single)">
+            <summary>
+            Draws a rectangle with the thickness provided
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="location">Where to draw</param>
+            <param name="size">The size of the rectangle</param>
+            <param name="color">The color to draw the rectangle in</param>
+            <param name="thickness">The thickness of the line</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawLine(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Single,System.Single,System.Single,System.Single,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Draws a line from point1 to point2 with an offset
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="x1">The X coord of the first point</param>
+            <param name="y1">The Y coord of the first point</param>
+            <param name="x2">The X coord of the second point</param>
+            <param name="y2">The Y coord of the second point</param>
+            <param name="color">The color to use</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawLine(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Single,System.Single,System.Single,System.Single,Microsoft.Xna.Framework.Color,System.Single)">
+            <summary>
+            Draws a line from point1 to point2 with an offset
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="x1">The X coord of the first point</param>
+            <param name="y1">The Y coord of the first point</param>
+            <param name="x2">The X coord of the second point</param>
+            <param name="y2">The Y coord of the second point</param>
+            <param name="color">The color to use</param>
+            <param name="thickness">The thickness of the line</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawLine(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Draws a line from point1 to point2 with an offset
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="point1">The first point</param>
+            <param name="point2">The second point</param>
+            <param name="color">The color to use</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawLine(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Color,System.Single)">
+            <summary>
+            Draws a line from point1 to point2 with an offset
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="point1">The first point</param>
+            <param name="point2">The second point</param>
+            <param name="color">The color to use</param>
+            <param name="thickness">The thickness of the line</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawLine(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Vector2,System.Single,System.Single,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Draws a line from point1 to point2 with an offset
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="point">The starting point</param>
+            <param name="length">The length of the line</param>
+            <param name="angle">The angle of this line from the starting point in radians</param>
+            <param name="color">The color to use</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawLine(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Vector2,System.Single,System.Single,Microsoft.Xna.Framework.Color,System.Single)">
+            <summary>
+            Draws a line from point1 to point2 with an offset
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="point">The starting point</param>
+            <param name="length">The length of the line</param>
+            <param name="angle">The angle of this line from the starting point</param>
+            <param name="color">The color to use</param>
+            <param name="thickness">The thickness of the line</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawCircle(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Vector2,System.Single,System.Int32,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Draw a circle
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="center">The center of the circle</param>
+            <param name="radius">The radius of the circle</param>
+            <param name="sides">The number of sides to generate</param>
+            <param name="color">The color of the circle</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawCircle(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Vector2,System.Single,System.Int32,Microsoft.Xna.Framework.Color,System.Single)">
+            <summary>
+            Draw a circle
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="center">The center of the circle</param>
+            <param name="radius">The radius of the circle</param>
+            <param name="sides">The number of sides to generate</param>
+            <param name="color">The color of the circle</param>
+            <param name="thickness">The thickness of the lines used</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawCircle(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Single,System.Single,System.Single,System.Int32,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Draw a circle
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="x">The center X of the circle</param>
+            <param name="y">The center Y of the circle</param>
+            <param name="radius">The radius of the circle</param>
+            <param name="sides">The number of sides to generate</param>
+            <param name="color">The color of the circle</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawCircle(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Single,System.Single,System.Single,System.Int32,Microsoft.Xna.Framework.Color,System.Single)">
+            <summary>
+            Draw a circle
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="x">The center X of the circle</param>
+            <param name="y">The center Y of the circle</param>
+            <param name="radius">The radius of the circle</param>
+            <param name="sides">The number of sides to generate</param>
+            <param name="color">The color of the circle</param>
+            <param name="thickness">The thickness of the lines used</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawArc(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Vector2,System.Single,System.Int32,System.Single,System.Single,Microsoft.Xna.Framework.Color)">
+            <summary>
+            Draw a arc
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="center">The center of the arc</param>
+            <param name="radius">The radius of the arc</param>
+            <param name="sides">The number of sides to generate</param>
+            <param name="startingAngle">The starting angle of arc, 0 being to the east, increasing as you go clockwise</param>
+            <param name="radians">The number of radians to draw, clockwise from the starting angle</param>
+            <param name="color">The color of the arc</param>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.Graphics.Primitives2D.DrawArc(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Vector2,System.Single,System.Int32,System.Single,System.Single,Microsoft.Xna.Framework.Color,System.Single)">
+            <summary>
+            Draw a arc
+            </summary>
+            <param name="spriteBatch">The destination drawing surface</param>
+            <param name="center">The center of the arc</param>
+            <param name="radius">The radius of the arc</param>
+            <param name="sides">The number of sides to generate</param>
+            <param name="startingAngle">The starting angle of arc, 0 being to the east, increasing as you go clockwise</param>
+            <param name="radians">The number of radians to draw, clockwise from the starting angle</param>
+            <param name="color">The color of the arc</param>
+            <param name="thickness">The thickness of the arc</param>
+        </member>
+        <member name="T:Microsoft.Xna.Framework.DRectangle">
+            <summary>
+            Much like Microsoft.Xna.Framework.Rectangle, except with double precision.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DRectangle.Intersect(Microsoft.Xna.Framework.DRectangle,Microsoft.Xna.Framework.DRectangle)">
+            <summary>
+            
+            </summary>
+            <param name="rect1"></param>
+            <param name="rect2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DRectangle.Union(Microsoft.Xna.Framework.DRectangle,Microsoft.Xna.Framework.DRectangle)">
+            <summary>
+            
+            </summary>
+            <param name="rect1"></param>
+            <param name="rect2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DRectangle.Parse(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DRectangle.TryParse(System.String,Microsoft.Xna.Framework.DRectangle@)">
+            <summary>
+            
+            </summary>
+            <param name="value"></param>
+            <param name="rectangle"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Xna.Framework.DRectangle.op_Explicit(Microsoft.Xna.Framework.DRectangle)~Microsoft.Xna.Framework.Rectangle">
+            <summary>
+            Cast a DRectanlge to a regular Rectangle. Performs Math.Rounding to achieve highest accuracy.
+            </summary>
+            <param name="rect"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DRectangle.TopLeft">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DRectangle.Top">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DRectangle.TopRight">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DRectangle.Right">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DRectangle.BottomRight">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DRectangle.Bottom">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DRectangle.BottomLeft">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DRectangle.Left">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DRectangle.Center">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DRectangle.Size">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Microsoft.Xna.Framework.DRectangle.IsEmpty">
+            <summary>
+            
+            </summary>
+        </member>
+    </members>
+</doc>
