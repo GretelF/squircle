@@ -13,7 +13,7 @@ namespace Configuration
 
         static ConfigFile()
         {
-            GlobalSectionName = "<GLOBAL>";
+            GlobalSectionName = "";
         }
 
         public IDictionary<string, ConfigSection> Sections { get; set; }
