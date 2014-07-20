@@ -45,8 +45,8 @@ namespace Squircle
 
             LevelConfig = ConfigFile.FromFile("Content/level/level0.cfg");
 
-            int globalOption0 = LevelConfig["<GLOBAL>"]["globalOption0"];
-            string globalOption1 = LevelConfig["<GLOBAL>"]["globalOption1"];
+            int globalOption0 = LevelConfig[""]["globalOption0"];
+            string globalOption1 = LevelConfig[""]["globalOption1"];
 
             int metaOption = LevelConfig["MetaData"]["metaOption"];
 
