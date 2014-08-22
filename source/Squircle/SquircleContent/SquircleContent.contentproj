@@ -40,6 +40,10 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
+    <None Include="level\levels.cfg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Name>levels</Name>
+    </None>
     <None Include="level\level0.cfg">
       <Name>level0</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

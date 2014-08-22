@@ -25,7 +25,6 @@ namespace Squircle
         public World World { get; set; }
         LevelGenerator LevelGenerator;
         List<Body> bodyList;
-        public ConfigFile LevelConfig { get; set; }
 
         public Game()
         {
@@ -43,18 +42,11 @@ namespace Squircle
         {
             // TODO: Add your initialization logic here
 
-            LevelConfig = ConfigFile.FromFile("Content/level/level0.cfg");
-
-            int globalOption0 = LevelConfig[""]["globalOption0"];
-            string globalOption1 = LevelConfig[""]["globalOption1"];
-
-            int metaOption = LevelConfig["MetaData"]["metaOption"];
-
-            float anotherOption = LevelConfig["AnotherSection"]["anotherOption"];
+           
 
             World = new Box2D.XNA.World(new Vector2(0.0f, 9.81f), false);
             LevelGenerator = new LevelGenerator(this);
-            bodyList = LevelGenerator.generateLevel();
+            bodyList = LevelGenerator.generateLevel("level0");
             base.Initialize();
         }
 

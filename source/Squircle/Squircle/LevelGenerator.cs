@@ -5,12 +5,14 @@ using System.Text;
 using System.Drawing;
 using Box2D.XNA;
 using Microsoft.Xna.Framework;
+using Configuration;
 
 namespace Squircle
 {
     public class LevelGenerator
     {
         private List<Body> bodyList = new List<Body>();
+        public ConfigFile LevelConfig { get; set; }
         protected Game Game { get; private set; }
 
         public LevelGenerator(Game Game)
@@ -19,8 +21,18 @@ namespace Squircle
         }
 
 
-        public List<Body> generateLevel()
+        public List<Body> generateLevel(String level)
         {
+            var LevelConfigs = ConfigFile.FromFile("Content/level/levels.cfg");
+
+            var LevelConfig = ConfigFile.FromFile(LevelConfigs["Levels"][level]);
+
+            //Vector2 circlePos = LevelConfig["Players"]["circle"];
+            //Vector2 squarePos = LevelConfig["Players"]["square"];
+
+            String pathToLevelFile = LevelConfig["Level"]["path"];
+
+
 
             var vertices = new Vector2[4];
 
@@ -29,7 +41,7 @@ namespace Squircle
 
             var grays = new List<Vector2>();
 
-            var map = new Bitmap("Content\\level\\test.bmp");
+            var map = new Bitmap(pathToLevelFile);
 
             for (int x = 0; x < map.Size.Width; ++x)
             {
