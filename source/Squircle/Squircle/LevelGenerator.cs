@@ -27,8 +27,9 @@ namespace Squircle
 
             var LevelConfig = ConfigFile.FromFile(LevelConfigs["Levels"][level]);
 
-            //Vector2 circlePos = LevelConfig["Players"]["circle"];
-            //Vector2 squarePos = LevelConfig["Players"]["square"];
+            Vector2 circlePos = LevelConfig["Players"]["circle"].AsVector2();
+            Vector2 squarePos = LevelConfig["Players"]["square"].AsVector2();
+            
 
             String pathToLevelFile = LevelConfig["Level"]["path"];
 
