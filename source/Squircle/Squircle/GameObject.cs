@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Squircle
 {
-    class GameObject
+    public abstract class GameObject
     {
         protected Game Game { get; private set; }
 
