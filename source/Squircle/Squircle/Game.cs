@@ -25,6 +25,7 @@ namespace Squircle
         public World World { get; set; }
         LevelGenerator LevelGenerator;
         List<Body> bodyList;
+        Square square { get; set; }
 
         public Game()
         {
@@ -47,7 +48,13 @@ namespace Squircle
             World = new Box2D.XNA.World(new Vector2(0.0f, 9.81f), false);
             LevelGenerator = new LevelGenerator(this);
             bodyList = LevelGenerator.generateLevel("level0");
+
+            square = new Square(this);
+            square.Pos = new Vector2(20,20);
+            square.Initialize();
+
             base.Initialize();
+
         }
 
        
@@ -146,7 +153,8 @@ namespace Squircle
                     fixture = fixture.GetNext();
                 }
             }
-           
+
+            spriteBatch.Draw(square.Texture, square.Pos, Microsoft.Xna.Framework.Color.White);
 
             spriteBatch.End();
 

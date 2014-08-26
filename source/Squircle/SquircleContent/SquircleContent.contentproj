@@ -48,12 +48,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="player\circle.png">
+    <Compile Include="player\circle.png">
       <Name>circle</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="player\square.png">
