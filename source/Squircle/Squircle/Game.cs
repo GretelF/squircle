@@ -23,6 +23,7 @@ namespace Squircle
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         public Level level;
+        public ConfigFile gameConfig { get; set; }
 
         public Game()
         {
@@ -39,9 +40,9 @@ namespace Squircle
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
             level = new Level(this);
-            level.Initialize();
+            level.Initialize(gameConfig["Levels"]["level0"]);
 
             base.Initialize();
 

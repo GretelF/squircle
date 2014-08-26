@@ -12,28 +12,20 @@ namespace Squircle
     public class LevelGenerator
     {
         private List<Body> bodyList = new List<Body>();
-        public ConfigFile LevelConfig { get; set; }
         protected Game game { get; private set; }
+        public Level level { get; set; }
 
-        public LevelGenerator(Game game)
+        public LevelGenerator(Game game, Level level)
         {
+            this.level = level;
             this.game = game;
         }
 
 
-        public List<Body> generateLevel(String level)
+        public List<Body> generateLevel()
         {
-            var LevelConfigs = ConfigFile.FromFile("Content/level/levels.cfg");
 
-            var LevelConfig = ConfigFile.FromFile(LevelConfigs["Levels"][level]);
-
-            Vector2 circlePos = LevelConfig["Players"]["circle"].AsVector2();
-            Vector2 squarePos = LevelConfig["Players"]["square"].AsVector2();
-            
-
-            String pathToLevelFile = LevelConfig["Level"]["path"];
-
-
+            String pathToLevelFile = level.levelConfig["Level"]["path"];
 
             var vertices = new Vector2[4];
 

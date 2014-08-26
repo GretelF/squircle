@@ -41,6 +41,8 @@ namespace Squircle
 
         public override void Initialize()
         {
+
+
         }
 
         public override void Update(GameTime gameTime)

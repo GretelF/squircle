@@ -23,6 +23,7 @@ namespace Squircle
         LevelGenerator LevelGenerator;
         List<Body> bodyList;
         Square square { get; set; }
+        public ConfigFile levelConfig { get; private set; }
 
 
         public Level(Game game)
@@ -30,14 +31,15 @@ namespace Squircle
             this.game = game;
         }
 
-        public void Initialize()
+        public void Initialize(ConfigOption option)
         {
+            levelConfig = ConfigFile.FromFile(option.Value);
             World = new Box2D.XNA.World(new Vector2(0.0f, 9.81f), false);
-            LevelGenerator = new LevelGenerator(game);
-            bodyList = LevelGenerator.generateLevel("level0");
+            LevelGenerator = new LevelGenerator(game, this);
+            bodyList = LevelGenerator.generateLevel();
 
             square = new Square(game);
-            square.Pos = new Vector2(20, 20);
+            square.Pos = levelConfig["Players"]["square"].AsVector2();
             square.Initialize();
         }
 

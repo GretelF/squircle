@@ -30,9 +30,9 @@
     <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.VideoImporters, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="level\levels.cfg">
+    <None Include="level\game.cfg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Name>levels</Name>
+      <Name>game</Name>
     </None>
     <None Include="level\level0.cfg">
       <Name>level0</Name>
