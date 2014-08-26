@@ -34,11 +34,11 @@ namespace Squircle
         public void Initialize(ConfigOption option)
         {
             levelConfig = ConfigFile.FromFile(option.Value);
-            World = new Box2D.XNA.World(new Vector2(0.0f, 9.81f), false);
+            World = new Box2D.XNA.World(new Vector2(0.0f, 100.0f), false);
             LevelGenerator = new LevelGenerator(this);
             bodyList = LevelGenerator.generateLevel();
 
-            square = new Square(game);
+            square = new Square(game, this);
             square.Pos = levelConfig["Players"]["square"].AsVector2();
             square.Initialize();
         }
@@ -51,6 +51,7 @@ namespace Squircle
         public void Update(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            square.PrePhysicsUpdate(gameTime);
             World.Step(deltaTime, 20, 10);
             square.Update(gameTime);
         }
@@ -59,7 +60,9 @@ namespace Squircle
         {
             spriteBatch.Begin();
             //spriteBatch.DrawCircle(body.Position, 50.0f, 50, Microsoft.Xna.Framework.Color.Red);
-            foreach (var body in bodyList)
+
+            var body = World.GetBodyList();
+            while (body != null)
             {
                 var fixture = body.GetFixtureList();
                 while (fixture != null)
@@ -102,6 +105,7 @@ namespace Squircle
                     }
                     fixture = fixture.GetNext();
                 }
+                body = body.GetNext();
             }
 
             spriteBatch.Draw(square.Texture, square.Pos, Microsoft.Xna.Framework.Color.White);

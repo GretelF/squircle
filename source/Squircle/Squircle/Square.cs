@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Box2D.XNA;
+using Configuration;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -13,6 +15,8 @@ namespace Squircle
     {
         private Texture2D squareTexture;
         private Vector2 squarePos;
+        private Level level;
+        private Body body;
 
         public override Texture2D Texture
         {
@@ -28,9 +32,9 @@ namespace Squircle
             set { squarePos = value; }
         }
 
-        public Square(Game game) :  base(game)
+        public Square(Game game, Level level) :  base(game)
         {
-
+            this.level = level;
         }
 
 
@@ -42,10 +46,38 @@ namespace Squircle
         public override void Initialize()
         {
 
+            var bodyDef = new BodyDef();
+            bodyDef.type = BodyType.Dynamic;
+
+            bodyDef.angle = 0;
+            bodyDef.position = squarePos;
+            bodyDef.inertiaScale = 1.0f;
+            bodyDef.linearDamping = 0.0f;
+            bodyDef.angularDamping = 10.0f;
+
+            body = level.World.CreateBody(bodyDef);
+
+            var shape = new PolygonShape();
+            shape.Set(new Vector2[]{
+                new Vector2(-10, -10),
+                new Vector2(10, -10),
+                new Vector2(10,10),
+                new Vector2(-10,10)
+                }
+            , 4);
+
+            var c = new ContactConstraint();
+            var fixture = new FixtureDef();
+            fixture.restitution = 0.1f;
+            fixture.density = 1.0f;
+            fixture.shape = shape;
+            fixture.friction = .2f;
+            body.CreateFixture(fixture);
+
 
         }
 
-        public override void Update(GameTime gameTime)
+        public void PrePhysicsUpdate(GameTime gameTime)
         {
             KeyboardState state = Keyboard.GetState();
 
@@ -57,13 +89,17 @@ namespace Squircle
                 tempPos.X += speed;
             if (state.IsKeyDown(Keys.Left))
                 tempPos.X -= speed;
-            if (state.IsKeyDown(Keys.Down))
-                tempPos.Y += speed;
             if (state.IsKeyDown(Keys.Up))
-                tempPos.Y -= speed;
+                body.ApplyLinearImpulse(new Vector2(0.0f, -100000.0f), body.GetPosition());
 
-            squarePos = tempPos;
+            var velocity = body.GetLinearVelocity() + tempPos - squarePos;
 
+            body.SetLinearVelocity(velocity);
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            squarePos = body.GetPosition();
             base.Update(gameTime);
         }
     }

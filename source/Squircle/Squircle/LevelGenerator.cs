@@ -13,12 +13,16 @@ namespace Squircle
     {
         private List<Body> bodyList = new List<Body>();
         public Level level { get; set; }
+        private struct EdgeInfo
+        {
+            public EdgeShape shape;
+            public bool isVertical;
+        }
 
         public LevelGenerator(Level level)
         {
             this.level = level;
         }
-
 
         public List<Body> generateLevel()
         {
@@ -85,7 +89,7 @@ namespace Squircle
 
                 var Body = level.World.CreateBody(bodyDef);
 
-                var edges = new List<EdgeShape>();
+                var edges = new List<EdgeInfo>();
 
                 if (vertices.Length < 2)
                 {
@@ -94,15 +98,29 @@ namespace Squircle
 
                 for (int i = 1; i < vertices.Length; ++i)
                 {
-                    var edge = new EdgeShape();
-                    edge.Set(vertices[i - 1], vertices[i]);
-                    edges.Add(edge);
+                    var vertexA = vertices[i - 1];
+                    var vertexB = vertices[i];
+
+                    var edgeInfo = new EdgeInfo();
+                    edgeInfo.shape = new EdgeShape();
+                    edgeInfo.isVertical = vertexA.X == vertexB.X;
+                    edgeInfo.shape.Set(vertexA, vertexB);
+                    edges.Add(edgeInfo);
+                    
                 }
 
                 foreach (var edge in edges)
                 {
                     var fixture = new FixtureDef();
-                    fixture.shape = edge;
+                    fixture.shape = edge.shape;
+                    if (edge.isVertical)
+                    {
+                        fixture.friction = 0.0f;
+                    }
+                    else
+                    {
+                        fixture.friction = 4.0f;
+                    }
                     Body.CreateFixture(fixture);
                 }
 
