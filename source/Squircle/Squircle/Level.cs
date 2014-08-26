@@ -35,7 +35,7 @@ namespace Squircle
         {
             levelConfig = ConfigFile.FromFile(option.Value);
             World = new Box2D.XNA.World(new Vector2(0.0f, 9.81f), false);
-            LevelGenerator = new LevelGenerator(game, this);
+            LevelGenerator = new LevelGenerator(this);
             bodyList = LevelGenerator.generateLevel();
 
             square = new Square(game);
