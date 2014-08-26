@@ -36,7 +36,7 @@ namespace Squircle
 
         public override void LoadContent(ContentManager content)
         {
-            squareTexture = content.Load<Texture2D>("square");
+            squareTexture = content.Load<Texture2D>("player/square");
         }
 
         public override void Initialize()

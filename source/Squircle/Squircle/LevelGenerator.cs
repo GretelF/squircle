@@ -13,11 +13,11 @@ namespace Squircle
     {
         private List<Body> bodyList = new List<Body>();
         public ConfigFile LevelConfig { get; set; }
-        protected Game Game { get; private set; }
+        protected Game game { get; private set; }
 
-        public LevelGenerator(Game Game)
+        public LevelGenerator(Game game)
         {
-            this.Game = Game;
+            this.game = game;
         }
 
 
@@ -70,7 +70,7 @@ namespace Squircle
                 bodyDef.position = startPoint;
                 bodyDef.inertiaScale = 1.0f;
 
-                var body = Game.World.CreateBody(bodyDef);
+                var body = game.level.World.CreateBody(bodyDef);
 
                 var polygon = new PolygonShape();
                 polygon.Set(vertices, vertices.Length);
@@ -93,7 +93,7 @@ namespace Squircle
                 bodyDef.angle = 0;
                 bodyDef.position = startPoint;
 
-                var Body = Game.World.CreateBody(bodyDef);
+                var Body = game.level.World.CreateBody(bodyDef);
 
                 var edges = new List<EdgeShape>();
 

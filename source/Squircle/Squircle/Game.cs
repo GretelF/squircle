@@ -22,10 +22,7 @@ namespace Squircle
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        public World World { get; set; }
-        LevelGenerator LevelGenerator;
-        List<Body> bodyList;
-        Square square { get; set; }
+        public Level level;
 
         public Game()
         {
@@ -43,15 +40,8 @@ namespace Squircle
         {
             // TODO: Add your initialization logic here
 
-           
-
-            World = new Box2D.XNA.World(new Vector2(0.0f, 9.81f), false);
-            LevelGenerator = new LevelGenerator(this);
-            bodyList = LevelGenerator.generateLevel("level0");
-
-            square = new Square(this);
-            square.Pos = new Vector2(20,20);
-            square.Initialize();
+            level = new Level(this);
+            level.Initialize();
 
             base.Initialize();
 
@@ -67,7 +57,7 @@ namespace Squircle
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            level.LoadContent(Content);
         }
 
         /// <summary>
@@ -79,21 +69,24 @@ namespace Squircle
             // TODO: Unload any non ContentManager content here
         }
 
+
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        /// 
+
         protected override void Update(GameTime gameTime)
         {
-            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
             // TODO: Add your update logic here
+            level.Update(gameTime);
 
-            World.Step(deltaTime, 20, 10);
 
             base.Update(gameTime);
         }
@@ -106,57 +99,7 @@ namespace Squircle
         {
             GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
 
-            // TODO: Add your drawing code here
-            spriteBatch.Begin();
-            //spriteBatch.DrawCircle(body.Position, 50.0f, 50, Microsoft.Xna.Framework.Color.Red);
-            foreach (var body in bodyList)
-            {
-                var fixture = body.GetFixtureList();
-                while (fixture != null)
-                {
-                    var shape = fixture.GetShape();
-                    var position = body.GetPosition();
-                    var rotation = body.GetAngle();
-                    switch (shape.ShapeType)
-                    {
-                        case ShapeType.Circle:
-                            break;
-                        case ShapeType.Edge:
-                            {
-                                var edge = (EdgeShape)shape;
-
-                                var from = position + edge._vertex1;
-                                var to = position + edge._vertex2;
-                                spriteBatch.DrawLine(from, to, Microsoft.Xna.Framework.Color.Red);
-                            }
-                            break;
-                        case ShapeType.Polygon:
-                            {
-                                var polygon = (PolygonShape)shape;
-                                var vertices = new List<Vector2>();
-                                for (int i = 1; i < polygon.GetVertexCount(); i++)
-                                {
-                                    var from = position + polygon.GetVertex(i - 1).Rotate(rotation);
-                                    var to = position + polygon.GetVertex(i).Rotate(rotation);
-                                    spriteBatch.DrawLine(from, to, Microsoft.Xna.Framework.Color.Lime);
-                                }
-                                var startPoint = position + polygon.GetVertex(0).Rotate(rotation);
-                                var endPoint = position + polygon.GetVertex(polygon.GetVertexCount() - 1).Rotate(rotation);
-                                spriteBatch.DrawLine(startPoint, endPoint, Microsoft.Xna.Framework.Color.Lime);
-                            }
-                            break;
-                        case ShapeType.Loop:
-                            break;
-                        default:
-                            break;
-                    }
-                    fixture = fixture.GetNext();
-                }
-            }
-
-            spriteBatch.Draw(square.Texture, square.Pos, Microsoft.Xna.Framework.Color.White);
-
-            spriteBatch.End();
+            level.Draw(spriteBatch, gameTime);
 
             base.Draw(gameTime);
         }
