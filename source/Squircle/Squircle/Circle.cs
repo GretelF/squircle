@@ -1,6 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Box2D.XNA;
+using Configuration;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +15,10 @@ namespace Squircle
     {
         private Texture2D circleTexture;
         private Vector2 circlePos;
+        private Level level;
+        public Body body;
 
-         public override Texture2D Texture
+        public override Texture2D Texture
         {
             get
             {
@@ -27,26 +32,65 @@ namespace Squircle
             set { circlePos = value; }
         }
 
-        public Circle(Game game) : base(game)
+        public Circle(Game game, Level level)
+            : base(game)
         {
-
+            this.level = level;
         }
-        
 
 
         public override void LoadContent(ContentManager content)
         {
-            circleTexture = content.Load<Texture2D>("circle");
+            circleTexture = content.Load<Texture2D>("player/circle");
         }
 
         public override void Initialize()
         {
-            throw new NotImplementedException();
+
+            var bodyDef = new BodyDef();
+            bodyDef.type = BodyType.Dynamic;
+
+            bodyDef.angle = 0;
+            bodyDef.position = circlePos;
+            bodyDef.inertiaScale = 1.0f;
+            bodyDef.linearDamping = 0.0f;
+            bodyDef.angularDamping = 10.0f;
+
+            body = level.World.CreateBody(bodyDef);
+
+            var shape = new CircleShape();
+            shape._radius = 10;
+
+            var fixture = new FixtureDef();
+            fixture.restitution = 0.1f;
+            fixture.density = 1.0f;
+            fixture.shape = shape;
+            fixture.friction = .2f;
+            body.CreateFixture(fixture);
+            
+
+        }
+
+        public void PrePhysicsUpdate(GameTime gameTime)
+        {
+            KeyboardState state = Keyboard.GetState();
+
+
+            float tempDir = 0.0f;
+            float speed = 300f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (state.IsKeyDown(Keys.D))
+                tempDir = 1.0f;
+            if (state.IsKeyDown(Keys.A))
+                tempDir = -1.0f;
+
+            body.ApplyTorque(tempDir * 50000000);
         }
 
         public override void Update(GameTime gameTime)
         {
-            throw new NotImplementedException();
+            circlePos = body.GetPosition();
+            base.Update(gameTime);
         }
     }
 }

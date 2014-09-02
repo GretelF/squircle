@@ -23,6 +23,7 @@ namespace Squircle
         LevelGenerator LevelGenerator;
         List<Body> bodyList;
         Square square { get; set; }
+        Circle circle { get; set; }
         public ConfigFile levelConfig { get; private set; }
 
 
@@ -41,19 +42,27 @@ namespace Squircle
             square = new Square(game, this);
             square.Pos = levelConfig["Players"]["square"].AsVector2();
             square.Initialize();
+
+            circle = new Circle(game, this);
+            circle.Pos = levelConfig["Players"]["circle"].AsVector2();
+            circle.Initialize();
         }
 
         public void LoadContent(ContentManager content)
         {
             square.LoadContent(content);
+            circle.LoadContent(content);
         }
 
         public void Update(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             square.PrePhysicsUpdate(gameTime);
+            circle.PrePhysicsUpdate(gameTime);
             World.Step(deltaTime, 20, 10);
             square.Update(gameTime);
+            circle.Update(gameTime);
+
         }
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
@@ -72,8 +81,6 @@ namespace Squircle
                     var rotation = body.GetAngle();
                     switch (shape.ShapeType)
                     {
-                        case ShapeType.Circle:
-                            break;
                         case ShapeType.Edge:
                             {
                                 var edge = (EdgeShape)shape;
@@ -98,7 +105,12 @@ namespace Squircle
                                 spriteBatch.DrawLine(startPoint, endPoint, Microsoft.Xna.Framework.Color.Lime);
                             }
                             break;
-                        case ShapeType.Loop:
+                        case ShapeType.Circle:
+                            {
+                                var circleShape = (CircleShape)shape;
+                                spriteBatch.DrawCircle(position + circleShape._p, circleShape._radius, 20, Microsoft.Xna.Framework.Color.White);
+
+                            }
                             break;
                         default:
                             break;
@@ -109,7 +121,7 @@ namespace Squircle
             }
 
             spriteBatch.Draw(square.Texture, square.Pos, Microsoft.Xna.Framework.Color.White);
-
+            spriteBatch.Draw(circle.Texture, circle.Pos, Microsoft.Xna.Framework.Color.White);
             spriteBatch.End();
         }
     }
