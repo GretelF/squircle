@@ -101,9 +101,13 @@ namespace Squircle
         {
             GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
 
-            level.Draw(spriteBatch, gameTime);
+            spriteBatch.Begin();
 
+            level.Draw(spriteBatch, gameTime);
+            
             base.Draw(gameTime);
+            
+            spriteBatch.End();
         }
     }
 }

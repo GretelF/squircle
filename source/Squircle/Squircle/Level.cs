@@ -22,6 +22,7 @@ namespace Squircle
         public World World { get; set; }
         LevelGenerator LevelGenerator;
         List<Body> bodyList;
+        Texture2D background;
         Square square { get; set; }
         Circle circle { get; set; }
         public ConfigFile levelConfig { get; private set; }
@@ -52,6 +53,8 @@ namespace Squircle
         {
             square.LoadContent(content);
             circle.LoadContent(content);
+
+            background = content.Load < Texture2D > (levelConfig["Level"]["background"]);
         }
 
         public void Update(GameTime gameTime)
@@ -119,15 +122,18 @@ namespace Squircle
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            spriteBatch.Begin();
+           
             //spriteBatch.DrawCircle(body.Position, 50.0f, 50, Microsoft.Xna.Framework.Color.Red);
 
-            DrawPhysicalObjects(spriteBatch);
 
+            spriteBatch.Draw(background, new Vector2(0.0f, 0.0f), Microsoft.Xna.Framework.Color.White);
             square.Draw(spriteBatch);
             circle.Draw(spriteBatch);
+
             
-            spriteBatch.End();
+
+            DrawPhysicalObjects(spriteBatch);
+            
         }
 
 

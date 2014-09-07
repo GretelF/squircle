@@ -27,7 +27,7 @@ namespace Squircle
         public List<Body> generateLevel()
         {
 
-            String pathToLevelFile = level.levelConfig["Level"]["path"];
+            String pathToCollisionFile = level.levelConfig["Level"]["collision"];
 
             var vertices = new Vector2[4];
 
@@ -36,7 +36,7 @@ namespace Squircle
 
             var grays = new List<Vector2>();
 
-            var map = new Bitmap(pathToLevelFile);
+            var map = new Bitmap(pathToCollisionFile);
 
             for (int x = 0; x < map.Size.Width; ++x)
             {
