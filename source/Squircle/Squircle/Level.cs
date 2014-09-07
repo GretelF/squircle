@@ -65,11 +65,8 @@ namespace Squircle
 
         }
 
-        public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        public void DrawPhysicalObjects(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin();
-            //spriteBatch.DrawCircle(body.Position, 50.0f, 50, Microsoft.Xna.Framework.Color.Red);
-
             var body = World.GetBodyList();
             while (body != null)
             {
@@ -109,7 +106,6 @@ namespace Squircle
                             {
                                 var circleShape = (CircleShape)shape;
                                 spriteBatch.DrawCircle(position + circleShape._p, circleShape._radius, 20, Microsoft.Xna.Framework.Color.White);
-
                             }
                             break;
                         default:
@@ -119,11 +115,21 @@ namespace Squircle
                 }
                 body = body.GetNext();
             }
+        }
+
+        public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            spriteBatch.Begin();
+            //spriteBatch.DrawCircle(body.Position, 50.0f, 50, Microsoft.Xna.Framework.Color.Red);
+
+            DrawPhysicalObjects(spriteBatch);
 
             square.Draw(spriteBatch);
             circle.Draw(spriteBatch);
             
             spriteBatch.End();
         }
+
+
     }
 }

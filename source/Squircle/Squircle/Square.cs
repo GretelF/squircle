@@ -15,6 +15,7 @@ namespace Squircle
     {
         private Texture2D squareTexture;
         private Vector2 squarePos;
+        private float squareSideLength = 50.0f;
         private Level level;
         private Body body;
 
@@ -58,11 +59,12 @@ namespace Squircle
             body = level.World.CreateBody(bodyDef);
 
             var shape = new PolygonShape();
+            var offset = squareSideLength / 2;
             shape.Set(new Vector2[]{
-                new Vector2(-25, -25),
-                new Vector2(25, -25),
-                new Vector2(25,25),
-                new Vector2(-25,25)
+                new Vector2(-offset, -offset),
+                new Vector2(offset, -offset),
+                new Vector2(offset, offset),
+                new Vector2(-offset, offset)
                 }
             , 4);
 
@@ -102,10 +104,12 @@ namespace Squircle
             squarePos = body.GetPosition();
             base.Update(gameTime);
         }
-
+       
         public override void Draw (SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(squareTexture, squarePos, Microsoft.Xna.Framework.Color.White);
+            var pos = squarePos + new Vector2(-squareSideLength/2, -squareSideLength/2);
+            spriteBatch.Draw(squareTexture, squarePos, null, Microsoft.Xna.Framework.Color.White, body.Rotation, new Vector2(squareSideLength/2, squareSideLength/2), 1.0f, SpriteEffects.None, 0.0f);
+
         }
     }
 }

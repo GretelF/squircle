@@ -15,6 +15,7 @@ namespace Squircle
     {
         private Texture2D circleTexture;
         private Vector2 circlePos;
+        private float circleRadius = 20.0f;
         private Level level;
         public Body body;
 
@@ -46,7 +47,6 @@ namespace Squircle
 
         public override void Initialize()
         {
-
             var bodyDef = new BodyDef();
             bodyDef.type = BodyType.Dynamic;
 
@@ -59,13 +59,13 @@ namespace Squircle
             body = level.World.CreateBody(bodyDef);
 
             var shape = new CircleShape();
-            shape._radius = 20;
+            shape._radius = circleRadius;
 
             var fixture = new FixtureDef();
             fixture.restitution = 0.1f;
             fixture.density = 1.0f;
             fixture.shape = shape;
-            fixture.friction = .2f;
+            fixture.friction = 10.0f;
             body.CreateFixture(fixture);
             
 
@@ -95,7 +95,9 @@ namespace Squircle
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(circleTexture, circlePos, Microsoft.Xna.Framework.Color.White);
+            var pos = circlePos + new Vector2(-circleRadius, -circleRadius);
+
+            spriteBatch.Draw(circleTexture, circlePos, null, Microsoft.Xna.Framework.Color.White, body.Rotation, new Vector2(circleRadius, circleRadius), 1.0f, SpriteEffects.None, 0.0f);
         }
     }
 
