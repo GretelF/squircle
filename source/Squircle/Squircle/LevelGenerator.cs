@@ -162,6 +162,27 @@ namespace Squircle
             return map.GetPixel(x, y);
         }
 
+        private List<Vector2> GetValidNeighbors(Vector2 vertex, Vector2[] offsets, Bitmap map)
+        {
+            var neighbors = new List<Vector2>();
+
+            var width = map.Size.Width;
+            var heigth = map.Size.Height;
+            foreach (var offset in offsets)
+            {
+                var possibleNeighbor = vertex + offset;
+                if (possibleNeighbor.X >= width || possibleNeighbor.X < 0 || possibleNeighbor.Y >= heigth || possibleNeighbor.Y < 0)
+                {
+                    continue;
+                }
+                else
+                {
+                    neighbors.Add(possibleNeighbor);
+                }
+            }
+            return neighbors;
+        }
+
         private Vector2[] GetVertices(Bitmap map, Vector2 start)
         {
             var vertices = new List<Vector2>();
@@ -185,9 +206,11 @@ namespace Squircle
             do
             {
                 var next = current;
-                foreach (var offset in offsets)
+
+                var neighbors = GetValidNeighbors(next, offsets, map);
+
+                foreach (var neighbor in neighbors)
                 {
-                    var neighbor = current + offset;
                     if (visited.Contains(neighbor))
                     {
                         continue;
@@ -211,7 +234,9 @@ namespace Squircle
                         visited.Add(neighbor);
                         break;
                     }
+                
                 }
+               
                 if (next == current)
                 {
                     break;          // nothing was found.

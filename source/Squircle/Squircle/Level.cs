@@ -120,8 +120,9 @@ namespace Squircle
                 body = body.GetNext();
             }
 
-            spriteBatch.Draw(square.Texture, square.Pos, Microsoft.Xna.Framework.Color.White);
-            spriteBatch.Draw(circle.Texture, circle.Pos, Microsoft.Xna.Framework.Color.White);
+            square.Draw(spriteBatch);
+            circle.Draw(spriteBatch);
+            
             spriteBatch.End();
         }
     }

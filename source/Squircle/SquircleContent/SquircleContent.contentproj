@@ -48,19 +48,24 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="player\circle.png">
-      <Name>circle</Name>
+    <Compile Include="player\circle_40px.png">
+      <Name>circle_40px</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="player\square_50px.png">
+      <Name>square_50px</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="player\square.png">
-      <Name>square</Name>
+    <None Include="level\level_01_collision.bmp">
+      <Name>level_01_collision</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
-    </Compile>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!--  To modify your build process, add your task inside one of the targets below and uncomment it. 

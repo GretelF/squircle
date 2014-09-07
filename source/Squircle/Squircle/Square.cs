@@ -40,7 +40,7 @@ namespace Squircle
 
         public override void LoadContent(ContentManager content)
         {
-            squareTexture = content.Load<Texture2D>("player/square");
+            squareTexture = content.Load<Texture2D>("player/square_50px");
         }
 
         public override void Initialize()
@@ -59,10 +59,10 @@ namespace Squircle
 
             var shape = new PolygonShape();
             shape.Set(new Vector2[]{
-                new Vector2(-10, -10),
-                new Vector2(10, -10),
-                new Vector2(10,10),
-                new Vector2(-10,10)
+                new Vector2(-25, -25),
+                new Vector2(25, -25),
+                new Vector2(25,25),
+                new Vector2(-25,25)
                 }
             , 4);
 
@@ -101,6 +101,11 @@ namespace Squircle
         {
             squarePos = body.GetPosition();
             base.Update(gameTime);
+        }
+
+        public override void Draw (SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(squareTexture, squarePos, Microsoft.Xna.Framework.Color.White);
         }
     }
 }

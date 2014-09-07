@@ -41,7 +41,7 @@ namespace Squircle
 
         public override void LoadContent(ContentManager content)
         {
-            circleTexture = content.Load<Texture2D>("player/circle");
+            circleTexture = content.Load<Texture2D>("player/circle_40px");
         }
 
         public override void Initialize()
@@ -59,7 +59,7 @@ namespace Squircle
             body = level.World.CreateBody(bodyDef);
 
             var shape = new CircleShape();
-            shape._radius = 10;
+            shape._radius = 20;
 
             var fixture = new FixtureDef();
             fixture.restitution = 0.1f;
@@ -92,5 +92,11 @@ namespace Squircle
             circlePos = body.GetPosition();
             base.Update(gameTime);
         }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(circleTexture, circlePos, Microsoft.Xna.Framework.Color.White);
+        }
     }
+
 }
