@@ -18,6 +18,7 @@ namespace Squircle
         private float squareSideLength = 50.0f;
         private Level level;
         private Body body;
+        private Boolean canJump = false;
 
         public override Texture2D Texture
         {
@@ -57,6 +58,7 @@ namespace Squircle
             bodyDef.angularDamping = 10.0f;
 
             body = level.World.CreateBody(bodyDef);
+            body.SetUserData(this);
 
             var shape = new PolygonShape();
             var offset = squareSideLength / 2;
@@ -76,7 +78,6 @@ namespace Squircle
             fixture.density = 1.0f;
             fixture.shape = shape;
             fixture.friction = .2f;
-            fixture.userData = this;
             body.CreateFixture(fixture);
         }
 
@@ -92,8 +93,12 @@ namespace Squircle
                 tempPos.X += speed;
             if (state.IsKeyDown(Keys.Left))
                 tempPos.X -= speed;
-            if (state.IsKeyDown(Keys.Up))
-                body.ApplyLinearImpulse(new Vector2(0.0f, -100000.0f), body.GetPosition());
+            if (state.IsKeyDown(Keys.Up) && canJump)
+            {
+                body.ApplyLinearImpulse(new Vector2(0.0f, -10000000.0f), body.GetPosition());
+                canJump = false;
+            }
+                
 
             var velocity = body.GetLinearVelocity() + tempPos - squarePos;
 
@@ -110,7 +115,16 @@ namespace Squircle
         {
             var pos = squarePos + new Vector2(-squareSideLength/2, -squareSideLength/2);
             spriteBatch.Draw(squareTexture, squarePos, null, Microsoft.Xna.Framework.Color.White, body.Rotation, new Vector2(squareSideLength/2, squareSideLength/2), 1.0f, SpriteEffects.None, 0.0f);
+        }
 
+        public override void BeginContact(ContactInfo contactInfo)
+        {
+            Manifold manifold;
+            contactInfo.contact.GetManifold(out manifold);
+            if (manifold._localPoint.Y >= 0.0f)
+            {
+                canJump = true;
+            }
         }
     }
 }

@@ -15,6 +15,18 @@ using Configuration;
 
 namespace Squircle
 {
+    public enum FixtureType
+    {
+        A, 
+        B,
+    }
+    public struct ContactInfo
+    {
+        public Contact contact { get; set; }
+        public FixtureType fixtureType { get; set; }
+    }
+
+
     public class Level : IContactListener
     {
         private Game game;
@@ -28,6 +40,7 @@ namespace Squircle
         public ConfigFile levelConfig { get; private set; }
 
 
+
         public Level(Game game)
         {
             this.game = game;
@@ -37,6 +50,7 @@ namespace Squircle
         {
             levelConfig = ConfigFile.FromFile(option.Value);
             World = new Box2D.XNA.World(new Vector2(0.0f, 100.0f), false);
+            World.ContactListener = this;
             LevelGenerator = new LevelGenerator(this);
             bodyList = LevelGenerator.generateLevel();
 
@@ -118,49 +132,96 @@ namespace Squircle
                 }
                 body = body.GetNext();
             }
+
+            var contact = World.GetContactList();
+            var drawingSize = new Vector2(3.0f, 3.0f);
+            while (contact != null)
+            {
+                Manifold manifold;
+                contact.GetManifold(out manifold);
+
+                WorldManifold worldManifold;
+                contact.GetWorldManifold(out worldManifold);
+
+                for (int i = 0; i < manifold._pointCount; i++)
+                {
+                    var point = worldManifold._points[i];
+                    spriteBatch.FillRectangle(point, drawingSize, Microsoft.Xna.Framework.Color.Pink);
+                }
+
+                contact = contact.GetNext();
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-           
-            //spriteBatch.DrawCircle(body.Position, 50.0f, 50, Microsoft.Xna.Framework.Color.Red);
-
-
             spriteBatch.Draw(background, new Vector2(0.0f, 0.0f), Microsoft.Xna.Framework.Color.White);
             square.Draw(spriteBatch);
             circle.Draw(spriteBatch);
 
-            
-
-            //DrawPhysicalObjects(spriteBatch);
-            
+            DrawPhysicalObjects(spriteBatch);
         }
 
         #region IContactListener interface
 
         public void BeginContact(Contact contact)
         {
+            var contactInfo = new ContactInfo();
+
             while (contact != null)
             {
+                contactInfo.contact = contact;
+
                 var fixtureA = contact.GetFixtureA();
-                var go = fixtureA.GetUserData() as GameObject;
-                
+                var go = fixtureA.GetBody().GetUserData() as GameObject;
+                if (go != null)
+                {
+                    contactInfo.fixtureType = FixtureType.A;
+                    go.BeginContact(contactInfo);
+                }
+                var fixtureB = contact.GetFixtureB();
+                go = fixtureB.GetBody().GetUserData() as GameObject;
+                if (go != null)
+                {
+                    contactInfo.fixtureType = FixtureType.B;
+                    go.BeginContact(contactInfo);
+                }
+                contact = contact.GetNext();
             }
         }
 
         public void EndContact(Contact contact)
         {
-            throw new NotImplementedException();
+            var contactInfo = new ContactInfo();
+
+            while (contact != null)
+            {
+                contactInfo.contact = contact;
+
+                var fixtureA = contact.GetFixtureA();
+                var go = fixtureA.GetBody().GetUserData() as GameObject;
+                if (go != null)
+                {
+                    contactInfo.fixtureType = FixtureType.A;
+                    go.EndContact(contactInfo);
+                }
+                var fixtureB = contact.GetFixtureB();
+                go = fixtureB.GetBody().GetUserData() as GameObject;
+                if (go != null)
+                {
+                    contactInfo.fixtureType = FixtureType.B;
+                    go.EndContact(contactInfo);
+                }
+                contact = contact.GetNext();
+            }
         }
 
         public void PreSolve(Contact contact, ref Manifold oldManifold)
         {
-            throw new NotImplementedException();
         }
 
         public void PostSolve(Contact contact, ref ContactImpulse impulse)
         {
-            throw new NotImplementedException();
         }
 
         #endregion

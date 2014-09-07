@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Box2D.XNA;
 
 namespace Squircle
 {
@@ -28,6 +29,14 @@ namespace Squircle
         }
 
         public virtual void Draw(SpriteBatch spriteBatch)
+        {
+        }
+
+        public virtual void BeginContact(ContactInfo contactInfo)
+        {
+        }
+
+        public virtual void EndContact(ContactInfo contactInfo)
         {
         }
     }
