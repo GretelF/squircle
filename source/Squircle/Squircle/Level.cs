@@ -15,7 +15,7 @@ using Configuration;
 
 namespace Squircle
 {
-    public class Level
+    public class Level : IContactListener
     {
         private Game game;
 
@@ -132,10 +132,37 @@ namespace Squircle
 
             
 
-            DrawPhysicalObjects(spriteBatch);
+            //DrawPhysicalObjects(spriteBatch);
             
         }
 
+        #region IContactListener interface
 
+        public void BeginContact(Contact contact)
+        {
+            while (contact != null)
+            {
+                var fixtureA = contact.GetFixtureA();
+                var go = fixtureA.GetUserData() as GameObject;
+                
+            }
+        }
+
+        public void EndContact(Contact contact)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void PreSolve(Contact contact, ref Manifold oldManifold)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void PostSolve(Contact contact, ref ContactImpulse impulse)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
     }
 }

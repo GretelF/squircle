@@ -68,15 +68,16 @@ namespace Squircle
                 }
             , 4);
 
+          
+
             var c = new ContactConstraint();
             var fixture = new FixtureDef();
             fixture.restitution = 0.1f;
             fixture.density = 1.0f;
             fixture.shape = shape;
             fixture.friction = .2f;
+            fixture.userData = this;
             body.CreateFixture(fixture);
-
-
         }
 
         public void PrePhysicsUpdate(GameTime gameTime)
