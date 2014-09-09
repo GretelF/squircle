@@ -96,9 +96,8 @@ namespace Squircle
             if (state.IsKeyDown(Keys.Up) && canJump)
             {
                 body.ApplyLinearImpulse(new Vector2(0.0f, -10000000.0f), body.GetPosition());
-                canJump = false;
             }
-                
+            canJump = false;  
 
             var velocity = body.GetLinearVelocity() + tempPos - squarePos;
 
@@ -121,10 +120,34 @@ namespace Squircle
         {
             Manifold manifold;
             contactInfo.contact.GetManifold(out manifold);
-            if (manifold._localPoint.Y >= 0.0f)
+            Fixture fixture;
+            if (contactInfo.fixtureType == FixtureType.A)
+            {
+                fixture = contactInfo.contact.GetFixtureB();
+            }
+            else
+            {
+                fixture = contactInfo.contact.GetFixtureA();
+            }
+
+            var gameObjectUserData = (GameObject)fixture.GetBody().GetUserData();
+            var circle = gameObjectUserData as Circle;
+
+            if (circle != null)
+            {
+                // TODO: check if above circle.
+                canJump = true;
+                return;
+            }
+
+            var elementInfo = fixture.GetUserData() as LevelElementInfo;
+            if (elementInfo != null && elementInfo.type == LevelElementType.Ground)
             {
                 canJump = true;
+                return;
             }
+
+
         }
     }
 }

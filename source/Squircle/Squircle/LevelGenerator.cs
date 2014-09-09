@@ -9,10 +9,22 @@ using Configuration;
 
 namespace Squircle
 {
+    public enum LevelElementType
+    {
+        Wall,
+        Ground
+    }
+
+    public class LevelElementInfo
+    {
+        public LevelElementType type { get; set; }
+    }
+
     public class LevelGenerator
     {
         private List<Body> bodyList = new List<Body>();
         public Level level { get; set; }
+
         private struct EdgeInfo
         {
             public EdgeShape shape;
@@ -87,7 +99,7 @@ namespace Squircle
                 bodyDef.angle = 0;
                 bodyDef.position = startPoint;
 
-                var Body = level.World.CreateBody(bodyDef);
+                var body = level.World.CreateBody(bodyDef);
 
                 var edges = new List<EdgeInfo>();
 
@@ -112,19 +124,23 @@ namespace Squircle
                 foreach (var edge in edges)
                 {
                     var fixture = new FixtureDef();
+                    var elementInfo = new LevelElementInfo();
                     fixture.shape = edge.shape;
                     if (edge.isVertical)
                     {
                         fixture.friction = 0.0f;
+                        elementInfo.type = LevelElementType.Wall;
                     }
                     else
                     {
                         fixture.friction = 4.0f;
+                        elementInfo.type = LevelElementType.Ground;
                     }
-                    Body.CreateFixture(fixture);
+                    fixture.userData = elementInfo;
+                    body.CreateFixture(fixture);
                 }
 
-                bodyList.Add(Body);
+                bodyList.Add(body);
             }
 
             return bodyList;
