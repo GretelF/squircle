@@ -72,7 +72,6 @@ namespace Squircle
 
           
 
-            var c = new ContactConstraint();
             var fixture = new FixtureDef();
             fixture.restitution = 0.1f;
             fixture.density = 1.0f;

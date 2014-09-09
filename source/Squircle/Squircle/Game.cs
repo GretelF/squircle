@@ -24,6 +24,8 @@ namespace Squircle
         SpriteBatch spriteBatch;
         public Level level;
         public ConfigFile gameConfig { get; set; }
+        
+
 
         public Game()
         {
@@ -39,10 +41,13 @@ namespace Squircle
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+
+
             gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
             level = new Level(this);
             level.Initialize(gameConfig["Levels"]["level0"]);
+
+           
 
             base.Initialize();
 
@@ -89,6 +94,7 @@ namespace Squircle
             // TODO: Add your update logic here
             level.Update(gameTime);
 
+            
 
             base.Update(gameTime);
         }
@@ -101,7 +107,14 @@ namespace Squircle
         {
             GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
 
-            spriteBatch.Begin();
+            spriteBatch.Begin(
+                SpriteSortMode.BackToFront, 
+                BlendState.AlphaBlend, 
+                null, 
+                null,
+                null,
+                null,
+                level.camera.Transform);
 
             level.Draw(spriteBatch, gameTime);
             

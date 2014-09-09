@@ -38,6 +38,7 @@ namespace Squircle
         Square square { get; set; }
         Circle circle { get; set; }
         public ConfigFile levelConfig { get; private set; }
+        public Camera2D camera { get; set; }
 
 
 
@@ -61,6 +62,11 @@ namespace Squircle
             circle = new Circle(game, this);
             circle.Pos = levelConfig["Players"]["circle"].AsVector2();
             circle.Initialize();
+
+            camera = new Camera2D(game);
+            camera.Initialize();
+            camera.Focus = new PhantomObject(game);
+            camera.Focus.Pos = new Vector2(0.0f,255.0f);
         }
 
         public void LoadContent(ContentManager content)
@@ -80,6 +86,11 @@ namespace Squircle
             square.Update(gameTime);
             circle.Update(gameTime);
 
+            var center = circle.Pos + (square.Pos - circle.Pos) / 2;                // calculate center between circle and square.
+            camera.Focus.Pos = new Vector2(center.X , camera.Focus.Pos.Y);
+
+
+            camera.Update(gameTime);
         }
 
         public void DrawPhysicalObjects(SpriteBatch spriteBatch)
