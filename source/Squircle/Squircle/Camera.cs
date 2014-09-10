@@ -85,6 +85,8 @@ namespace Squircle
         private Vector2 _position;
         protected float _viewportHeight;
         protected float _viewportWidth;
+        private Rectangle _focusBounds;
+        private Rectangle _viewBounds;
 
         public Camera2D(Game game)
             : base(game)
@@ -104,6 +106,25 @@ namespace Squircle
         public Matrix Transform { get; set; }
         public GameObject Focus { get; set; }
         public float MoveSpeed { get; set; }
+        public Rectangle ViewBounds
+        {
+            get
+            {
+                return _viewBounds;
+            }
+            set
+            {
+                _viewBounds = value;
+
+                // calculate _focusBounds
+                var origin = new Vector2(_viewportWidth / 2, _viewportHeight / 2);
+                var width = ViewBounds.Width - (int)_viewportWidth;
+                var height = ViewBounds.Height - (int)_viewportHeight;
+                _focusBounds = new Rectangle((int)origin.X, (int)origin.Y, width, height);
+            }
+        }
+       
+
 
         #endregion
 
@@ -124,6 +145,18 @@ namespace Squircle
 
         public override void Update(GameTime gameTime)
         {
+            // Move the Camera to the position that it needs to go
+            var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            Origin = ScreenCenter / Scale;
+
+            var targetPos = CalculateTarget();
+
+            _position.X += (targetPos.X - _position.X) * MoveSpeed * dt;
+            _position.Y += (targetPos.Y - _position.Y) * MoveSpeed * dt;
+
+            base.Update(gameTime);
+            
             // Create the Transform used by any
             // spritebatch process
             Transform = Matrix.Identity *
@@ -131,16 +164,6 @@ namespace Squircle
                         Matrix.CreateRotationZ(Rotation) *
                         Matrix.CreateTranslation(Origin.X, Origin.Y, 0) *
                         Matrix.CreateScale(new Vector3(Scale, Scale, Scale));
-
-            Origin = ScreenCenter / Scale;
-
-            // Move the Camera to the position that it needs to go
-            var delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            _position.X += (Focus.Pos.X - Position.X) * MoveSpeed * delta;
-            _position.Y += (Focus.Pos.Y - Position.Y) * MoveSpeed * delta;
-
-            base.Update(gameTime);
         }
 
         /// <summary>
@@ -166,6 +189,16 @@ namespace Squircle
 
             // In View
             return true;
+        }
+
+        private Vector2 CalculateTarget()
+        {
+            var target = Focus.Pos;
+
+            target.X = MathHelper.Clamp(target.X, _focusBounds.Left, _focusBounds.Right);
+            target.Y = MathHelper.Clamp(target.Y, _focusBounds.Top, _focusBounds.Bottom);
+
+            return target;
         }
     }
 }

@@ -67,6 +67,7 @@ namespace Squircle
             camera.Initialize();
             camera.Focus = new PhantomObject(game);
             camera.Focus.Pos = new Vector2(0.0f,255.0f);
+            camera.ViewBounds = new Microsoft.Xna.Framework.Rectangle(0, 0, 1977, 400);
         }
 
         public void LoadContent(ContentManager content)
@@ -170,7 +171,9 @@ namespace Squircle
             square.Draw(spriteBatch);
             circle.Draw(spriteBatch);
 
-            DrawPhysicalObjects(spriteBatch);
+            spriteBatch.DrawCircle(camera.Position, 5, 5, Microsoft.Xna.Framework.Color.Coral);
+
+            //DrawPhysicalObjects(spriteBatch);
         }
 
         #region IContactListener interface
