@@ -44,10 +44,6 @@
       <Name>level0_objects</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="level\level0_triggers.cfg">
-      <Name>level0_triggers</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="level\test.bmp">
       <Name>test</Name>
       <Importer>TextureImporter</Importer>
