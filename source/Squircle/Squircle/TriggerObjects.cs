@@ -65,7 +65,8 @@ namespace Squircle
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_texture, Pos, Microsoft.Xna.Framework.Color.White);
+            var pos = Pos - new Vector2(_texture.Width / 2, _texture.Height / 2);
+            spriteBatch.Draw(_texture, pos, Microsoft.Xna.Framework.Color.White);
         }
     }
     
@@ -123,7 +124,8 @@ namespace Squircle
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_texture, Pos, Microsoft.Xna.Framework.Color.White);
+            var pos = Pos - new Vector2(_texture.Width / 2, _texture.Height / 2);
+            spriteBatch.Draw(_texture, pos, Microsoft.Xna.Framework.Color.White);
         }
     }
 }

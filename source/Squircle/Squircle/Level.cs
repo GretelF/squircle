@@ -207,7 +207,11 @@ namespace Squircle
             square.Draw(spriteBatch);
             circle.Draw(spriteBatch);
 
-            DrawPhysicalObjects(spriteBatch);
+            if (game.debugDrawingEnabled)
+            {
+                DrawPhysicalObjects(spriteBatch);
+            }
+            
         }
 
         #region IContactListener interface

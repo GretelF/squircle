@@ -24,6 +24,7 @@ namespace Squircle
         SpriteBatch spriteBatch;
         public Level level;
         public ConfigFile gameConfig { get; set; }
+        public bool debugDrawingEnabled { get; set; }
         
 
 
@@ -47,7 +48,7 @@ namespace Squircle
             level = new Level(this);
             level.Initialize(gameConfig["Levels"]["level0"]);
 
-           
+            debugDrawingEnabled = false;
 
             base.Initialize();
 
@@ -91,7 +92,12 @@ namespace Squircle
             {
                 this.Exit();
             }
-            // TODO: Add your update logic here
+
+            if (Keyboard.GetState().IsKeyDown(Keys.F9))
+            {
+                debugDrawingEnabled = !debugDrawingEnabled;
+            }
+
             level.Update(gameTime);
 
             
