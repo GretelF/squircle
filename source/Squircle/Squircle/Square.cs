@@ -80,7 +80,11 @@ namespace Squircle
             body.CreateFixture(fixture);
         }
 
-        public void PrePhysicsUpdate(GameTime gameTime)
+        public override void InitializeFromConfig(ConfigSection section)
+        {
+        }
+
+        public override void PrePhysicsUpdate(GameTime gameTime)
         {
             KeyboardState state = Keyboard.GetState();
 

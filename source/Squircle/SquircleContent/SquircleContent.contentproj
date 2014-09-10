@@ -40,6 +40,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="level\level0_objects.cfg">
+      <Name>level0_objects</Name>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="level\level0_triggers.cfg">
+      <Name>level0_triggers</Name>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="level\test.bmp">
       <Name>test</Name>
       <Importer>TextureImporter</Importer>
@@ -70,6 +78,48 @@
   <ItemGroup>
     <Compile Include="level\level_01.png">
       <Name>level_01</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="objects\button_circle_off.png">
+      <Name>button_circle_off</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="objects\button_circle_off_02.png">
+      <Name>button_circle_off_02</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="objects\button_circle_on.png">
+      <Name>button_circle_on</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="objects\button_square_off_01.png">
+      <Name>button_square_off_01</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="objects\button_square_off_02.png">
+      <Name>button_square_off_02</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="objects\button_square_on.png">
+      <Name>button_square_on</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="objects\platform_01.png">
+      <Name>platform_01</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="objects\platform_02.png">
+      <Name>platform_02</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

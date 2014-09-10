@@ -106,6 +106,7 @@ namespace Squircle
         public Matrix Transform { get; set; }
         public GameObject Focus { get; set; }
         public float MoveSpeed { get; set; }
+        public float MaxMoveSpeed { get; set; }
         public Rectangle ViewBounds
         {
             get
@@ -138,6 +139,7 @@ namespace Squircle
 
             ScreenCenter = new Vector2(_viewportWidth / 2, _viewportHeight / 2);
             Scale = 1;
+            MaxMoveSpeed = 1.25f;
             MoveSpeed = 1.25f;
 
             base.Initialize();
@@ -152,8 +154,8 @@ namespace Squircle
 
             var targetPos = CalculateTarget();
 
-            _position.X += (targetPos.X - _position.X) * MoveSpeed * dt;
-            _position.Y += (targetPos.Y - _position.Y) * MoveSpeed * dt;
+            _position.X += MathHelper.Clamp((targetPos.X - _position.X) * MoveSpeed * dt, -MaxMoveSpeed, MaxMoveSpeed);
+            _position.Y += MathHelper.Clamp((targetPos.Y - _position.Y) * MoveSpeed * dt, -MaxMoveSpeed, MaxMoveSpeed);
 
             base.Update(gameTime);
             

@@ -19,5 +19,15 @@ namespace Squircle
             return (Vector2)cfg.AsDVector2();
         }
 
+        public static DRectangle AsDRectangle(this ConfigOption cfg)
+        {
+            return DRectangle.Parse(cfg);
+        }
+
+        public static Rectangle AsRectangle(this ConfigOption cfg)
+        {
+            return (Rectangle)cfg.AsDRectangle();
+        }
+
     }
 }

@@ -39,12 +39,12 @@ namespace Squircle
         Circle circle { get; set; }
         public ConfigFile levelConfig { get; private set; }
         public Camera2D camera { get; set; }
-
-
+        public IDictionary<string, GameObject> gameObjects { get; set; }
 
         public Level(Game game)
         {
             this.game = game;
+            gameObjects = new Dictionary<string, GameObject>();
         }
 
         public void Initialize(ConfigOption option)
@@ -66,16 +66,35 @@ namespace Squircle
             camera = new Camera2D(game);
             camera.Initialize();
             camera.Focus = new PhantomObject(game);
-            camera.Focus.Pos = new Vector2(0.0f,255.0f);
-            camera.ViewBounds = new Microsoft.Xna.Framework.Rectangle(0, 0, 1977, 400);
+            camera.Position = levelConfig["Camera"]["startPos"].AsVector2();
+            camera.ViewBounds = levelConfig["Camera"]["viewBounds"].AsRectangle();
+            camera.MaxMoveSpeed = levelConfig["Camera"]["maxMoveSpeed"];
+
+            var gameObjectsConfig = ConfigFile.FromFile(levelConfig[""]["objects"]);
+
+            foreach (var section in gameObjectsConfig.Sections)
+            {
+                if (section.Value == gameObjectsConfig.GlobalSection)
+                {
+                    // Skip the global section because it can not contain any useful info in this case.
+                    continue;
+                }
+                var go = GameObject.Create(game, section.Value);
+                gameObjects.Add(section.Key, go);
+            }
         }
 
         public void LoadContent(ContentManager content)
         {
+            background = content.Load<Texture2D>(levelConfig["Level"]["background"]);
+
             square.LoadContent(content);
             circle.LoadContent(content);
 
-            background = content.Load < Texture2D > (levelConfig["Level"]["background"]);
+            foreach (var go in gameObjects.Values)
+            {
+                go.LoadContent(content);
+            }
         }
 
         public void Update(GameTime gameTime)
@@ -83,13 +102,24 @@ namespace Squircle
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             square.PrePhysicsUpdate(gameTime);
             circle.PrePhysicsUpdate(gameTime);
+
+            foreach (var go in gameObjects.Values)
+            {
+                go.PrePhysicsUpdate(gameTime);
+            }
+
             World.Step(deltaTime, 20, 10);
+
             square.Update(gameTime);
             circle.Update(gameTime);
 
+            foreach (var go in gameObjects.Values)
+            {
+                go.Update(gameTime);
+            }
+
             var center = circle.Pos + (square.Pos - circle.Pos) / 2;                // calculate center between circle and square.
             camera.Focus.Pos = new Vector2(center.X , camera.Focus.Pos.Y);
-
 
             camera.Update(gameTime);
         }
@@ -168,12 +198,16 @@ namespace Squircle
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             spriteBatch.Draw(background, new Vector2(0.0f, 0.0f), Microsoft.Xna.Framework.Color.White);
+
+            foreach (var go in gameObjects.Values)
+            {
+                go.Draw(spriteBatch);
+            }
+
             square.Draw(spriteBatch);
             circle.Draw(spriteBatch);
 
-            spriteBatch.DrawCircle(camera.Position, 5, 5, Microsoft.Xna.Framework.Color.Coral);
-
-            //DrawPhysicalObjects(spriteBatch);
+            DrawPhysicalObjects(spriteBatch);
         }
 
         #region IContactListener interface
