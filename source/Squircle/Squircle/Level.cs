@@ -38,8 +38,8 @@ namespace Squircle
         public ConfigFile levelConfig { get; private set; }
         public Camera2D camera { get; set; }
         public IDictionary<string, GameObject> gameObjects { get; set; }
-        private Rectangle maxSquareBounds;
-        private Rectangle maxCircleBounds;
+        public Body playerBounds { get; set; }
+        private Vector2 center;
 
         public Level(Game game)
         {
@@ -61,15 +61,9 @@ namespace Squircle
             square.Pos = levelConfig["Players"]["square"].AsVector2();
             square.Initialize();
 
-            maxSquareBounds = viewport.Bounds;
-            maxSquareBounds.Inflate((int)(-square.SideLength/2), (int)(-square.SideLength/2));
-
             circle = new Circle(game, this);
             circle.Pos = levelConfig["Players"]["circle"].AsVector2();
             circle.Initialize();
-
-            maxCircleBounds = viewport.Bounds;
-            maxCircleBounds.Inflate((int)-circle.Radius, (int)-circle.Radius);
 
             camera = new Camera2D(game);
             camera.Initialize();
@@ -77,6 +71,8 @@ namespace Squircle
             camera.Position = levelConfig["Camera"]["startPos"].AsVector2();
             camera.ViewBounds = levelConfig["Camera"]["viewBounds"].AsRectangle();
             camera.MaxMoveSpeed = levelConfig["Camera"]["maxMoveSpeed"];
+
+            playerBounds = CreatePhysicalViewBounds();
 
 
             var gameObjectsConfig = ConfigFile.FromFile(levelConfig[""]["objects"]);
@@ -119,11 +115,6 @@ namespace Squircle
                 go.PrePhysicsUpdate(gameTime);
             }
 
-            if (!maxSquareBounds.Contains(square.Pos.ToPoint()))
-            {
-                square.Body.SetLinearVelocity(Vector2.Zero);
-            }
-
             World.Step(deltaTime, 20, 10);
 
             square.Update(gameTime);
@@ -134,11 +125,12 @@ namespace Squircle
                 go.Update(gameTime);
             }
 
-            var center = circle.Pos + (square.Pos - circle.Pos) / 2;                // calculate center between circle and square.
-            camera.Focus.Pos = new Vector2(center.X , camera.Focus.Pos.Y);
+            center = circle.Pos + (square.Pos - circle.Pos) / 2;                // calculate center between circle and square.
+            camera.Focus.Pos = new Vector2(center.X , center.Y);
 
             camera.Update(gameTime);
 
+            playerBounds.Position = camera.Position;
         }
 
         public void DrawPhysicalObjects(SpriteBatch spriteBatch)
@@ -228,10 +220,36 @@ namespace Squircle
             {
                 DrawPhysicalObjects(spriteBatch);
             }
-
-            spriteBatch.DrawRectangle(new Vector2(maxSquareBounds.X, maxSquareBounds.Y), new Vector2(maxSquareBounds.Width, maxSquareBounds.Height) , Microsoft.Xna.Framework.Color.Lime);
-            spriteBatch.DrawRectangle(new Vector2(maxCircleBounds.X, maxCircleBounds.Y), new Vector2(maxCircleBounds.Width, maxCircleBounds.Height),  Microsoft.Xna.Framework.Color.White);
         }
+
+
+        private Body CreatePhysicalViewBounds()
+        {
+            var bodyDef = new BodyDef();
+            bodyDef.type = BodyType.Static;
+            var body = World.CreateBody(bodyDef);
+            var edges = new EdgeShape[]{new EdgeShape(), new EdgeShape(), new EdgeShape(), new EdgeShape()};
+
+            var viewport = game.GraphicsDevice.Viewport;
+
+            var X = viewport.Width / 2;
+            var Y = viewport.Height / 2;
+            edges[0].Set(new Vector2(-X, -Y), new Vector2(+X, -Y));
+            edges[1].Set(new Vector2(+X, -Y), new Vector2(+X, +Y));
+            edges[2].Set(new Vector2(+X, +Y), new Vector2(-X, +Y));
+            edges[3].Set(new Vector2(-X, +Y), new Vector2(-X, -Y));
+
+            foreach (var edge in edges)
+            {
+                var fixtureDef = new FixtureDef();
+                fixtureDef.shape = edge;
+                fixtureDef.friction = 0.0f;
+                body.CreateFixture(fixtureDef);
+            }
+
+            return body;
+        }
+
 
         #region IContactListener interface
 
