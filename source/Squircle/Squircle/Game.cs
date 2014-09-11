@@ -25,8 +25,7 @@ namespace Squircle
         public Level level;
         public ConfigFile gameConfig { get; set; }
         public bool debugDrawingEnabled { get; set; }
-        
-
+        public EventSystem EventSystem { get; set; }
 
         public Game()
         {
@@ -42,7 +41,8 @@ namespace Squircle
         /// </summary>
         protected override void Initialize()
         {
-
+            EventSystem = new EventSystem();
+            EventSystem.getEvent("endLevel").addListener(onEndLevel);
 
             gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
             level = new Level(this);
@@ -100,8 +100,6 @@ namespace Squircle
 
             level.Update(gameTime);
 
-            
-
             base.Update(gameTime);
         }
 
@@ -128,5 +126,11 @@ namespace Squircle
             
             spriteBatch.End();
         }
+
+        private void onEndLevel(String data)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
