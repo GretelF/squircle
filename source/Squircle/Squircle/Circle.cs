@@ -16,8 +16,10 @@ namespace Squircle
         private Texture2D circleTexture;
         private Vector2 circlePos;
         private float circleRadius = 20.0f;
+        public float Radius { get { return circleRadius; } set { circleRadius = value; } }
         private Level level;
-        public Body body;
+        private Body body;
+        public Body Body { get { return body; } }
 
         public override Texture2D Texture
         {

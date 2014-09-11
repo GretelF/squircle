@@ -9,8 +9,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Box2D.XNA;
-//using C3.XNA;
-using System.Drawing;
 using Configuration;
 
 namespace Squircle
@@ -40,6 +38,8 @@ namespace Squircle
         public ConfigFile levelConfig { get; private set; }
         public Camera2D camera { get; set; }
         public IDictionary<string, GameObject> gameObjects { get; set; }
+        private Rectangle maxSquareBounds;
+        private Rectangle maxCircleBounds;
 
         public Level(Game game)
         {
@@ -55,13 +55,21 @@ namespace Squircle
             LevelGenerator = new LevelGenerator(this);
             bodyList = LevelGenerator.generateLevel();
 
+            var viewport = game.GraphicsDevice.Viewport;
+
             square = new Square(game, this);
             square.Pos = levelConfig["Players"]["square"].AsVector2();
             square.Initialize();
 
+            maxSquareBounds = viewport.Bounds;
+            maxSquareBounds.Inflate((int)(-square.SideLength/2), (int)(-square.SideLength/2));
+
             circle = new Circle(game, this);
             circle.Pos = levelConfig["Players"]["circle"].AsVector2();
             circle.Initialize();
+
+            maxCircleBounds = viewport.Bounds;
+            maxCircleBounds.Inflate((int)-circle.Radius, (int)-circle.Radius);
 
             camera = new Camera2D(game);
             camera.Initialize();
@@ -69,6 +77,7 @@ namespace Squircle
             camera.Position = levelConfig["Camera"]["startPos"].AsVector2();
             camera.ViewBounds = levelConfig["Camera"]["viewBounds"].AsRectangle();
             camera.MaxMoveSpeed = levelConfig["Camera"]["maxMoveSpeed"];
+
 
             var gameObjectsConfig = ConfigFile.FromFile(levelConfig[""]["objects"]);
 
@@ -82,6 +91,8 @@ namespace Squircle
                 var go = GameObject.Create(game, section.Value);
                 gameObjects.Add(section.Key, go);
             }
+
+
         }
 
         public void LoadContent(ContentManager content)
@@ -108,6 +119,11 @@ namespace Squircle
                 go.PrePhysicsUpdate(gameTime);
             }
 
+            if (!maxSquareBounds.Contains(square.Pos.ToPoint()))
+            {
+                square.Body.SetLinearVelocity(Vector2.Zero);
+            }
+
             World.Step(deltaTime, 20, 10);
 
             square.Update(gameTime);
@@ -122,6 +138,7 @@ namespace Squircle
             camera.Focus.Pos = new Vector2(center.X , camera.Focus.Pos.Y);
 
             camera.Update(gameTime);
+
         }
 
         public void DrawPhysicalObjects(SpriteBatch spriteBatch)
@@ -211,7 +228,9 @@ namespace Squircle
             {
                 DrawPhysicalObjects(spriteBatch);
             }
-            
+
+            spriteBatch.DrawRectangle(new Vector2(maxSquareBounds.X, maxSquareBounds.Y), new Vector2(maxSquareBounds.Width, maxSquareBounds.Height) , Microsoft.Xna.Framework.Color.Lime);
+            spriteBatch.DrawRectangle(new Vector2(maxCircleBounds.X, maxCircleBounds.Y), new Vector2(maxCircleBounds.Width, maxCircleBounds.Height),  Microsoft.Xna.Framework.Color.White);
         }
 
         #region IContactListener interface

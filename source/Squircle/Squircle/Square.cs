@@ -16,8 +16,10 @@ namespace Squircle
         private Texture2D squareTexture;
         private Vector2 squarePos;
         private float squareSideLength = 50.0f;
+        public float SideLength { get { return squareSideLength; } set { squareSideLength = value; } }
         private Level level;
         private Body body;
+        public Body Body { get { return body; } }
         private Boolean canJump = false;
 
         public override Texture2D Texture

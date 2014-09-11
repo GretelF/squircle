@@ -12,5 +12,10 @@ namespace Microsoft.Xna.Framework
             var temp = (DVector2)vec;
             return (Vector2)temp.Rotate(angle);
         }
+
+        public static Point ToPoint(this Vector2 vec)
+        {
+            return new Point((int)vec.X, (int)vec.Y);
+        }
     }
 }
