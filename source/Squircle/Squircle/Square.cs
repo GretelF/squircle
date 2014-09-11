@@ -89,23 +89,20 @@ namespace Squircle
 
         public override void PrePhysicsUpdate(GameTime gameTime)
         {
-            KeyboardState state = Keyboard.GetState();
-
-
             Vector2 tempPos = squarePos;
             float speed = 300f * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (state.IsKeyDown(Keys.Right))
+            if (Game.InputHandler.IsDown(Keys.Right))
                 tempPos.X += speed;
-            if (state.IsKeyDown(Keys.Left))
+            if (Game.InputHandler.IsDown(Keys.Left))
                 tempPos.X -= speed;
-            if (state.IsKeyDown(Keys.Up) && canJump)
+            if (Game.InputHandler.IsDown(Keys.Up) && canJump)
             {
                 body.ApplyLinearImpulse(new Vector2(0.0f, -10000000.0f), body.GetPosition());
             }
             canJump = false;
 
-            if (state.IsKeyDown(Keys.Down))
+            if (Game.InputHandler.WasTriggered(Keys.Down))
             {
                 Game.EventSystem.getEvent("onPressEvent").trigger("Square");
             }

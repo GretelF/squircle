@@ -17,6 +17,9 @@ namespace Squircle
         private Vector2 _pos;
         private Texture2D _texture;
         private string _textureName;
+        private State _state;
+        private string _toggleEvent;
+        public Body body { get; set; }
 
         public override Vector2 Pos
         {
@@ -48,6 +51,23 @@ namespace Squircle
             _textureName = section["texture"];
             Pos = section["position"].AsVector2();
             var dim = section["dimensions"].AsVector2();
+            _toggleEvent = section["toggleEvent"];
+            Game.EventSystem.getEvent(_toggleEvent).addListener(onToggleEvent);
+
+            var state = section["state"];
+
+            if (state == "active")
+            {
+                _state = State.Active;
+            }
+            else if (state == "inactive")
+            {
+                _state = State.Inactive;
+            }
+            else
+            {
+                throw new ArgumentException("Unsupported GameObject state: " + state);
+            }
 
             var bodyDef = new BodyDef();
             var fixtureDef = new FixtureDef();
@@ -57,7 +77,9 @@ namespace Squircle
             fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground };
             bodyDef.type = BodyType.Static;
             bodyDef.position = Pos;
-            Game.level.World.CreateBody(bodyDef).CreateFixture(fixtureDef);
+            bodyDef.active = _state == State.Active;
+            body = Game.level.World.CreateBody(bodyDef);
+            body.CreateFixture(fixtureDef);
         }
 
         public override void Update(GameTime gameTime)
@@ -66,8 +88,27 @@ namespace Squircle
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+            if (_state == State.Inactive)
+            {
+                return;
+            }
+
             var pos = Pos - new Vector2(_texture.Width / 2, _texture.Height / 2);
             spriteBatch.Draw(_texture, pos, Microsoft.Xna.Framework.Color.White);
+        }
+
+        public void onToggleEvent(String data)
+        {
+            if (_state == State.Active)
+            {
+                _state = State.Inactive;
+                body.SetActive(false);
+            }
+            else
+            {
+                _state = State.Active;
+                body.SetActive(true);
+            }
         }
     }
 }

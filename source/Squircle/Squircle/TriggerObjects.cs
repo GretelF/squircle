@@ -193,7 +193,7 @@ namespace Squircle
 
         public override void BeginContact(ContactInfo contactInfo)
         {
-            if (contactInfo.other as Player != null)
+            if (contactInfo.other is Player)
             {
                 triggerEnabled = true;
             }
@@ -201,7 +201,7 @@ namespace Squircle
 
         public override void EndContact(ContactInfo contactInfo)
         {
-            if (contactInfo.other as Player != null)
+            if (contactInfo.other is Player)
             {
                 triggerEnabled = false;
             }

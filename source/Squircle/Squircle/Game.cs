@@ -26,6 +26,7 @@ namespace Squircle
         public ConfigFile gameConfig { get; set; }
         public bool debugDrawingEnabled { get; set; }
         public EventSystem EventSystem { get; set; }
+        public InputHandler InputHandler { get; set; }
 
         public Game()
         {
@@ -41,6 +42,8 @@ namespace Squircle
         /// </summary>
         protected override void Initialize()
         {
+            InputHandler = new InputHandler();
+
             EventSystem = new EventSystem();
             EventSystem.getEvent("endLevel").addListener(onEndLevel);
 
@@ -87,13 +90,15 @@ namespace Squircle
 
         protected override void Update(GameTime gameTime)
         {
+            InputHandler.Update(gameTime);
+
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || InputHandler.IsDown(Keys.Escape))
             {
                 this.Exit();
             }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.F9))
+            if (InputHandler.WasTriggered(Keys.F9))
             {
                 debugDrawingEnabled = !debugDrawingEnabled;
             }

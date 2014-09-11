@@ -10,6 +10,12 @@ using Configuration;
 
 namespace Squircle
 {
+    public enum State
+    {
+        Active,
+        Inactive
+    }
+
     public abstract class GameObject
     {
         public static GameObject Create(Game game, ConfigSection section)

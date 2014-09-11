@@ -79,21 +79,18 @@ namespace Squircle
 
         public override void PrePhysicsUpdate(GameTime gameTime)
         {
-            KeyboardState state = Keyboard.GetState();
-
-
             float tempDir = 0.0f;
             float speed = 300f * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (state.IsKeyDown(Keys.D))
+            if (Game.InputHandler.IsDown(Keys.D))
             {
                 tempDir = 1.0f;
             }
-            if (state.IsKeyDown(Keys.A))
+            if (Game.InputHandler.IsDown(Keys.A))
             {
                 tempDir = -1.0f;
             }
-            if (state.IsKeyDown(Keys.S))
+            if (Game.InputHandler.WasTriggered(Keys.S))
             {
                 Game.EventSystem.getEvent("onPressEvent").trigger("Circle");
             }
