@@ -22,6 +22,7 @@ namespace Squircle
     {
         public Contact contact { get; set; }
         public FixtureType fixtureType { get; set; }
+        public GameObject other { get; set; }
     }
 
 
@@ -262,18 +263,22 @@ namespace Squircle
                 contactInfo.contact = contact;
 
                 var fixtureA = contact.GetFixtureA();
-                var go = fixtureA.GetBody().GetUserData() as GameObject;
-                if (go != null)
+                var goA = fixtureA.GetBody().GetUserData() as GameObject;
+                var fixtureB = contact.GetFixtureB();
+                var goB = fixtureB.GetBody().GetUserData() as GameObject;
+
+                if (goA != null)
                 {
                     contactInfo.fixtureType = FixtureType.A;
-                    go.BeginContact(contactInfo);
+                    contactInfo.other = goB;
+                    goA.BeginContact(contactInfo);
                 }
-                var fixtureB = contact.GetFixtureB();
-                go = fixtureB.GetBody().GetUserData() as GameObject;
-                if (go != null)
+               
+                if (goB != null)
                 {
                     contactInfo.fixtureType = FixtureType.B;
-                    go.BeginContact(contactInfo);
+                    contactInfo.other = goA;
+                    goB.BeginContact(contactInfo);
                 }
                 contact = contact.GetNext();
             }
@@ -288,18 +293,22 @@ namespace Squircle
                 contactInfo.contact = contact;
 
                 var fixtureA = contact.GetFixtureA();
-                var go = fixtureA.GetBody().GetUserData() as GameObject;
-                if (go != null)
+                var goA = fixtureA.GetBody().GetUserData() as GameObject;
+                var fixtureB = contact.GetFixtureB();
+                var goB = fixtureB.GetBody().GetUserData() as GameObject;
+
+                if (goA != null)
                 {
                     contactInfo.fixtureType = FixtureType.A;
-                    go.EndContact(contactInfo);
+                    contactInfo.other = goB;
+                    goA.EndContact(contactInfo);
                 }
-                var fixtureB = contact.GetFixtureB();
-                go = fixtureB.GetBody().GetUserData() as GameObject;
-                if (go != null)
+
+                if (goB != null)
                 {
                     contactInfo.fixtureType = FixtureType.B;
-                    go.EndContact(contactInfo);
+                    contactInfo.other = goA;
+                    goB.EndContact(contactInfo);
                 }
                 contact = contact.GetNext();
             }

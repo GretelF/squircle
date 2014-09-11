@@ -58,6 +58,8 @@ namespace Squircle
             bodyDef.linearDamping = 0.0f;
             bodyDef.angularDamping = 10.0f;
 
+            bodyDef.userData = this;
+
             body = level.World.CreateBody(bodyDef);
 
             var shape = new CircleShape();
@@ -84,9 +86,17 @@ namespace Squircle
             float speed = 300f * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (state.IsKeyDown(Keys.D))
+            {
                 tempDir = 1.0f;
+            }
             if (state.IsKeyDown(Keys.A))
+            {
                 tempDir = -1.0f;
+            }
+            if (state.IsKeyDown(Keys.S))
+            {
+                Game.EventSystem.getEvent("onPressEvent").trigger("Circle");
+            }
 
             body.ApplyTorque(tempDir * 50000000);
         }

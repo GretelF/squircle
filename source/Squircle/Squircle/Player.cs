@@ -8,6 +8,14 @@ using System.Text;
 
 namespace Squircle
 {
+    public enum PlayerType
+    {
+        None,
+        Square,
+        Circle,
+        All
+    }
+
     public abstract class Player : GameObject
     {
 

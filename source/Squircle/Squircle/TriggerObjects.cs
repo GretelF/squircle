@@ -116,6 +116,10 @@ namespace Squircle
         private Vector2 _pos;
         private Texture2D _texture;
         private string _textureName;
+        private string _onPressEvent;
+        private string _onPressEventData;
+        private bool triggerEnabled = false;
+        private PlayerType playerType;
 
         public override Vector2 Pos
         {
@@ -148,7 +152,33 @@ namespace Squircle
             Pos = section["position"].AsVector2();
             var dim = section["dimensions"].AsVector2();
 
+            string playerTypeName = section["player"];
+
+            if (playerTypeName == "Circle")
+            {
+                playerType = PlayerType.Circle;
+            }
+            else if (playerTypeName == "Square")
+            {
+                playerType = PlayerType.Square;
+            }
+            else
+            {
+                throw new ArgumentException("Unsupported player type.");
+            }
+
+            if (section.Options.ContainsKey("onPressEvent"))
+            {
+                _onPressEvent = section["onPressEvent"];
+            }
+
+            if (section.Options.ContainsKey("onPressEventData"))
+            {
+                _onPressEventData = section["onPressEventData"];
+            }
+
             var bodyDef = new BodyDef();
+            bodyDef.userData = this;
             var fixtureDef = new FixtureDef();
             var shape = new PolygonShape();
             shape.SetAsBox(dim.X / 2, dim.Y / 2);
@@ -157,6 +187,24 @@ namespace Squircle
             fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground};
             bodyDef.position = Pos;
             Game.level.World.CreateBody(bodyDef).CreateFixture(fixtureDef);
+
+            Game.EventSystem.getEvent("onPressEvent").addListener(onPressEvent);
+        }
+
+        public override void BeginContact(ContactInfo contactInfo)
+        {
+            if (contactInfo.other as Player != null)
+            {
+                triggerEnabled = true;
+            }
+        }
+
+        public override void EndContact(ContactInfo contactInfo)
+        {
+            if (contactInfo.other as Player != null)
+            {
+                triggerEnabled = false;
+            }
         }
 
         public override void Update(GameTime gameTime)
@@ -167,6 +215,19 @@ namespace Squircle
         {
             var pos = Pos - new Vector2(_texture.Width / 2, _texture.Height / 2);
             spriteBatch.Draw(_texture, pos, Microsoft.Xna.Framework.Color.White);
+        }
+
+        public void onPressEvent(String data)
+        {
+            if (!triggerEnabled)
+            {
+                return;
+            }
+
+            if (data == "Square" && playerType == PlayerType.Square || data == "Circle" && playerType == PlayerType.Circle)
+            {
+                Game.EventSystem.getEvent(_onPressEvent).trigger(_onPressEventData);
+            }
         }
     }
 }

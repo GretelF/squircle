@@ -59,8 +59,9 @@ namespace Squircle
             bodyDef.linearDamping = 0.0f;
             bodyDef.angularDamping = 10.0f;
 
+            bodyDef.userData = this;
+
             body = level.World.CreateBody(bodyDef);
-            body.SetUserData(this);
 
             var shape = new PolygonShape();
             var offset = squareSideLength / 2;
@@ -102,7 +103,12 @@ namespace Squircle
             {
                 body.ApplyLinearImpulse(new Vector2(0.0f, -10000000.0f), body.GetPosition());
             }
-            canJump = false;  
+            canJump = false;
+
+            if (state.IsKeyDown(Keys.Down))
+            {
+                Game.EventSystem.getEvent("onPressEvent").trigger("Square");
+            }
 
             var velocity = body.GetLinearVelocity() + tempPos - squarePos;
 
