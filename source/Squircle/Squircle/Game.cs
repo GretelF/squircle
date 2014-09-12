@@ -116,8 +116,8 @@ namespace Squircle
             GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
 
             spriteBatch.Begin(
-                SpriteSortMode.BackToFront, 
-                BlendState.AlphaBlend, 
+                SpriteSortMode.BackToFront,
+                BlendState.AlphaBlend,
                 null, 
                 null,
                 null,
