@@ -33,8 +33,8 @@ namespace Squircle
         LevelGenerator LevelGenerator;
         List<Body> bodyList;
         Texture2D background;
-        Square square { get; set; }
-        Circle circle { get; set; }
+        public Square square { get; set; }
+        public Circle circle { get; set; }
         public ConfigFile levelConfig { get; private set; }
         public Camera2D camera { get; set; }
         public IList<GameObject> gameObjects { get; set; }

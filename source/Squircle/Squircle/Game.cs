@@ -179,7 +179,18 @@ namespace Squircle
 
                     var key = prop.Name;
                     var value = prop.GetValue(go, null);
-                    debugMessage.AppendFormat("\n{0}: {1}", key, value);
+
+                    var nestedGo = value as GameObject;
+
+                    if (nestedGo != null)
+                    {
+                        debugMessage.AppendFormat("\n{0}: {1}", key, nestedGo.Name);
+                    }
+                    else
+                    {
+                        debugMessage.AppendFormat("\n{0}: {1}", key, value);
+                    }
+
                 }
 
                 var dimensions = debugFont.MeasureString(debugMessage);

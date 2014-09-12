@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Squircle
 {
-    class Circle : Player
+    public class Circle : Player
     {
         private Texture2D circleTexture;
         private Vector2 circlePos;
