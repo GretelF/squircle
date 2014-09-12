@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Box2D.XNA;
 using Configuration;
+using System.Text;
 
 namespace Squircle
 {
@@ -37,13 +38,17 @@ namespace Squircle
         public Circle circle { get; set; }
         public ConfigFile levelConfig { get; private set; }
         public Camera2D camera { get; set; }
-        public IList<GameObject> gameObjects { get; set; }
+        public IList<GameObject> GameObjects { get; set; }
+        public IList<GameObject> ToUpdate { get; set; }
+        public IList<GameObject> ToDraw { get; set; }
         public Body playerBounds { get; set; }
 
         public Level(Game game)
         {
             this.game = game;
-            gameObjects = new List<GameObject>();
+            GameObjects = new List<GameObject>();
+            ToUpdate = new List<GameObject>();
+            ToDraw = new List<GameObject>();
         }
 
         public void Initialize(ConfigOption option)
@@ -84,12 +89,34 @@ namespace Squircle
                     continue;
                 }
                 var go = GameObject.Create(game, section.Key, section.Value);
-                gameObjects.Add(go);
+                GameObjects.Add(go);
             }
 
-            if (levelConfig.GlobalSection.Options.ContainsKey("debugDrawingEnabled"))
+            if (!levelConfig.Sections.ContainsKey("Debug"))
             {
-                game.debugDrawingEnabled = levelConfig.GlobalSection.Options["debugDrawingEnabled"].AsBool();
+                return;
+            }
+
+            var debugSection = levelConfig["Debug"];
+
+            if (debugSection.Options.ContainsKey("drawPhysics"))
+            {
+                game.drawPhysics = debugSection.Options["drawPhysics"].AsBool();
+            }
+
+            if (debugSection.Options.ContainsKey("drawVisualHelpers"))
+            {
+                game.drawVisualHelpers = debugSection.Options["drawVisualHelpers"].AsBool();
+            }
+
+            if (debugSection.Options.ContainsKey("drawDebugData"))
+            {
+                game.drawDebugData = debugSection.Options["drawDebugData"].AsBool();
+            }
+
+            if (debugSection.Options.ContainsKey("drawMoreDebugData"))
+            {
+                game.drawMoreDebugData = debugSection.Options["drawMoreDebugData"].AsBool();
             }
         }
 
@@ -100,7 +127,7 @@ namespace Squircle
             square.LoadContent(content);
             circle.LoadContent(content);
 
-            foreach (var go in gameObjects)
+            foreach (var go in GameObjects)
             {
                 go.LoadContent(content);
             }
@@ -112,7 +139,7 @@ namespace Squircle
             square.PrePhysicsUpdate(gameTime);
             circle.PrePhysicsUpdate(gameTime);
 
-            foreach (var go in gameObjects)
+            foreach (var go in GameObjects)
             {
                 go.PrePhysicsUpdate(gameTime);
             }
@@ -122,7 +149,7 @@ namespace Squircle
             square.Update(gameTime);
             circle.Update(gameTime);
 
-            foreach (var go in gameObjects)
+            foreach (var go in GameObjects)
             {
                 go.Update(gameTime);
             }
@@ -137,10 +164,13 @@ namespace Squircle
 
         public void DrawPhysicalContacts(SpriteBatch spriteBatch)
         {
+            var numContacts = 0;
             var contact = World.GetContactList();
             var drawingSize = new Vector2(4.0f, 4.0f);
             while (contact != null)
             {
+                ++numContacts;
+
                 Manifold manifold;
                 contact.GetManifold(out manifold);
 
@@ -155,13 +185,18 @@ namespace Squircle
 
                 contact = contact.GetNext();
             }
+
+            if (game.drawMoreDebugData)
+            {
+                game.DrawOnScreen("Physical contacts: " + numContacts.ToString());
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             spriteBatch.Draw(background, new Vector2(0.0f, 0.0f), Microsoft.Xna.Framework.Color.White);
 
-            foreach (var go in gameObjects)
+            foreach (var go in GameObjects)
             {
                 go.Draw(spriteBatch);
             }
@@ -169,7 +204,7 @@ namespace Squircle
             square.Draw(spriteBatch);
             circle.Draw(spriteBatch);
 
-            if (game.debugDrawingEnabled)
+            if (game.drawPhysics)
             {
                 World.DrawDebugData();
                 DrawPhysicalContacts(spriteBatch);

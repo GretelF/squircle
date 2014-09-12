@@ -37,13 +37,14 @@ namespace Squircle
 
         public override Vector2 Dimensions
         {
-            get { return new Vector2(circleRadius, circleRadius); }
+            get { return new Vector2(circleRadius * 2, circleRadius * 2); }
         }
 
         public Circle(Game game, Level level)
             : base(game)
         {
             this.level = level;
+            Name = "Circle";
         }
 
 

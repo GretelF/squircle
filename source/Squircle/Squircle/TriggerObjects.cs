@@ -133,8 +133,8 @@ namespace Squircle
         private string _textureName;
         private string _onPressEvent;
         private string _onPressEventData;
-        private int playerContactCount = 0;
         private GameObject _master;
+        private float _proximityRadiusSquared;
 
         public override Vector2 Pos
         {
@@ -152,12 +152,11 @@ namespace Squircle
             get { return _texture; }
         }
 
-        public int PlayerContactCount
+        public bool MasterIsCloseEnough
         {
-            get { return playerContactCount; }
+            get { return (Pos - _master.Pos).LengthSquared() <= _proximityRadiusSquared; }
         }
 
-        [IgnoreDebugData]
         public GameObject Master { get { return _master; } }
 
         public ButtonObject(Game game)
@@ -179,21 +178,23 @@ namespace Squircle
         {
             _textureName = section["texture"];
             Pos = section["position"].AsVector2();
-            _dim = section["dimensions"].AsVector2();
+            var proximityRadius = section["proximityRadius"];
+            _dim = new Vector2(proximityRadius * 2);
+            _proximityRadiusSquared = proximityRadius * proximityRadius;
 
-            string playerTypeName = section["player"];
+            string masterName = section["master"];
 
-            if (playerTypeName == "Circle")
+            if (masterName == "Circle")
             {
                 _master = Game.level.circle;
             }
-            else if (playerTypeName == "Square")
+            else if (masterName == "Square")
             {
                 _master = Game.level.square;
             }
             else
             {
-                throw new ArgumentException("Unsupported player type.");
+                throw new ArgumentException("Unsupported master.");
             }
 
             if (section.Options.ContainsKey("onPressEvent"))
@@ -206,38 +207,7 @@ namespace Squircle
                 _onPressEventData = section["onPressEventData"];
             }
 
-            var bodyDef = new BodyDef();
-            bodyDef.userData = this;
-            var fixtureDef = new FixtureDef();
-            //var shape = new PolygonShape();
-            //shape.SetAsBox(Dimensions.X / 2, Dimensions.Y / 2);
-            var shape = new CircleShape();
-            shape._radius = Dimensions.X / 2;
-            fixtureDef.shape = shape;
-            fixtureDef.isSensor = true;
-            fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground };
-            bodyDef.position = Pos;
-            Game.level.World.CreateBody(bodyDef).CreateFixture(fixtureDef);
-
             Game.EventSystem.getEvent("onPressEvent").addListener(onPressEvent);
-        }
-
-        public override void BeginContact(ContactInfo contactInfo)
-        {
-            if (!contactInfo.contact.IsTouching()) { return; }
-            if (contactInfo.other == _master)
-            {
-                ++playerContactCount;
-            }
-        }
-
-        public override void EndContact(ContactInfo contactInfo)
-        {
-            if (!contactInfo.contact.IsTouching()) { return; }
-            if (contactInfo.other == _master)
-            {
-                --playerContactCount;
-            }
         }
 
         public override void Update(GameTime gameTime)
@@ -247,12 +217,18 @@ namespace Squircle
         public override void Draw(SpriteBatch spriteBatch)
         {
             var pos = Pos - new Vector2(_texture.Width / 2, _texture.Height / 2);
-            spriteBatch.Draw(_texture, pos, Microsoft.Xna.Framework.Color.White);
+            spriteBatch.Draw(_texture, pos, Color.White);
+
+            if (Game.drawVisualHelpers)
+            {
+                spriteBatch.DrawLine(Pos, _master.Pos, Color.Red);
+                spriteBatch.DrawCircle(Pos, (int)(Dimensions.X / 2), 16, Color.Yellow);
+            }
         }
 
         public void onPressEvent(String data)
         {
-            if (playerContactCount == 0)
+            if (!MasterIsCloseEnough)
             {
                 return;
             }

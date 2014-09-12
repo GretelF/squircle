@@ -44,6 +44,7 @@ namespace Squircle
         public Square(Game game, Level level) :  base(game)
         {
             this.level = level;
+            Name = "Square";
         }
 
 

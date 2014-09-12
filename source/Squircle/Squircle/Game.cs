@@ -10,7 +10,6 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Box2D.XNA;
 //using C3.XNA;
-using System.Drawing;
 using Configuration;
 using System.Text;
 
@@ -33,21 +32,28 @@ namespace Squircle
         SpriteBatch spriteBatch;
         public Level level;
         public ConfigFile gameConfig { get; set; }
-        public bool debugDrawingEnabled { get; set; }
+        public bool drawPhysics { get; set; }                   ///< Draws the physical world.
+        public bool drawDebugData { get; set; }                 ///< Draws textual game object data above them.
+        public bool drawMoreDebugData { get; set; }             ///< Up to the specific game object to use.
+        public bool drawVisualHelpers { get; set; }             ///< Draws some visual helpers for game objects.
         public SpriteFont debugFont { get; set; }
         public EventSystem EventSystem { get; set; }
         public InputHandler InputHandler { get; set; }
 
         public PhysicsDebugDraw PhysicsDebugDrawer { get; set; }
 
-        public IList<Func<object>> DebugData { get; set; }
+        public IList<Vector2> DebugScreenDataStack { get; set; }
 
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            debugDrawingEnabled = false;
-            DebugData = new List<Func<object>>();
+            drawPhysics = false;
+            drawVisualHelpers = false;
+            drawMoreDebugData = false;
+            drawDebugData = false;
+
+            DebugScreenDataStack = new List<Vector2>();
         }
 
         /// <summary>
@@ -113,6 +119,8 @@ namespace Squircle
 
         protected override void Update(GameTime gameTime)
         {
+            DebugScreenDataStack.Clear();
+
             InputHandler.Update(gameTime);
 
             // Allows the game to exit
@@ -123,7 +131,22 @@ namespace Squircle
 
             if (InputHandler.WasTriggered(Keys.F9))
             {
-                debugDrawingEnabled = !debugDrawingEnabled;
+                drawPhysics = !drawPhysics;
+            }
+
+            if (InputHandler.WasTriggered(Keys.F10))
+            {
+                drawDebugData = !drawDebugData;
+            }
+
+            if (InputHandler.WasTriggered(Keys.F11))
+            {
+                drawMoreDebugData = !drawMoreDebugData;
+            }
+
+            if (InputHandler.WasTriggered(Keys.F12))
+            {
+                drawVisualHelpers = !drawVisualHelpers;
             }
 
             level.Update(gameTime);
@@ -137,7 +160,7 @@ namespace Squircle
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
+            GraphicsDevice.Clear(Color.Black);
 
             spriteBatch.Begin(
                 SpriteSortMode.Deferred,
@@ -152,17 +175,47 @@ namespace Squircle
             
             base.Draw(gameTime);
 
-            if (debugDrawingEnabled)
+            if (drawPhysics)
+            {
+                DrawOnScreen("Drawing physical world");
+            }
+
+            if (drawVisualHelpers)
+            {
+                DrawBoundingBoxes(gameTime);
+                DrawOnScreen("Drawing visual helpers");
+            }
+
+            if (drawDebugData)
             {
                 DrawDebugData(gameTime);
+                DrawOnScreen("Drawing debug data");
+            }
+
+            if (drawMoreDebugData)
+            {
+                DrawOnScreen("Drawing more debug data");
             }
 
             spriteBatch.End();
         }
 
+        private void DrawBoundingBoxes(GameTime gameTime)
+        {
+            var drawSize = new Vector2(4, 4);
+
+            foreach (var go in level.GameObjects)
+            {
+                spriteBatch.FillRectangle(go.Pos - drawSize / 2, drawSize, Color.Red);
+                spriteBatch.DrawRectangle((Microsoft.Xna.Framework.Rectangle)go.CalculateBoundingBox(), Color.Red);
+            }
+            spriteBatch.DrawRectangle((Microsoft.Xna.Framework.Rectangle)level.circle.CalculateBoundingBox(), Color.Red);
+            spriteBatch.DrawRectangle((Microsoft.Xna.Framework.Rectangle)level.square.CalculateBoundingBox(), Color.Red);
+        }
+
         private void DrawDebugData(GameTime gameTime)
         {
-            foreach (var go in level.gameObjects)
+            foreach (var go in level.GameObjects)
             {
                 var debugMessage = new StringBuilder();
                 debugMessage.AppendFormat("[{0}]", go.Name);
@@ -184,26 +237,45 @@ namespace Squircle
 
                     if (nestedGo != null)
                     {
-                        debugMessage.AppendFormat("\n{0}: {1}", key, nestedGo.Name);
+                        debugMessage.AppendFormat("\n{0}: {1}@{2}", key, nestedGo.Name, nestedGo.Pos);
                     }
                     else
                     {
                         debugMessage.AppendFormat("\n{0}: {1}", key, value);
                     }
-
                 }
 
                 var dimensions = debugFont.MeasureString(debugMessage);
                 var position = go.Pos - go.Dimensions / 2;
                 position.Y -= dimensions.Y;
 
-                spriteBatch.DrawString(debugFont, debugMessage, position, Microsoft.Xna.Framework.Color.White);
+                spriteBatch.DrawString(debugFont, debugMessage, position, Color.White);
             }
         }
 
-        public void DrawOnScreen(string message, Vector2 position)
+        public void DrawOnScreen(string message, Vector2? position = null)
         {
-            spriteBatch.DrawString(debugFont, message, position, Microsoft.Xna.Framework.Color.White);
+            Vector2 pos;
+            if (position == null)
+            {
+                if (DebugScreenDataStack.Count == 0)
+                {
+                    pos = new Vector2(20, 20);
+                }
+                else
+                {
+                    pos = DebugScreenDataStack.Last();
+                    pos.Y += 20;
+                }
+                DebugScreenDataStack.Add(pos);
+            }
+            else
+            {
+                pos = position.Value;
+            }
+
+            var cameraUpperLeft = level.camera.Position - new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            spriteBatch.DrawString(debugFont, message, cameraUpperLeft + pos, Color.White);
         }
 
         private void onEndLevel(String data)

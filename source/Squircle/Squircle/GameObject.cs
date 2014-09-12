@@ -94,6 +94,11 @@ namespace Squircle
         public virtual void EndContact(ContactInfo contactInfo)
         {
         }
+
+        public virtual DRectangle CalculateBoundingBox()
+        {
+            return new DRectangle(Pos - Dimensions / 2, Dimensions);
+        }
     }
 
     public class PhantomObject : GameObject
