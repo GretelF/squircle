@@ -51,7 +51,7 @@ namespace Squircle
             level = new Level(this);
             level.Initialize(gameConfig["Levels"]["level_01"]);
 
-            debugDrawingEnabled = true;
+            debugDrawingEnabled = false;
 
             base.Initialize();
         }
@@ -116,7 +116,7 @@ namespace Squircle
             GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
 
             spriteBatch.Begin(
-                SpriteSortMode.BackToFront,
+                SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
                 null, 
                 null,
