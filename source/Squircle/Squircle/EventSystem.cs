@@ -10,6 +10,8 @@ namespace Squircle
     public class Event
     {
         private IList<StringEvent> listeners;
+
+        public string Name { get; set; }
         
         public Event()
         {
@@ -31,28 +33,33 @@ namespace Squircle
                 listener(data);
             }
         }
+
+        public override string ToString()
+        {
+            return string.Format("\"{0}\" ({1})", Name, listeners.Count);
+        }
     }
 
     public class EventSystem
     {
-        public IDictionary<String, Event> Events { get; set; }
+        public IList<Event> Events { get; set; }
         
         public EventSystem()
         {
-            Events = new Dictionary<String, Event>();
+            Events = new List<Event>();
         }
 
         public Event getEvent(String name)
         {
-            Event e;
+            Event result = Events.SingleOrDefault(e => e.Name == name);
 
-            if (!Events.TryGetValue(name, out e))
+            if (result == null)
             {
-                e = new Event();
-                Events.Add(name, e);
+                result = new Event() { Name = name };
+                Events.Add(result);
             }
 
-            return e;
+            return result;
         }
 
     }

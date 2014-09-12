@@ -10,10 +10,52 @@ using Configuration;
 
 namespace Squircle
 {
-    public enum State
+    public enum StateType
     {
         Active,
-        Inactive
+        Inactive,
+    }
+
+    public class State
+    {
+        public StateType Value { get; set; }
+
+        public bool IsActive
+        {
+            get { return Value == StateType.Active; }
+        }
+
+        public bool IsInactive
+        {
+            get { return Value == StateType.Inactive; }
+        }
+
+        public void toggle()
+        {
+            if (IsActive)
+            {
+                setInactive();
+            }
+            else
+            {
+                setActive();
+            }
+        }
+
+        public void setActive()
+        {
+            Value = StateType.Active;
+        }
+
+        public void setInactive()
+        {
+            Value = StateType.Inactive;
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 
     public abstract class GameObject
@@ -31,8 +73,11 @@ namespace Squircle
                 case "trigger":
                     resultObject = new TriggerObject(game);
                     break;
-                case "button":
-                    resultObject = new ButtonObject(game);
+                case "toggleButton":
+                    resultObject = new ToggleButtonObject(game);
+                    break;
+                case "holdButton":
+                    resultObject = new HoldButtonObject(game);
                     break;
                 default:
                 {
@@ -98,6 +143,11 @@ namespace Squircle
         public virtual DRectangle CalculateBoundingBox()
         {
             return new DRectangle(Pos - Dimensions / 2, Dimensions);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}@{1}", Name, Pos);
         }
     }
 

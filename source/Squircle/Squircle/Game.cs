@@ -151,6 +151,16 @@ namespace Squircle
 
             level.Update(gameTime);
 
+            if (InputHandler.IsDown(Keys.Add))
+            {
+                level.camera.Scale += 0.01f;
+            }
+
+            if (InputHandler.IsDown(Keys.Subtract))
+            {
+                level.camera.Scale -= 0.01f;
+            }
+
             base.Update(gameTime);
         }
 
@@ -233,16 +243,7 @@ namespace Squircle
                     var key = prop.Name;
                     var value = prop.GetValue(go, null);
 
-                    var nestedGo = value as GameObject;
-
-                    if (nestedGo != null)
-                    {
-                        debugMessage.AppendFormat("\n{0}: {1}@{2}", key, nestedGo.Name, nestedGo.Pos);
-                    }
-                    else
-                    {
-                        debugMessage.AppendFormat("\n{0}: {1}", key, value);
-                    }
+                    debugMessage.AppendFormat("\n{0}: {1}", key, value);
                 }
 
                 var dimensions = debugFont.MeasureString(debugMessage);

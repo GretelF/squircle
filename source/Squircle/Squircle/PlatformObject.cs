@@ -43,6 +43,7 @@ namespace Squircle
         public PlatformObject(Game game)
             : base(game)
         {
+            _state = new State();
         }
 
         public override void Initialize()
@@ -67,11 +68,11 @@ namespace Squircle
 
             if (state == "active")
             {
-                _state = State.Active;
+                _state.setActive();
             }
             else if (state == "inactive")
             {
-                _state = State.Inactive;
+                _state.setInactive();
             }
             else
             {
@@ -86,7 +87,7 @@ namespace Squircle
             fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground };
             bodyDef.type = BodyType.Static;
             bodyDef.position = Pos;
-            bodyDef.active = _state == State.Active;
+            bodyDef.active = _state.IsActive;
             body = Game.level.World.CreateBody(bodyDef);
             body.CreateFixture(fixtureDef);
         }
@@ -97,7 +98,7 @@ namespace Squircle
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (_state == State.Inactive)
+            if (_state.IsInactive)
             {
                 return;
             }
@@ -108,16 +109,8 @@ namespace Squircle
 
         public void onToggleEvent(String data)
         {
-            if (_state == State.Active)
-            {
-                _state = State.Inactive;
-                body.SetActive(false);
-            }
-            else
-            {
-                _state = State.Active;
-                body.SetActive(true);
-            }
+            _state.toggle();
+            body.SetActive(_state.IsActive);
         }
     }
 }
