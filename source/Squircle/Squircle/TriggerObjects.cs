@@ -50,12 +50,17 @@ namespace Squircle
 
         public override void LoadContent(ContentManager content)
         {
+            if (_textureName == null) { return; }
             _texture = content.Load<Texture2D>(_textureName);
         }
 
         public override void InitializeFromConfig(ConfigSection section)
         {
-            _textureName = section["texture"];
+            if (section.Options.ContainsKey("texture"))
+            {
+                _textureName = section["texture"];
+            }
+
             _pos = section["position"].AsVector2();
             _dim = section["dimensions"].AsVector2();
 
@@ -113,6 +118,8 @@ namespace Squircle
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+            if (_texture == null) { return; }
+
             var pos = Pos - new Vector2(_texture.Width / 2, _texture.Height / 2);
             spriteBatch.Draw(_texture, pos, Microsoft.Xna.Framework.Color.White);
         }
@@ -127,7 +134,7 @@ namespace Squircle
         private string _onPressEvent;
         private string _onPressEventData;
         private int playerContactCount = 0;
-        private PlayerType playerType;
+        private GameObject _master;
 
         public override Vector2 Pos
         {
@@ -150,7 +157,8 @@ namespace Squircle
             get { return playerContactCount; }
         }
 
-        public PlayerType PlayerType { get { return playerType; } }
+        [IgnoreDebugData]
+        public GameObject Master { get { return _master; } }
 
         public ButtonObject(Game game)
             : base(game)
@@ -177,11 +185,11 @@ namespace Squircle
 
             if (playerTypeName == "Circle")
             {
-                playerType = PlayerType.Circle;
+                _master = Game.level.circle;
             }
             else if (playerTypeName == "Square")
             {
-                playerType = PlayerType.Square;
+                _master = Game.level.square;
             }
             else
             {
@@ -216,7 +224,8 @@ namespace Squircle
 
         public override void BeginContact(ContactInfo contactInfo)
         {
-            if (contactInfo.other is Circle && playerType == PlayerType.Circle || contactInfo.other is Square && playerType == PlayerType.Square)
+            if (!contactInfo.contact.IsTouching()) { return; }
+            if (contactInfo.other == _master)
             {
                 ++playerContactCount;
             }
@@ -224,7 +233,8 @@ namespace Squircle
 
         public override void EndContact(ContactInfo contactInfo)
         {
-            if (contactInfo.other is Circle && playerType == PlayerType.Circle || contactInfo.other is Square && playerType == PlayerType.Square)
+            if (!contactInfo.contact.IsTouching()) { return; }
+            if (contactInfo.other == _master)
             {
                 --playerContactCount;
             }
@@ -247,7 +257,8 @@ namespace Squircle
                 return;
             }
 
-            if (data == "Square" && playerType == PlayerType.Square || data == "Circle" && playerType == PlayerType.Circle)
+            if (data == "Square" && _master is Square
+             || data == "Circle" && _master is Circle)
             {
                 Game.EventSystem.getEvent(_onPressEvent).trigger(_onPressEventData);
             }

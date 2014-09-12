@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Squircle
 {
-    class Square : Player
+    public class Square : Player
     {
         private Texture2D squareTexture;
         private Vector2 squarePos;

@@ -33,8 +33,8 @@ namespace Squircle
         LevelGenerator LevelGenerator;
         List<Body> bodyList;
         Texture2D background;
-        Square square { get; set; }
-        Circle circle { get; set; }
+        public Square square { get; set; }
+        public Circle circle { get; set; }
         public ConfigFile levelConfig { get; private set; }
         public Camera2D camera { get; set; }
         public IList<GameObject> gameObjects { get; set; }
@@ -51,6 +51,7 @@ namespace Squircle
             levelConfig = ConfigFile.FromFile(option.Value);
             World = new Box2D.XNA.World(new Vector2(0.0f, 100.0f), false);
             World.ContactListener = this;
+            World.DebugDraw = game.PhysicsDebugDrawer;
             LevelGenerator = new LevelGenerator(this);
             bodyList = LevelGenerator.generateLevel();
 
@@ -134,57 +135,8 @@ namespace Squircle
             playerBounds.Position = camera.Position;
         }
 
-        public void DrawPhysicalObjects(SpriteBatch spriteBatch)
+        public void DrawPhysicalContacts(SpriteBatch spriteBatch)
         {
-            var body = World.GetBodyList();
-            while (body != null)
-            {
-                var fixture = body.GetFixtureList();
-                while (fixture != null)
-                {
-                    var shape = fixture.GetShape();
-                    var position = body.GetPosition();
-                    var rotation = body.GetAngle();
-                    switch (shape.ShapeType)
-                    {
-                        case ShapeType.Edge:
-                            {
-                                var edge = (EdgeShape)shape;
-
-                                var from = position + edge._vertex1;
-                                var to = position + edge._vertex2;
-                                spriteBatch.DrawLine(from, to, Microsoft.Xna.Framework.Color.Red);
-                            }
-                            break;
-                        case ShapeType.Polygon:
-                            {
-                                var polygon = (PolygonShape)shape;
-                                var vertices = new List<Vector2>();
-                                for (int i = 1; i < polygon.GetVertexCount(); i++)
-                                {
-                                    var from = position + polygon.GetVertex(i - 1).Rotate(rotation);
-                                    var to = position + polygon.GetVertex(i).Rotate(rotation);
-                                    spriteBatch.DrawLine(from, to, Microsoft.Xna.Framework.Color.Lime);
-                                }
-                                var startPoint = position + polygon.GetVertex(0).Rotate(rotation);
-                                var endPoint = position + polygon.GetVertex(polygon.GetVertexCount() - 1).Rotate(rotation);
-                                spriteBatch.DrawLine(startPoint, endPoint, Microsoft.Xna.Framework.Color.Lime);
-                            }
-                            break;
-                        case ShapeType.Circle:
-                            {
-                                var circleShape = (CircleShape)shape;
-                                spriteBatch.DrawCircle(position + circleShape._p, circleShape._radius, 20, Microsoft.Xna.Framework.Color.White);
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                    fixture = fixture.GetNext();
-                }
-                body = body.GetNext();
-            }
-
             var contact = World.GetContactList();
             var drawingSize = new Vector2(4.0f, 4.0f);
             while (contact != null)
@@ -198,7 +150,7 @@ namespace Squircle
                 for (int i = 0; i < manifold._pointCount; i++)
                 {
                     var point = worldManifold._points[i];
-                    spriteBatch.FillRectangle(point - drawingSize / 2, drawingSize, new Microsoft.Xna.Framework.Color(1.0f, 0.0f, 1.0f));
+                    spriteBatch.FillRectangle(point - drawingSize / 2, drawingSize, Microsoft.Xna.Framework.Color.Lime);
                 }
 
                 contact = contact.GetNext();
@@ -219,10 +171,10 @@ namespace Squircle
 
             if (game.debugDrawingEnabled)
             {
-                DrawPhysicalObjects(spriteBatch);
+                World.DrawDebugData();
+                DrawPhysicalContacts(spriteBatch);
             }
         }
-
 
         private Body CreatePhysicalViewBounds()
         {

@@ -38,6 +38,8 @@ namespace Squircle
         public EventSystem EventSystem { get; set; }
         public InputHandler InputHandler { get; set; }
 
+        public PhysicsDebugDraw PhysicsDebugDrawer { get; set; }
+
         public IList<Func<object>> DebugData { get; set; }
 
         public Game()
@@ -61,6 +63,14 @@ namespace Squircle
             EventSystem = new EventSystem();
             EventSystem.getEvent("endLevel").addListener(onEndLevel);
 
+            PhysicsDebugDrawer = new PhysicsDebugDraw();
+
+            PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.AABB);
+            PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.CenterOfMass);
+            PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.Joint);
+            PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.Pair);
+            PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.Shape);
+
             gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
             level = new Level(this);
             level.Initialize(gameConfig["Levels"]["level_01"]);
@@ -77,6 +87,7 @@ namespace Squircle
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            PhysicsDebugDrawer.spriteBatch = spriteBatch;
             debugFont = Content.Load<SpriteFont>(gameConfig.GlobalSection["debugFont"]);
 
             level.LoadContent(Content);
@@ -168,7 +179,18 @@ namespace Squircle
 
                     var key = prop.Name;
                     var value = prop.GetValue(go, null);
-                    debugMessage.AppendFormat("\n{0}: {1}", key, value);
+
+                    var nestedGo = value as GameObject;
+
+                    if (nestedGo != null)
+                    {
+                        debugMessage.AppendFormat("\n{0}: {1}", key, nestedGo.Name);
+                    }
+                    else
+                    {
+                        debugMessage.AppendFormat("\n{0}: {1}", key, value);
+                    }
+
                 }
 
                 var dimensions = debugFont.MeasureString(debugMessage);
