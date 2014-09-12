@@ -84,12 +84,12 @@ namespace Squircle
 
             gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
             level = new Level(this);
+            level.Name = "level_01";
             level.Initialize(gameConfig["Levels"]["level_01"]);
 
             base.Initialize();
         }
 
-       
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
@@ -130,10 +130,7 @@ namespace Squircle
             {
                 if (LoadingScreenDrawn)
                 {
-                    level.Initialize(gameConfig["Levels"][level.Name]);
-                    level.LoadContent(Content);
-                    LoadingNextLevel = false;
-                    LoadingScreenDrawn = false;
+                    EndLoadLevel();
                 }
                 return;
             }
@@ -144,6 +141,12 @@ namespace Squircle
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || InputHandler.IsDown(Keys.Escape))
             {
                 this.Exit();
+            }
+
+            if (InputHandler.WasTriggered(Keys.R))
+            {
+                StartLoadingLevel(level.Name);
+                return;
             }
 
             if (InputHandler.WasTriggered(Keys.F9))
@@ -312,6 +315,23 @@ namespace Squircle
             spriteBatch.DrawString(debugFont, message, upperLeft + pos, Color.White);
         }
 
+        private void StartLoadingLevel(String name)
+        {
+            LoadingScreenDrawn = false;
+            LoadingNextLevel = true;
+
+            level = new Level(this);
+            level.Name = name;
+        }
+
+        private void EndLoadLevel()
+        {
+            level.Initialize(gameConfig["Levels"][level.Name]);
+            level.LoadContent(Content);
+            LoadingNextLevel = false;
+            LoadingScreenDrawn = false;
+        }
+
         private void onEndLevel(String data)
         {
             if (data == "credits")
@@ -320,13 +340,7 @@ namespace Squircle
                 throw new NotImplementedException();
             }
 
-            LoadingScreenDrawn = false;
-            LoadingNextLevel = true;
-            NumFramesLoading = 0;
-
-            level = new Level(this);
-            level.Name = data;
+            StartLoadingLevel(data);
         }
-
     }
 }
