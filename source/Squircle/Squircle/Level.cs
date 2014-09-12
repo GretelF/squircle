@@ -39,7 +39,6 @@ namespace Squircle
         public Camera2D camera { get; set; }
         public IDictionary<string, GameObject> gameObjects { get; set; }
         public Body playerBounds { get; set; }
-        private Vector2 center;
 
         public Level(Game game)
         {
@@ -125,7 +124,7 @@ namespace Squircle
                 go.Update(gameTime);
             }
 
-            center = circle.Pos + (square.Pos - circle.Pos) / 2;                // calculate center between circle and square.
+            var center = circle.Pos + (square.Pos - circle.Pos) / 2;                // calculate center between circle and square.
             camera.Focus.Pos = new Vector2(center.X , center.Y);
 
             camera.Update(gameTime);
