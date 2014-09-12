@@ -128,7 +128,7 @@ namespace Squircle
     public class ButtonObjectBase : GameObject
     {
         public override Vector2 Pos { get; set; }
-        public override Vector2 Dimensions { get { return new Vector2(ProximityRadius); } }
+        public override Vector2 Dimensions { get { return new Vector2(ProximityRadius * 2); } }
 
         public override Texture2D Texture
         {

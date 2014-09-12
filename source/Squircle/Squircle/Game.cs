@@ -44,6 +44,11 @@ namespace Squircle
 
         public IList<Vector2> DebugScreenDataStack { get; set; }
 
+        public bool LoadingNextLevel { get; set; }
+        public bool LoadingScreenDrawn { get; set; }
+
+        public uint NumFramesLoading { get; set; }
+
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -121,6 +126,18 @@ namespace Squircle
         {
             DebugScreenDataStack.Clear();
 
+            if (LoadingNextLevel)
+            {
+                if (LoadingScreenDrawn)
+                {
+                    level.Initialize(gameConfig["Levels"][level.Name]);
+                    level.LoadContent(Content);
+                    LoadingNextLevel = false;
+                    LoadingScreenDrawn = false;
+                }
+                return;
+            }
+
             InputHandler.Update(gameTime);
 
             // Allows the game to exit
@@ -171,6 +188,16 @@ namespace Squircle
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
+
+            if (LoadingNextLevel)
+            {
+                spriteBatch.Begin();
+                DrawOnScreen("Loading...");
+                spriteBatch.End();
+                LoadingScreenDrawn = true;
+                ++NumFramesLoading;
+                return;
+            }
 
             spriteBatch.Begin(
                 SpriteSortMode.Deferred,
@@ -275,13 +302,30 @@ namespace Squircle
                 pos = position.Value;
             }
 
-            var cameraUpperLeft = level.camera.Position - new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            spriteBatch.DrawString(debugFont, message, cameraUpperLeft + pos, Color.White);
+            var upperLeft = Vector2.Zero;
+
+            if (level.camera != null)
+            {
+                upperLeft = level.camera.Position - new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            }
+
+            spriteBatch.DrawString(debugFont, message, upperLeft + pos, Color.White);
         }
 
         private void onEndLevel(String data)
         {
-            throw new NotImplementedException();
+            if (data == "credits")
+            {
+                // TODO show credits.
+                throw new NotImplementedException();
+            }
+
+            LoadingScreenDrawn = false;
+            LoadingNextLevel = true;
+            NumFramesLoading = 0;
+
+            level = new Level(this);
+            level.Name = data;
         }
 
     }

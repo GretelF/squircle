@@ -30,6 +30,7 @@ namespace Squircle
     {
         private Game game;
 
+        public string Name { get; set; }
         public World World { get; set; }
         LevelGenerator LevelGenerator;
         List<Body> bodyList;
