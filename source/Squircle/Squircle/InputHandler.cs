@@ -33,6 +33,11 @@ namespace Squircle
             return _currentState.IsKeyDown(key) && _previousState.IsKeyUp(key);
         }
 
+        public bool WasReleased(Keys key)
+        {
+            return _currentState.IsKeyUp(key) && _previousState.IsKeyDown(key);
+        }
+
         public void Update(GameTime gameTime)
         {
             _previousState = _currentState;

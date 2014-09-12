@@ -133,6 +133,8 @@ namespace Squircle
         private string _textureName;
         private string _onPressEvent;
         private string _onPressEventData;
+        private string _onReleaseEvent;
+        private string _onReleaseEventData;
         private GameObject _master;
         private float _proximityRadiusSquared;
 
@@ -207,7 +209,18 @@ namespace Squircle
                 _onPressEventData = section["onPressEventData"];
             }
 
-            Game.EventSystem.getEvent("onPressEvent").addListener(onPressEvent);
+            if (section.Options.ContainsKey("onReleaseEvent"))
+            {
+                _onReleaseEvent = section["onReleaseEvent"];
+            }
+
+            if (section.Options.ContainsKey("onReleaseEventData"))
+            {
+                _onReleaseEventData = section["onReleaseEventData"];
+            }
+
+            Game.EventSystem.getEvent("playerButtonPress").addListener(onPlayerButtonPress);
+            Game.EventSystem.getEvent("playerButtonRelease").addListener(onPlayerButtonRelease);
         }
 
         public override void Update(GameTime gameTime)
@@ -226,7 +239,21 @@ namespace Squircle
             }
         }
 
-        public void onPressEvent(String data)
+        public void onPlayerButtonPress(String data)
+        {
+            if (!MasterIsCloseEnough)
+            {
+                return;
+            }
+
+            if (data == "Square" && _master is Square
+             || data == "Circle" && _master is Circle)
+            {
+                Game.EventSystem.getEvent(_onPressEvent).trigger(_onPressEventData);
+            }
+        }
+
+        public void onPlayerButtonRelease(String data)
         {
             if (!MasterIsCloseEnough)
             {

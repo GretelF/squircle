@@ -98,7 +98,11 @@ namespace Squircle
             }
             if (Game.InputHandler.WasTriggered(Keys.S))
             {
-                Game.EventSystem.getEvent("onPressEvent").trigger("Circle");
+                Game.EventSystem.getEvent("playerButtonPress").trigger("Circle");
+            }
+            else if (Game.InputHandler.WasReleased(Keys.S))
+            {
+                Game.EventSystem.getEvent("playerButtonRelease").trigger("Circle");
             }
 
             body.ApplyTorque(tempDir * 50000000);

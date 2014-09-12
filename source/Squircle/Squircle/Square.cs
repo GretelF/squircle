@@ -110,7 +110,11 @@ namespace Squircle
 
             if (Game.InputHandler.WasTriggered(Keys.Down))
             {
-                Game.EventSystem.getEvent("onPressEvent").trigger("Square");
+                Game.EventSystem.getEvent("playerButtonPress").trigger("Square");
+            }
+            else if (Game.InputHandler.WasReleased(Keys.S))
+            {
+                Game.EventSystem.getEvent("playerButtonRelease").trigger("Square");
             }
 
             var velocity = body.GetLinearVelocity() + tempPos - squarePos;
