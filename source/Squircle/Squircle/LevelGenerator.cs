@@ -38,8 +38,7 @@ namespace Squircle
 
         public List<Body> generateLevel()
         {
-
-            String pathToCollisionFile = level.levelConfig["Level"]["collision"];
+            String pathToCollisionFile = level.levelConfig.GlobalSection["collision"];
 
             var vertices = new Vector2[4];
 

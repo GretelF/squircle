@@ -25,7 +25,6 @@ namespace Squircle
         public GameObject other { get; set; }
     }
 
-
     public class Level : IContactListener
     {
         private Game game;
@@ -76,7 +75,7 @@ namespace Squircle
             playerBounds = CreatePhysicalViewBounds();
 
 
-            var gameObjectsConfig = ConfigFile.FromFile(levelConfig[""]["objects"]);
+            var gameObjectsConfig = ConfigFile.FromFile(levelConfig.GlobalSection["objects"]);
 
             foreach (var section in gameObjectsConfig.Sections)
             {
@@ -94,7 +93,7 @@ namespace Squircle
 
         public void LoadContent(ContentManager content)
         {
-            background = content.Load<Texture2D>(levelConfig["Level"]["background"]);
+            background = content.Load<Texture2D>(levelConfig.GlobalSection["background"]);
 
             square.LoadContent(content);
             circle.LoadContent(content);

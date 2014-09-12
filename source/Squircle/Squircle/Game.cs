@@ -49,7 +49,7 @@ namespace Squircle
 
             gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
             level = new Level(this);
-            level.Initialize(gameConfig["Levels"]["level0"]);
+            level.Initialize(gameConfig["Levels"]["level_01"]);
 
             debugDrawingEnabled = false;
 
