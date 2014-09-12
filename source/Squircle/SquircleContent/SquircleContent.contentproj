@@ -60,6 +60,10 @@
       <Name>level_test</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="level\level_test_objects.cfg">
+      <Name>level_test_objects</Name>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="level\test.bmp">
       <Name>test</Name>
       <Importer>TextureImporter</Importer>

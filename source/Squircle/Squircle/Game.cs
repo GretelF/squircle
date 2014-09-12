@@ -32,6 +32,7 @@ namespace Squircle
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            debugDrawingEnabled = false;
         }
 
         /// <summary>
@@ -50,8 +51,6 @@ namespace Squircle
             gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
             level = new Level(this);
             level.Initialize(gameConfig["Levels"]["level_01"]);
-
-            debugDrawingEnabled = false;
 
             base.Initialize();
         }

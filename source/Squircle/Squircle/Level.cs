@@ -73,7 +73,6 @@ namespace Squircle
 
             playerBounds = CreatePhysicalViewBounds();
 
-
             var gameObjectsConfig = ConfigFile.FromFile(levelConfig.GlobalSection["objects"]);
 
             foreach (var section in gameObjectsConfig.Sections)
@@ -87,7 +86,10 @@ namespace Squircle
                 gameObjects.Add(section.Key, go);
             }
 
-
+            if (levelConfig.GlobalSection.Options.ContainsKey("debugDrawingEnabled"))
+            {
+                game.debugDrawingEnabled = levelConfig.GlobalSection.Options["debugDrawingEnabled"].AsBool();
+            }
         }
 
         public void LoadContent(ContentManager content)

@@ -29,5 +29,9 @@ namespace Squircle
             return (Rectangle)cfg.AsDRectangle();
         }
 
+        public static bool AsBool(this ConfigOption cfg)
+        {
+            return bool.Parse(cfg);
+        }
     }
 }
