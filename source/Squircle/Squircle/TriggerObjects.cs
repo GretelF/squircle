@@ -216,6 +216,7 @@ namespace Squircle
 
         public override void BeginContact(ContactInfo contactInfo)
         {
+            if (!contactInfo.contact.IsTouching()) { return; }
             if (contactInfo.other is Circle && playerType == PlayerType.Circle || contactInfo.other is Square && playerType == PlayerType.Square)
             {
                 ++playerContactCount;
@@ -224,6 +225,7 @@ namespace Squircle
 
         public override void EndContact(ContactInfo contactInfo)
         {
+            if (!contactInfo.contact.IsTouching()) { return; }
             if (contactInfo.other is Circle && playerType == PlayerType.Circle || contactInfo.other is Square && playerType == PlayerType.Square)
             {
                 --playerContactCount;

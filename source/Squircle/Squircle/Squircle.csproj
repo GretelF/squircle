@@ -79,6 +79,7 @@
     <Compile Include="Camera.cs" />
     <Compile Include="Circle.cs" />
     <Compile Include="ConfigFileExtensions.cs" />
+    <Compile Include="Debugging.cs" />
     <Compile Include="EventSystem.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="InputHandler.cs" />
