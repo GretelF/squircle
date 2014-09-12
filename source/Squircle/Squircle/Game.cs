@@ -12,9 +12,18 @@ using Box2D.XNA;
 //using C3.XNA;
 using System.Drawing;
 using Configuration;
+using System.Text;
 
 namespace Squircle
 {
+    /// <summary>
+    /// Prevents a property of a game object to be used as debug data.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
+    public class IgnoreDebugData : System.Attribute
+    {
+    }
+
     /// <summary>
     /// This is the main type for your game
     /// </summary>
@@ -25,14 +34,18 @@ namespace Squircle
         public Level level;
         public ConfigFile gameConfig { get; set; }
         public bool debugDrawingEnabled { get; set; }
+        public SpriteFont debugFont { get; set; }
         public EventSystem EventSystem { get; set; }
         public InputHandler InputHandler { get; set; }
+
+        public IList<Func<object>> DebugData { get; set; }
 
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             debugDrawingEnabled = false;
+            DebugData = new List<Func<object>>();
         }
 
         /// <summary>
@@ -64,6 +77,7 @@ namespace Squircle
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            debugFont = Content.Load<SpriteFont>(gameConfig.GlobalSection["debugFont"]);
 
             level.LoadContent(Content);
         }
@@ -126,8 +140,48 @@ namespace Squircle
             level.Draw(spriteBatch, gameTime);
             
             base.Draw(gameTime);
-            
+
+            if (debugDrawingEnabled)
+            {
+                DrawDebugData(gameTime);
+            }
+
             spriteBatch.End();
+        }
+
+        private void DrawDebugData(GameTime gameTime)
+        {
+            foreach (var go in level.gameObjects)
+            {
+                var debugMessage = new StringBuilder();
+                debugMessage.AppendFormat("[{0}]", go.Name);
+
+                var type = go.GetType();
+                var properties = type.GetProperties();
+                foreach (var prop in properties)
+                {
+                    var propIsIgnored = Attribute.GetCustomAttribute(prop, typeof(IgnoreDebugData), true) != null;
+                    if (propIsIgnored)
+                    {
+                        continue;
+                    }
+
+                    var key = prop.Name;
+                    var value = prop.GetValue(go, null);
+                    debugMessage.AppendFormat("\n{0}: {1}", key, value);
+                }
+
+                var dimensions = debugFont.MeasureString(debugMessage);
+                var position = go.Pos - go.Dimensions / 2;
+                position.Y -= dimensions.Y;
+
+                spriteBatch.DrawString(debugFont, debugMessage, position, Microsoft.Xna.Framework.Color.White);
+            }
+        }
+
+        public void DrawOnScreen(string message, Vector2 position)
+        {
+            spriteBatch.DrawString(debugFont, message, position, Microsoft.Xna.Framework.Color.White);
         }
 
         private void onEndLevel(String data)

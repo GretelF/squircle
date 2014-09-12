@@ -35,6 +35,11 @@ namespace Squircle
             set { circlePos = value; }
         }
 
+        public override Vector2 Dimensions
+        {
+            get { return new Vector2(circleRadius, circleRadius); }
+        }
+
         public Circle(Game game, Level level)
             : base(game)
         {

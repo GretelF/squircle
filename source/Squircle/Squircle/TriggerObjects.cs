@@ -14,6 +14,7 @@ namespace Squircle
     public class TriggerObject : GameObject
     {
         private Vector2 _pos;
+        private Vector2 _dim;
         private Texture2D _texture;
         private string _textureName;
         private string _enterEvent;
@@ -26,6 +27,12 @@ namespace Squircle
             get { return _pos; }
             set { _pos = value; }
         }
+
+        public override Vector2 Dimensions
+        {
+            get { return _dim; }
+        }
+
         public override Texture2D Texture
         {
             get { return _texture; }
@@ -49,8 +56,8 @@ namespace Squircle
         public override void InitializeFromConfig(ConfigSection section)
         {
             _textureName = section["texture"];
-            Pos = section["position"].AsVector2();
-            var dim = section["dimensions"].AsVector2();
+            _pos = section["position"].AsVector2();
+            _dim = section["dimensions"].AsVector2();
 
             if (section.Options.ContainsKey("enterEvent"))
             {
@@ -76,7 +83,7 @@ namespace Squircle
             bodyDef.userData = this;
             var fixtureDef = new FixtureDef();
             var shape = new PolygonShape();
-            shape.SetAsBox(dim.X / 2, dim.Y / 2);
+            shape.SetAsBox(_dim.X / 2, _dim.Y / 2);
             fixtureDef.shape = shape;
             fixtureDef.isSensor = true;
             fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground };
@@ -110,26 +117,40 @@ namespace Squircle
             spriteBatch.Draw(_texture, pos, Microsoft.Xna.Framework.Color.White);
         }
     }
-    
+
     public class ButtonObject : GameObject
     {
         private Vector2 _pos;
+        private Vector2 _dim;
         private Texture2D _texture;
         private string _textureName;
         private string _onPressEvent;
         private string _onPressEventData;
-        private bool triggerEnabled = false;
+        private int playerContactCount = 0;
         private PlayerType playerType;
 
         public override Vector2 Pos
         {
             get { return _pos; }
-            set { _pos = value;}
+            set { _pos = value; }
         }
+
+        public override Vector2 Dimensions
+        {
+            get { return _dim; }
+        }
+
         public override Texture2D Texture
         {
             get { return _texture; }
         }
+
+        public int PlayerContactCount
+        {
+            get { return playerContactCount; }
+        }
+
+        public PlayerType PlayerType { get { return playerType; } }
 
         public ButtonObject(Game game)
             : base(game)
@@ -150,7 +171,7 @@ namespace Squircle
         {
             _textureName = section["texture"];
             Pos = section["position"].AsVector2();
-            var dim = section["dimensions"].AsVector2();
+            _dim = section["dimensions"].AsVector2();
 
             string playerTypeName = section["player"];
 
@@ -180,11 +201,13 @@ namespace Squircle
             var bodyDef = new BodyDef();
             bodyDef.userData = this;
             var fixtureDef = new FixtureDef();
-            var shape = new PolygonShape();
-            shape.SetAsBox(dim.X / 2, dim.Y / 2);
+            //var shape = new PolygonShape();
+            //shape.SetAsBox(Dimensions.X / 2, Dimensions.Y / 2);
+            var shape = new CircleShape();
+            shape._radius = Dimensions.X / 2;
             fixtureDef.shape = shape;
             fixtureDef.isSensor = true;
-            fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground};
+            fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground };
             bodyDef.position = Pos;
             Game.level.World.CreateBody(bodyDef).CreateFixture(fixtureDef);
 
@@ -195,7 +218,7 @@ namespace Squircle
         {
             if (contactInfo.other is Circle && playerType == PlayerType.Circle || contactInfo.other is Square && playerType == PlayerType.Square)
             {
-                triggerEnabled = true;
+                ++playerContactCount;
             }
         }
 
@@ -203,7 +226,7 @@ namespace Squircle
         {
             if (contactInfo.other is Circle && playerType == PlayerType.Circle || contactInfo.other is Square && playerType == PlayerType.Square)
             {
-                triggerEnabled = false;
+                --playerContactCount;
             }
         }
 
@@ -219,7 +242,7 @@ namespace Squircle
 
         public void onPressEvent(String data)
         {
-            if (!triggerEnabled)
+            if (playerContactCount == 0)
             {
                 return;
             }

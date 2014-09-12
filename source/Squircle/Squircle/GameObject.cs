@@ -18,7 +18,7 @@ namespace Squircle
 
     public abstract class GameObject
     {
-        public static GameObject Create(Game game, ConfigSection section)
+        public static GameObject Create(Game game, string gameObjectName, ConfigSection section)
         {
             var typeName = (string)section["type"];
             GameObject resultObject;
@@ -42,6 +42,7 @@ namespace Squircle
                 }
             }
 
+            resultObject.Name = gameObjectName;
             resultObject.InitializeFromConfig(section);
 
             return resultObject;
@@ -49,8 +50,17 @@ namespace Squircle
 
         protected Game Game { get; private set; }
 
+        [IgnoreDebugData]
+        public string Name { get; set; }
+
+        [IgnoreDebugData]
         public abstract Texture2D Texture { get; }
         public abstract Vector2 Pos { get; set; }
+
+        /// <summary>
+        /// X => Width, Y => Height
+        /// </summary>
+        public abstract Vector2 Dimensions { get; }
 
         public bool IsEnabled { get; set; }
 
@@ -88,11 +98,11 @@ namespace Squircle
 
     public class PhantomObject : GameObject
     {
-
         public override Texture2D Texture { get { return null; } }
         public override Vector2 Pos { get; set; }
+        public override Vector2 Dimensions { get { return Vector2.Zero; } }
 
-        public PhantomObject(Game game):base(game)
+        public PhantomObject(Game game) : base(game)
         {
         }
 

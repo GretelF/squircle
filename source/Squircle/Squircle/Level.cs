@@ -37,13 +37,13 @@ namespace Squircle
         Circle circle { get; set; }
         public ConfigFile levelConfig { get; private set; }
         public Camera2D camera { get; set; }
-        public IDictionary<string, GameObject> gameObjects { get; set; }
+        public IList<GameObject> gameObjects { get; set; }
         public Body playerBounds { get; set; }
 
         public Level(Game game)
         {
             this.game = game;
-            gameObjects = new Dictionary<string, GameObject>();
+            gameObjects = new List<GameObject>();
         }
 
         public void Initialize(ConfigOption option)
@@ -82,8 +82,8 @@ namespace Squircle
                     // Skip the global section because it can not contain any useful info in this case.
                     continue;
                 }
-                var go = GameObject.Create(game, section.Value);
-                gameObjects.Add(section.Key, go);
+                var go = GameObject.Create(game, section.Key, section.Value);
+                gameObjects.Add(go);
             }
 
             if (levelConfig.GlobalSection.Options.ContainsKey("debugDrawingEnabled"))
@@ -99,7 +99,7 @@ namespace Squircle
             square.LoadContent(content);
             circle.LoadContent(content);
 
-            foreach (var go in gameObjects.Values)
+            foreach (var go in gameObjects)
             {
                 go.LoadContent(content);
             }
@@ -111,7 +111,7 @@ namespace Squircle
             square.PrePhysicsUpdate(gameTime);
             circle.PrePhysicsUpdate(gameTime);
 
-            foreach (var go in gameObjects.Values)
+            foreach (var go in gameObjects)
             {
                 go.PrePhysicsUpdate(gameTime);
             }
@@ -121,7 +121,7 @@ namespace Squircle
             square.Update(gameTime);
             circle.Update(gameTime);
 
-            foreach (var go in gameObjects.Values)
+            foreach (var go in gameObjects)
             {
                 go.Update(gameTime);
             }
@@ -186,7 +186,7 @@ namespace Squircle
             }
 
             var contact = World.GetContactList();
-            var drawingSize = new Vector2(3.0f, 3.0f);
+            var drawingSize = new Vector2(4.0f, 4.0f);
             while (contact != null)
             {
                 Manifold manifold;
@@ -198,7 +198,7 @@ namespace Squircle
                 for (int i = 0; i < manifold._pointCount; i++)
                 {
                     var point = worldManifold._points[i];
-                    spriteBatch.FillRectangle(point, drawingSize, Microsoft.Xna.Framework.Color.Pink);
+                    spriteBatch.FillRectangle(point - drawingSize / 2, drawingSize, new Microsoft.Xna.Framework.Color(1.0f, 0.0f, 1.0f));
                 }
 
                 contact = contact.GetNext();
@@ -209,7 +209,7 @@ namespace Squircle
         {
             spriteBatch.Draw(background, new Vector2(0.0f, 0.0f), Microsoft.Xna.Framework.Color.White);
 
-            foreach (var go in gameObjects.Values)
+            foreach (var go in gameObjects)
             {
                 go.Draw(spriteBatch);
             }
@@ -256,60 +256,52 @@ namespace Squircle
 
         public void BeginContact(Contact contact)
         {
-            var contactInfo = new ContactInfo();
-
             while (contact != null)
             {
-                contactInfo.contact = contact;
+                var lhsInfo = new ContactInfo();
+                var rhsInfo = new ContactInfo();
 
-                var fixtureA = contact.GetFixtureA();
-                var goA = fixtureA.GetBody().GetUserData() as GameObject;
-                var fixtureB = contact.GetFixtureB();
-                var goB = fixtureB.GetBody().GetUserData() as GameObject;
+                lhsInfo.contact = contact;
+                rhsInfo.contact = contact;
 
-                if (goA != null)
-                {
-                    contactInfo.fixtureType = FixtureType.A;
-                    contactInfo.other = goB;
-                    goA.BeginContact(contactInfo);
-                }
-               
-                if (goB != null)
-                {
-                    contactInfo.fixtureType = FixtureType.B;
-                    contactInfo.other = goA;
-                    goB.BeginContact(contactInfo);
-                }
+                lhsInfo.fixtureType = FixtureType.A;
+                rhsInfo.fixtureType = FixtureType.B;
+
+                var lhsGo = contact.GetFixtureA().GetBody().GetUserData() as GameObject;
+                var rhsGo = contact.GetFixtureB().GetBody().GetUserData() as GameObject;
+
+                lhsInfo.other = rhsGo;
+                rhsInfo.other = lhsGo;
+
+                if (lhsGo != null) { lhsGo.BeginContact(lhsInfo); }
+                if (rhsGo != null) { rhsGo.BeginContact(rhsInfo); }
+
                 contact = contact.GetNext();
             }
         }
 
         public void EndContact(Contact contact)
         {
-            var contactInfo = new ContactInfo();
-
             while (contact != null)
             {
-                contactInfo.contact = contact;
+                var lhsInfo = new ContactInfo();
+                var rhsInfo = new ContactInfo();
 
-                var fixtureA = contact.GetFixtureA();
-                var goA = fixtureA.GetBody().GetUserData() as GameObject;
-                var fixtureB = contact.GetFixtureB();
-                var goB = fixtureB.GetBody().GetUserData() as GameObject;
+                lhsInfo.contact = contact;
+                rhsInfo.contact = contact;
 
-                if (goA != null)
-                {
-                    contactInfo.fixtureType = FixtureType.A;
-                    contactInfo.other = goB;
-                    goA.EndContact(contactInfo);
-                }
+                lhsInfo.fixtureType = FixtureType.A;
+                rhsInfo.fixtureType = FixtureType.B;
 
-                if (goB != null)
-                {
-                    contactInfo.fixtureType = FixtureType.B;
-                    contactInfo.other = goA;
-                    goB.EndContact(contactInfo);
-                }
+                var lhsGo = contact.GetFixtureA().GetBody().GetUserData() as GameObject;
+                var rhsGo = contact.GetFixtureB().GetBody().GetUserData() as GameObject;
+
+                lhsInfo.other = rhsGo;
+                rhsInfo.other = lhsGo;
+
+                if (lhsGo != null) { lhsGo.EndContact(lhsInfo); }
+                if (rhsGo != null) { rhsGo.EndContact(rhsInfo); }
+
                 contact = contact.GetNext();
             }
         }

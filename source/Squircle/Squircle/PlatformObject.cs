@@ -15,10 +15,13 @@ namespace Squircle
     public class PlatformObject : GameObject
     {
         private Vector2 _pos;
+        private Vector2 _dim;
         private Texture2D _texture;
         private string _textureName;
         private State _state;
         private string _toggleEvent;
+
+        [IgnoreDebugData]
         public Body body { get; set; }
 
         public override Vector2 Pos
@@ -26,6 +29,12 @@ namespace Squircle
             get { return _pos; }
             set { _pos = value; }
         }
+
+        public override Vector2 Dimensions
+        {
+            get { return _dim; }
+        }
+
         public override Texture2D Texture
         {
             get { return _texture; }
@@ -50,7 +59,7 @@ namespace Squircle
         {
             _textureName = section["texture"];
             Pos = section["position"].AsVector2();
-            var dim = section["dimensions"].AsVector2();
+            _dim = section["dimensions"].AsVector2();
             _toggleEvent = section["toggleEvent"];
             Game.EventSystem.getEvent(_toggleEvent).addListener(onToggleEvent);
 
@@ -72,7 +81,7 @@ namespace Squircle
             var bodyDef = new BodyDef();
             var fixtureDef = new FixtureDef();
             var shape = new PolygonShape();
-            shape.SetAsBox(dim.X / 2, dim.Y / 2);
+            shape.SetAsBox(Dimensions.X / 2, Dimensions.Y / 2);
             fixtureDef.shape = shape;
             fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground };
             bodyDef.type = BodyType.Static;

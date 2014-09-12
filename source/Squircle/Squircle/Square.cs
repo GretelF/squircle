@@ -36,6 +36,11 @@ namespace Squircle
             set { squarePos = value; }
         }
 
+        public override Vector2 Dimensions
+        {
+            get { return new Vector2(squareSideLength, squareSideLength); }
+        }
+
         public Square(Game game, Level level) :  base(game)
         {
             this.level = level;
