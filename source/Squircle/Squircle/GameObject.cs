@@ -106,7 +106,10 @@ namespace Squircle
 
         [IgnoreDebugData]
         public abstract Texture2D Texture { get; }
+
         public abstract Vector2 Pos { get; set; }
+
+        public int DrawOrder { get; set; }
 
         /// <summary>
         /// X => Width, Y => Height
@@ -118,10 +121,14 @@ namespace Squircle
             Game = game;
         }
 
-        public abstract void Initialize(ConfigSection section);
+        public virtual void Initialize(ConfigSection section)
+        {
+            section.IfOptionExists("name", opt => Name = opt);
+            section.IfOptionExists("drawOrder", opt => DrawOrder = opt);
+        }
+
         public abstract void LoadContent(ContentManager content);
 
-        
         public virtual void PrePhysicsUpdate(GameTime gameTime)
         {
         }
@@ -160,10 +167,6 @@ namespace Squircle
         public override Vector2 Dimensions { get { return Vector2.Zero; } }
 
         public PhantomObject(Game game) : base(game)
-        {
-        }
-
-        public override void Initialize(ConfigSection section)
         {
         }
 

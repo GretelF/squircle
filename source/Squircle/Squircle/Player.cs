@@ -30,6 +30,7 @@ namespace Squircle
 
         public Player(Game game) : base(game)
         {
+            DrawOrder = 10;
         }
     }
 }

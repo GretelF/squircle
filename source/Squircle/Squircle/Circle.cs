@@ -40,6 +40,8 @@ namespace Squircle
 
         public override void Initialize(ConfigSection section)
         {
+            base.Initialize(section);
+
             circlePos = section["position"].AsVector2();
             Radius = section["radius"];
             MaxTorque = section["torque"];

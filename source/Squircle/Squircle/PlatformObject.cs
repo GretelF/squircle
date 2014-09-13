@@ -64,6 +64,8 @@ namespace Squircle
 
         public override void Initialize(ConfigSection section)
         {
+            base.Initialize(section);
+
             TextureName = section["texture"];
             _dimensions = section["dimensions"].AsVector2();
             Game.EventSystem.getEvent(section["toggleEvent"]).addListener(onToggleEvent);
@@ -83,15 +85,9 @@ namespace Squircle
                 throw new ArgumentException("Unsupported GameObject state: " + stateName);
             }
 
-            if (section.Options.ContainsKey("movementSpeed"))
-            {
-                MovementSpeed = section["movementSpeed"];
-            }
+            section.IfOptionExists("movementSpeed", opt => MovementSpeed = opt);
 
-            if (section.Options.ContainsKey("toggleWaypointEvent"))
-            {
-                Game.EventSystem.getEvent(section["toggleWaypointEvent"]).addListener(onToggleWaypointEvent);
-            }
+            section.IfOptionExists("toggleWaypointEvent", opt => Game.EventSystem.getEvent(opt).addListener(onToggleWaypointEvent));
 
             var bodyDef = new BodyDef();
             var fixtureDef = new FixtureDef();
@@ -105,23 +101,13 @@ namespace Squircle
             Body = Game.level.World.CreateBody(bodyDef);
             Body.CreateFixture(fixtureDef);
 
-            if (section.Options.ContainsKey("waypointStart"))
-            {
-                WaypointStart = section["waypointStart"].AsVector2();
-            }
-            else
-            {
-                WaypointStart = Pos;
-            }
+            section.IfOptionExists("waypointStart",
+                opt => WaypointStart = opt.AsVector2(),
+                () => WaypointStart = Pos);
 
-            if (section.Options.ContainsKey("waypointEnd"))
-            {
-                WaypointEnd = section["waypointEnd"].AsVector2();
-            }
-            else
-            {
-                WaypointEnd = Pos;
-            }
+            section.IfOptionExists("waypointEnd",
+                opt => WaypointEnd = opt.AsVector2(),
+                () => WaypointEnd = Pos);
 
             if (section.Options.ContainsKey("target"))
             {

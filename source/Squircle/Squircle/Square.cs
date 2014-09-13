@@ -54,6 +54,8 @@ namespace Squircle
 
         public override void Initialize(ConfigSection section)
         {
+            base.Initialize(section);
+
             var pos = section["position"].AsVector2();
             SideLength = section["sideLength"];
             Speed = section["speed"];

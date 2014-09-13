@@ -52,6 +52,8 @@ namespace Squircle
 
         public override void Initialize(ConfigSection section)
         {
+            base.Initialize(section);
+
             if (section.Options.ContainsKey("texture"))
             {
                 _textureName = section["texture"];
@@ -185,6 +187,8 @@ namespace Squircle
 
         public override void Initialize(ConfigSection section)
         {
+            base.Initialize(section);
+
             TextureOnName = section["textureOn"];
             TextureOffName = section["textureOff"];
             Pos = section["position"].AsVector2();

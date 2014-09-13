@@ -9,6 +9,31 @@ namespace Squircle
 {
     public static class ConfigFileExtensions
     {
+        public static void IfOptionExists(this ConfigSection section, string optionName, Action<ConfigOption> action)
+        {
+            ConfigOption option;
+            if (section.Options.TryGetValue(optionName, out option))
+            {
+                action(option);
+            }
+        }
+
+        public static void IfOptionExists(this ConfigSection section,
+                                          string optionName,
+                                          Action<ConfigOption> thenAction,
+                                          Action elseAction)
+        {
+            ConfigOption option;
+            if (section.Options.TryGetValue(optionName, out option))
+            {
+                thenAction(option);
+            }
+            else
+            {
+                elseAction();
+            }
+        }
+
         public static DVector2 AsDVector2(this ConfigOption cfg)
         {
             return DVector2.Parse(cfg);
