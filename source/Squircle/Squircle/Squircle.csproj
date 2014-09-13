@@ -92,6 +92,7 @@
     <Compile Include="Game.cs" />
     <Compile Include="Square.cs" />
     <Compile Include="TriggerObjects.cs" />
+    <Compile Include="UserInterface.cs" />
     <Compile Include="Vector2Extensions.cs" />
   </ItemGroup>
   <ItemGroup>

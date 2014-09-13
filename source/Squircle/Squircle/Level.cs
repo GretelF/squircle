@@ -44,6 +44,7 @@ namespace Squircle
         public Circle circle { get { if (_cachedCircle == null) _cachedCircle = (Circle)GetGameObject("circle"); return _cachedCircle; } }
         public IList<GameObject> GameObjects { get; set; }
         public Body playerBounds { get; set; }
+        public UserInterface Menu { get; set; }
 
         public Level(Game game)
         {
@@ -85,6 +86,10 @@ namespace Squircle
                 var go = GameObject.Create(game, section.Key, section.Value);
                 GameObjects.Add(go);
             }
+
+            Menu = new UserInterface(game);
+            var userInterfaceConfig = ConfigFile.FromFile(levelConfig.GlobalSection["userInterface"]);
+            Menu.InitializeFromConfigFile(userInterfaceConfig);
 
             if (!levelConfig.Sections.ContainsKey("Debug"))
             {
@@ -142,10 +147,18 @@ namespace Squircle
             {
                 go.LoadContent(content);
             }
+
+            Menu.LoadContent(content);
         }
 
         public void Update(GameTime gameTime)
         {
+            if (game.GameState.IsInMenu)
+            {
+                Menu.Update(gameTime);
+                return;
+            }
+
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             foreach (var go in GameObjects)
@@ -213,6 +226,11 @@ namespace Squircle
             {
                 World.DrawDebugData();
                 DrawPhysicalContacts(spriteBatch);
+            }
+
+            if (game.GameState.IsInMenu)
+            {
+                Menu.Draw(spriteBatch);
             }
         }
 

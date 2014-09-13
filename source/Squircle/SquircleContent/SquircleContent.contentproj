@@ -43,6 +43,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Name>game</Name>
     </None>
+    <None Include="menu\userInterface.cfg">
+      <Name>userInterface</Name>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="player\circle.cfg">
       <Name>circle</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -235,6 +239,55 @@
     </Compile>
     <Compile Include="objects\platform_04.png">
       <Name>platform_04</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="credits.png">
+      <Name>credits</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="menu\button_credits_off.png">
+      <Name>button_credits_off</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="menu\button_credits_on.png">
+      <Name>button_credits_on</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="menu\button_exit_off.png">
+      <Name>button_exit_off</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="menu\button_exit_on.png">
+      <Name>button_exit_on</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="menu\button_toTheGame_off.png">
+      <Name>button_toTheGame_off</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="menu\button_toTheGame_on.png">
+      <Name>button_toTheGame_on</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="menu\credits.png">
+      <Name>credits</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="menu\menu_background.png">
+      <Name>menu_background</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

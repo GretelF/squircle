@@ -12,6 +12,7 @@ using Box2D.XNA;
 //using C3.XNA;
 using Configuration;
 using System.Text;
+using System.Diagnostics;
 
 namespace Squircle
 {
@@ -21,6 +22,53 @@ namespace Squircle
     [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     public class IgnoreDebugData : System.Attribute
     {
+    }
+
+    public enum GameStateType
+    {
+        Invalid,
+
+        Loading,
+        Menu,
+        Running,
+    }
+
+    public class GameState
+    {
+        public GameStateType PreviousValue { get; private set; }
+        public GameStateType Value { get; set; }
+
+        public bool WasLoading { get { return PreviousValue == GameStateType.Loading; } }
+        public bool WasInMenu { get { return PreviousValue == GameStateType.Menu; } }
+        public bool WasRunning { get { return PreviousValue == GameStateType.Running; } }
+
+        public bool IsLoading { get { return Value == GameStateType.Loading; } }
+        public bool IsInMenu { get { return Value == GameStateType.Menu; } }
+        public bool IsRunning { get { return Value == GameStateType.Running; } }
+
+        public GameState()
+        {
+            PreviousValue = GameStateType.Invalid;
+            Value = GameStateType.Menu;
+        }
+
+        public void SetLoading() { PreviousValue = Value; Value = GameStateType.Loading; }
+        public void SetInMenu()  { PreviousValue = Value; Value = GameStateType.Menu; }
+        public void SetRunning() { PreviousValue = Value; Value = GameStateType.Running; }
+
+        public void ToggleRunningAndInMenu()
+        {
+            Debug.Assert(IsRunning || IsInMenu,
+                "Cannot toggle between Running and InMenu if we are in another state.");
+
+            if (IsRunning) { SetInMenu(); }
+            else           { SetRunning(); }
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 
     /// <summary>
@@ -39,15 +87,15 @@ namespace Squircle
         public SpriteFont debugFont { get; set; }
         public EventSystem EventSystem { get; set; }
         public InputHandler InputHandler { get; set; }
+        public GameState GameState { get; set; }
 
         public PhysicsDebugDraw PhysicsDebugDrawer { get; set; }
 
         public IList<Vector2> DebugScreenDataStack { get; set; }
 
-        public bool LoadingNextLevel { get; set; }
         public bool LoadingScreenDrawn { get; set; }
 
-        public uint NumFramesLoading { get; set; }
+        public Event ToggleRunningAndInMenuEvent { get; set; }
 
         public Game()
         {
@@ -59,6 +107,9 @@ namespace Squircle
             drawDebugData = false;
 
             DebugScreenDataStack = new List<Vector2>();
+
+            GameState = new GameState();
+            GameState.SetLoading();
         }
 
         /// <summary>
@@ -73,6 +124,9 @@ namespace Squircle
 
             EventSystem = new EventSystem();
             EventSystem.getEvent("endLevel").addListener(onEndLevel);
+            EventSystem.getEvent("exit").addListener(onExit);
+            ToggleRunningAndInMenuEvent = EventSystem.getEvent("toggleRunningAndInMenu");
+            ToggleRunningAndInMenuEvent.addListener(onToggleRunningAndInMenu);
 
             PhysicsDebugDrawer = new PhysicsDebugDraw();
 
@@ -88,6 +142,8 @@ namespace Squircle
             level.Initialize(gameConfig["Levels"]["level_01"]);
 
             base.Initialize();
+
+            GameState.SetRunning();
         }
 
         /// <summary>
@@ -113,8 +169,6 @@ namespace Squircle
             // TODO: Unload any non ContentManager content here
         }
 
-
-
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -126,7 +180,7 @@ namespace Squircle
         {
             DebugScreenDataStack.Clear();
 
-            if (LoadingNextLevel)
+            if (GameState.IsLoading)
             {
                 if (LoadingScreenDrawn)
                 {
@@ -140,7 +194,7 @@ namespace Squircle
             // Allows the game to exit
             if (InputHandler.WasTriggered(Keys.Escape) || InputHandler.WasTriggered(Buttons.Start))
             {
-                this.Exit();
+                ToggleRunningAndInMenuEvent.trigger("");
             }
 
             if (InputHandler.WasTriggered(Keys.R) || InputHandler.WasTriggered(Buttons.Back))
@@ -192,20 +246,19 @@ namespace Squircle
         {
             GraphicsDevice.Clear(Color.Black);
 
-            if (LoadingNextLevel)
+            if (GameState.IsLoading)
             {
                 spriteBatch.Begin();
                 DrawOnScreen("Loading...");
                 spriteBatch.End();
                 LoadingScreenDrawn = true;
-                ++NumFramesLoading;
                 return;
             }
 
             spriteBatch.Begin(
                 SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
-                null, 
+                null,
                 null,
                 null,
                 null,
@@ -230,6 +283,7 @@ namespace Squircle
             {
                 DrawDebugData(gameTime);
                 DrawOnScreen("Drawing debug data");
+                DrawOnScreen(string.Format("Game state: {0}", GameState));
             }
 
             if (drawMoreDebugData)
@@ -316,7 +370,7 @@ namespace Squircle
         private void StartLoadingLevel(String name)
         {
             LoadingScreenDrawn = false;
-            LoadingNextLevel = true;
+            GameState.SetLoading();
 
             level = new Level(this);
             level.Name = name;
@@ -326,7 +380,7 @@ namespace Squircle
         {
             level.Initialize(gameConfig["Levels"][level.Name]);
             level.LoadContent(Content);
-            LoadingNextLevel = false;
+            GameState.SetRunning();
             LoadingScreenDrawn = false;
         }
 
@@ -339,6 +393,16 @@ namespace Squircle
             }
 
             StartLoadingLevel(data);
+        }
+
+        private void onExit(String data)
+        {
+            Exit();
+        }
+
+        private void onToggleRunningAndInMenu(String data)
+        {
+            GameState.ToggleRunningAndInMenu();
         }
     }
 }
