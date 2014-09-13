@@ -30,26 +30,25 @@ namespace Squircle
     {
         private Game game;
 
+        private Square _cachedSquare;
+        private Circle _cachedCircle;
+
         public string Name { get; set; }
         public World World { get; set; }
         LevelGenerator LevelGenerator;
         List<Body> bodyList;
         Texture2D background;
-        public Square square { get; set; }
-        public Circle circle { get; set; }
         public ConfigFile levelConfig { get; private set; }
         public Camera2D camera { get; set; }
+        public Square square { get { if (_cachedSquare == null) _cachedSquare = (Square)GetGameObject("square"); return _cachedSquare; } }
+        public Circle circle { get { if (_cachedCircle == null) _cachedCircle = (Circle)GetGameObject("circle"); return _cachedCircle; } }
         public IList<GameObject> GameObjects { get; set; }
-        public IList<GameObject> ToUpdate { get; set; }
-        public IList<GameObject> ToDraw { get; set; }
         public Body playerBounds { get; set; }
 
         public Level(Game game)
         {
             this.game = game;
             GameObjects = new List<GameObject>();
-            ToUpdate = new List<GameObject>();
-            ToDraw = new List<GameObject>();
         }
 
         public void Initialize(ConfigOption option)
@@ -63,13 +62,7 @@ namespace Squircle
 
             var viewport = game.GraphicsDevice.Viewport;
 
-            square = new Square(game, this);
-            square.Pos = levelConfig["Players"]["square"].AsVector2();
-            square.Initialize();
-
-            circle = new Circle(game, this);
-            circle.Pos = levelConfig["Players"]["circle"].AsVector2();
-            circle.Initialize();
+            InitializePlayers();
 
             camera = new Camera2D(game);
             camera.Initialize();
@@ -121,12 +114,29 @@ namespace Squircle
             }
         }
 
+        private void InitializePlayers()
+        {
+            var playersSection = levelConfig["Players"];
+
+            foreach (var player in playersSection.Options)
+            {
+                var playerConfig = ConfigFile.FromFile(player.Value);
+                var section = playerConfig.GlobalSection;
+                var playerName = (string)player.Key;
+
+                if (!section.Options.ContainsKey("type"))
+                {
+                    section.Options.Add("type", playerName);
+                }
+
+                var go = GameObject.Create(game, playerName, section);
+                GameObjects.Add(go);
+            }
+        }
+
         public void LoadContent(ContentManager content)
         {
             background = content.Load<Texture2D>(levelConfig.GlobalSection["background"]);
-
-            square.LoadContent(content);
-            circle.LoadContent(content);
 
             foreach (var go in GameObjects)
             {
@@ -137,8 +147,6 @@ namespace Squircle
         public void Update(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            square.PrePhysicsUpdate(gameTime);
-            circle.PrePhysicsUpdate(gameTime);
 
             foreach (var go in GameObjects)
             {
@@ -146,9 +154,6 @@ namespace Squircle
             }
 
             World.Step(deltaTime, 20, 10);
-
-            square.Update(gameTime);
-            circle.Update(gameTime);
 
             foreach (var go in GameObjects)
             {
@@ -197,13 +202,12 @@ namespace Squircle
         {
             spriteBatch.Draw(background, new Vector2(0.0f, 0.0f), Microsoft.Xna.Framework.Color.White);
 
-            foreach (var go in GameObjects)
+            for (var i = GameObjects.Count; i > 0; --i)
             {
+                var index = i - 1;
+                var go = GameObjects[index];
                 go.Draw(spriteBatch);
             }
-
-            square.Draw(spriteBatch);
-            circle.Draw(spriteBatch);
 
             if (game.drawPhysics)
             {
@@ -239,6 +243,10 @@ namespace Squircle
             return body;
         }
 
+        public GameObject GetGameObject(string name)
+        {
+            return GameObjects.First(go => go.Name == name);
+        }
 
         #region IContactListener interface
 

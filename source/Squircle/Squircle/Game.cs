@@ -249,8 +249,6 @@ namespace Squircle
                 spriteBatch.FillRectangle(go.Pos - drawSize / 2, drawSize, Color.Red);
                 spriteBatch.DrawRectangle((Microsoft.Xna.Framework.Rectangle)go.CalculateBoundingBox(), Color.Red);
             }
-            spriteBatch.DrawRectangle((Microsoft.Xna.Framework.Rectangle)level.circle.CalculateBoundingBox(), Color.Red);
-            spriteBatch.DrawRectangle((Microsoft.Xna.Framework.Rectangle)level.square.CalculateBoundingBox(), Color.Red);
         }
 
         private void DrawDebugData(GameTime gameTime)

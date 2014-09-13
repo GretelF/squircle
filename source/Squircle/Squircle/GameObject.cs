@@ -67,6 +67,12 @@ namespace Squircle
 
             switch (typeName)
             {
+                case "square":
+                    resultObject = new Square(game);
+                    break;
+                case "circle":
+                    resultObject = new Circle(game);
+                    break;
                 case "platform":
                     resultObject = new PlatformObject(game);
                     break;
@@ -88,7 +94,7 @@ namespace Squircle
             }
 
             resultObject.Name = gameObjectName;
-            resultObject.InitializeFromConfig(section);
+            resultObject.Initialize(section);
 
             return resultObject;
         }
@@ -115,9 +121,8 @@ namespace Squircle
             IsEnabled = true;
         }
 
-        public abstract void Initialize();
+        public abstract void Initialize(ConfigSection section);
         public abstract void LoadContent(ContentManager content);
-        public abstract void InitializeFromConfig(ConfigSection section);
 
         
         public virtual void PrePhysicsUpdate(GameTime gameTime)
@@ -161,15 +166,11 @@ namespace Squircle
         {
         }
 
-        public override void Initialize()
+        public override void Initialize(ConfigSection section)
         {
         }
 
         public override void LoadContent(ContentManager content)
-        {
-        }
-
-        public override void InitializeFromConfig(ConfigSection section)
         {
         }
     }

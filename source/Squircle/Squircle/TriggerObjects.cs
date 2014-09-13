@@ -43,18 +43,13 @@ namespace Squircle
         {
         }
 
-        public override void Initialize()
-        {
-            throw new NotImplementedException();
-        }
-
         public override void LoadContent(ContentManager content)
         {
             if (_textureName == null) { return; }
             _texture = content.Load<Texture2D>(_textureName);
         }
 
-        public override void InitializeFromConfig(ConfigSection section)
+        public override void Initialize(ConfigSection section)
         {
             if (section.Options.ContainsKey("texture"))
             {
@@ -180,18 +175,13 @@ namespace Squircle
             PressedState = new State() { Value = StateType.Inactive };
         }
 
-        public override void Initialize()
-        {
-            throw new NotImplementedException();
-        }
-
         public override void LoadContent(ContentManager content)
         {
             TextureOn = content.Load<Texture2D>(TextureOnName);
             TextureOff = content.Load<Texture2D>(TextureOffName);
         }
 
-        public override void InitializeFromConfig(ConfigSection section)
+        public override void Initialize(ConfigSection section)
         {
             TextureOnName = section["textureOn"];
             TextureOffName = section["textureOff"];
@@ -200,18 +190,7 @@ namespace Squircle
 
             string masterName = section["master"];
 
-            if (masterName == "Circle")
-            {
-                Master = Game.level.circle;
-            }
-            else if (masterName == "Square")
-            {
-                Master = Game.level.square;
-            }
-            else
-            {
-                throw new ArgumentException("Unsupported master.");
-            }
+            Master = Game.level.GetGameObject(masterName);
 
             var state = section["state"];
 

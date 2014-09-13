@@ -46,17 +46,12 @@ namespace Squircle
             _state = new State();
         }
 
-        public override void Initialize()
-        {
-            throw new NotImplementedException();
-        }
-
         public override void LoadContent(ContentManager content)
         {
             _texture = content.Load<Texture2D>(_textureName);
         }
 
-        public override void InitializeFromConfig(ConfigSection section)
+        public override void Initialize(ConfigSection section)
         {
             _textureName = section["texture"];
             Pos = section["position"].AsVector2();

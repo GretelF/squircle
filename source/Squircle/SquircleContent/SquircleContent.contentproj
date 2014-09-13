@@ -43,6 +43,14 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Name>game</Name>
     </None>
+    <None Include="player\circle.cfg">
+      <Name>circle</Name>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="player\square.cfg">
+      <Name>square</Name>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="level\level_01.cfg">

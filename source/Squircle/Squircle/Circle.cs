@@ -17,7 +17,6 @@ namespace Squircle
         private Vector2 circlePos;
         private float circleRadius = 20.0f;
         public float Radius { get { return circleRadius; } set { circleRadius = value; } }
-        private Level level;
         private Body body;
         public Body Body { get { return body; } }
 
@@ -40,21 +39,17 @@ namespace Squircle
             get { return new Vector2(circleRadius * 2, circleRadius * 2); }
         }
 
-        public Circle(Game game, Level level)
-            : base(game)
-        {
-            this.level = level;
-            Name = "Circle";
-        }
-
+        public Circle(Game game) : base(game) {}
 
         public override void LoadContent(ContentManager content)
         {
             circleTexture = content.Load<Texture2D>("player/circle_40px");
         }
 
-        public override void Initialize()
+        public override void Initialize(ConfigSection section)
         {
+            circlePos = section["position"].AsVector2();
+
             var bodyDef = new BodyDef();
             bodyDef.type = BodyType.Dynamic;
 
@@ -66,7 +61,7 @@ namespace Squircle
 
             bodyDef.userData = this;
 
-            body = level.World.CreateBody(bodyDef);
+            body = Game.level.World.CreateBody(bodyDef);
 
             var shape = new CircleShape();
             shape._radius = circleRadius;
@@ -77,10 +72,6 @@ namespace Squircle
             fixture.shape = shape;
             fixture.friction = 10.0f;
             body.CreateFixture(fixture);
-        }
-
-        public override void InitializeFromConfig(ConfigSection section)
-        {
         }
 
         public override void PrePhysicsUpdate(GameTime gameTime)

@@ -17,7 +17,6 @@ namespace Squircle
         private Vector2 squarePos;
         private float squareSideLength = 50.0f;
         public float SideLength { get { return squareSideLength; } set { squareSideLength = value; } }
-        private Level level;
         private Body body;
         public Body Body { get { return body; } }
         private Boolean canJump = false;
@@ -41,20 +40,16 @@ namespace Squircle
             get { return new Vector2(squareSideLength, squareSideLength); }
         }
 
-        public Square(Game game, Level level) :  base(game)
-        {
-            this.level = level;
-            Name = "Square";
-        }
-
+        public Square(Game game) :  base(game) {}
 
         public override void LoadContent(ContentManager content)
         {
             squareTexture = content.Load<Texture2D>("player/square_50px");
         }
 
-        public override void Initialize()
+        public override void Initialize(ConfigSection section)
         {
+            squarePos = section["position"].AsVector2();
 
             var bodyDef = new BodyDef();
             bodyDef.type = BodyType.Dynamic;
@@ -67,7 +62,7 @@ namespace Squircle
 
             bodyDef.userData = this;
 
-            body = level.World.CreateBody(bodyDef);
+            body = Game.level.World.CreateBody(bodyDef);
 
             var shape = new PolygonShape();
             var offset = squareSideLength / 2;
@@ -79,18 +74,12 @@ namespace Squircle
                 }
             , 4);
 
-          
-
             var fixture = new FixtureDef();
             fixture.restitution = 0.1f;
             fixture.density = 1.0f;
             fixture.shape = shape;
             fixture.friction = .2f;
             body.CreateFixture(fixture);
-        }
-
-        public override void InitializeFromConfig(ConfigSection section)
-        {
         }
 
         public override void PrePhysicsUpdate(GameTime gameTime)
