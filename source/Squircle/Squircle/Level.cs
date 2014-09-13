@@ -16,7 +16,7 @@ namespace Squircle
 {
     public enum FixtureType
     {
-        A, 
+        A,
         B,
     }
     public struct ContactInfo
@@ -45,19 +45,31 @@ namespace Squircle
         public IList<GameObject> GameObjects { get; set; }
         public Body playerBounds { get; set; }
         public UserInterface Menu { get; set; }
+        public float PhysicsScale { get; set; }
+        public float GroundFriction { get; set; }
 
         public Level(Game game)
         {
             this.game = game;
             GameObjects = new List<GameObject>();
+            PhysicsScale = 1.0f;
         }
 
         public void Initialize(ConfigOption option)
         {
             levelConfig = ConfigFile.FromFile(option.Value);
-            World = new Box2D.XNA.World(new Vector2(0.0f, 100.0f), false);
-            World.ContactListener = this;
-            World.DebugDraw = game.PhysicsDebugDrawer;
+
+            {
+                var physicsSection = levelConfig["Physics"];
+
+                PhysicsScale = physicsSection["scale"];
+                GroundFriction = physicsSection["groundFriction"];
+                World = new World(physicsSection["gravity"].AsVector2(), physicsSection["doSleep"].AsBool());
+                World.ContinuousPhysics = physicsSection["continuousPhysics"].AsBool();
+                World.ContactListener = this;
+                World.DebugDraw = game.PhysicsDebugDrawer;
+            }
+
             LevelGenerator = new LevelGenerator(this);
             bodyList = LevelGenerator.generateLevel();
 
@@ -177,7 +189,7 @@ namespace Squircle
 
             camera.Update(gameTime);
 
-            playerBounds.Position = camera.Position;
+            playerBounds.Position = ConvertToBox2D(camera.Position);
         }
 
         private void UpdateCameraFocus()
@@ -251,8 +263,8 @@ namespace Squircle
 
             var viewport = game.GraphicsDevice.Viewport;
 
-            var X = viewport.Width / 2;
-            var Y = viewport.Height / 2;
+            var X = ConvertToBox2D(viewport.Width / 2);
+            var Y = ConvertToBox2D(viewport.Height / 2);
             edges[0].Set(new Vector2(-X, -Y), new Vector2(+X, -Y));
             edges[1].Set(new Vector2(+X, -Y), new Vector2(+X, +Y));
             edges[2].Set(new Vector2(+X, +Y), new Vector2(-X, +Y));
@@ -272,6 +284,26 @@ namespace Squircle
         public GameObject GetGameObject(string name)
         {
             return GameObjects.First(go => go.Name == name);
+        }
+
+        public Vector2 ConvertFromBox2D(Vector2 vec)
+        {
+            return vec / PhysicsScale;
+        }
+
+        public float ConvertFromBox2D(float f)
+        {
+            return f / PhysicsScale;
+        }
+
+        public Vector2 ConvertToBox2D(Vector2 vec)
+        {
+            return vec * PhysicsScale;
+        }
+
+        public float ConvertToBox2D(float f)
+        {
+            return f * PhysicsScale;
         }
 
         #region IContactListener interface

@@ -139,6 +139,7 @@ namespace Squircle
             gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
             level = new Level(this);
             level.Name = "level_01";
+            PhysicsDebugDrawer.Level = level;
             level.Initialize(gameConfig["Levels"]["level_01"]);
 
             base.Initialize();

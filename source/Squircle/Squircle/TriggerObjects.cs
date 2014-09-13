@@ -13,7 +13,6 @@ namespace Squircle
 
     public class TriggerObject : GameObject
     {
-        private Vector2 _pos;
         private Vector2 _dim;
         private Texture2D _texture;
         private string _textureName;
@@ -22,10 +21,12 @@ namespace Squircle
         private string _enterEventData;
         private string _leaveEventData;
 
+        public Body Body { get; set; }
+
         public override Vector2 Pos
         {
-            get { return _pos; }
-            set { _pos = value; }
+            get { return Game.level.ConvertFromBox2D(Body.Position); }
+            set { Body.Position = Game.level.ConvertToBox2D(value); }
         }
 
         public override Vector2 Dimensions
@@ -56,7 +57,7 @@ namespace Squircle
                 _textureName = section["texture"];
             }
 
-            _pos = section["position"].AsVector2();
+            var pos = section["position"].AsVector2();
             _dim = section["dimensions"].AsVector2();
 
             if (section.Options.ContainsKey("enterEvent"))
@@ -83,12 +84,13 @@ namespace Squircle
             bodyDef.userData = this;
             var fixtureDef = new FixtureDef();
             var shape = new PolygonShape();
-            shape.SetAsBox(_dim.X / 2, _dim.Y / 2);
+            shape.SetAsBox(Game.level.ConvertToBox2D(_dim.X / 2), Game.level.ConvertToBox2D(_dim.Y / 2));
             fixtureDef.shape = shape;
             fixtureDef.isSensor = true;
             fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground };
-            bodyDef.position = Pos;
-            Game.level.World.CreateBody(bodyDef).CreateFixture(fixtureDef);
+            bodyDef.position = Game.level.ConvertToBox2D(pos);
+            Body = Game.level.World.CreateBody(bodyDef);
+            Body.CreateFixture(fixtureDef);
         }
 
         public override void BeginContact(ContactInfo contactInfo)

@@ -26,12 +26,6 @@ namespace Squircle
             }
         }
 
-        public override Vector2 Pos
-        {
-            get { return circlePos; }
-            set { circlePos = value; }
-        }
-
         public override Vector2 Dimensions
         {
             get { return new Vector2(Radius * 2, Radius * 2); }
@@ -53,7 +47,7 @@ namespace Squircle
             var bodyDef = new BodyDef();
             bodyDef.type = BodyType.Dynamic;
 
-            bodyDef.position = circlePos;
+            bodyDef.position = Game.level.ConvertToBox2D(circlePos);
             bodyDef.inertiaScale = section["inertiaScale"];
             bodyDef.linearDamping = section["linearDamping"];
             bodyDef.angularDamping = section["angularDamping"];
@@ -63,7 +57,7 @@ namespace Squircle
             Body = Game.level.World.CreateBody(bodyDef);
 
             var shape = new CircleShape();
-            shape._radius = Radius;
+            shape._radius = Game.level.ConvertToBox2D(Radius);
 
             var fixture = new FixtureDef();
             fixture.restitution = section["restitution"];
@@ -101,15 +95,13 @@ namespace Squircle
 
         public override void Update(GameTime gameTime)
         {
-            circlePos = Body.GetPosition();
+            circlePos = Game.level.ConvertFromBox2D(Body.GetPosition());
             base.Update(gameTime);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            var pos = circlePos + new Vector2(-Radius, -Radius);
-
-            spriteBatch.Draw(circleTexture, circlePos, null, Color.White, Body.Rotation, new Vector2(Radius, Radius), 1.0f, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(circleTexture, Pos, null, Color.White, Body.Rotation, new Vector2(Radius, Radius), 1.0f, SpriteEffects.None, 0.0f);
         }
     }
 

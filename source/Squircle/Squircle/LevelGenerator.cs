@@ -72,7 +72,7 @@ namespace Squircle
                 bodyDef.type = BodyType.Dynamic;
 
                 bodyDef.angle = 0;
-                bodyDef.position = startPoint;
+                bodyDef.position = level.ConvertToBox2D(startPoint);
                 bodyDef.inertiaScale = 1.0f;
 
                 var body = level.World.CreateBody(bodyDef);
@@ -88,7 +88,6 @@ namespace Squircle
                 bodyList.Add(body);
             }
 
-
             foreach (var startPoint in startPointsStatic)
             {
                 vertices = GetVertices(map, startPoint);
@@ -96,7 +95,7 @@ namespace Squircle
                 bodyDef.type = BodyType.Static;
 
                 bodyDef.angle = 0;
-                bodyDef.position = startPoint;
+                bodyDef.position = level.ConvertToBox2D(startPoint);
 
                 var body = level.World.CreateBody(bodyDef);
 
@@ -132,7 +131,7 @@ namespace Squircle
                     }
                     else
                     {
-                        fixture.friction = 4.0f;
+                        fixture.friction = level.GroundFriction;
                         elementInfo.type = LevelElementType.Ground;
                     }
                     fixture.userData = elementInfo;
@@ -239,7 +238,7 @@ namespace Squircle
                     if (isBlack(getPixel(map, neighbor)))
                     {
                         next = neighbor;
-                        vertices.Add(next - start);                 // subtract start, to transform to local space. 
+                        vertices.Add(level.ConvertToBox2D(next - start));       // subtract start, to transform to local space.
                         visited.Add(neighbor);
                         break;
                     }

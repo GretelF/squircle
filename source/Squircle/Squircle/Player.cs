@@ -22,6 +22,12 @@ namespace Squircle
         [IgnoreDebugData]
         public virtual Body Body { get; protected set; }
 
+        public override Vector2 Pos
+        {
+            get { return Game.level.ConvertFromBox2D(Body.Position); }
+            set { Body.Position = Game.level.ConvertToBox2D(value); }
+        }
+
         public Player(Game game) : base(game)
         {
         }

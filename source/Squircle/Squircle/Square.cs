@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -14,10 +15,20 @@ namespace Squircle
     public class Square : Player
     {
         private Texture2D squareTexture;
-        private Vector2 squarePos;
         public float SideLength { get; set; }
-        private Boolean canJump = false;
 
+        public bool CanJump
+        {
+            get
+            {
+                return JumpingEnabled
+                    && Math.Abs(Body.GetLinearVelocity().Y) <= JumpThreshold;
+            }
+        }
+        public bool JumpingEnabled { get; set; }
+        public float JumpThreshold { get; set; }
+
+        public float Speed { get; set; }
         public float MaxSpeed { get; set; }
         public float JumpImpulse { get; set; }
 
@@ -27,12 +38,6 @@ namespace Squircle
             {
                 return squareTexture;
             }
-        }
-
-        public override Vector2 Pos
-        {
-            get { return squarePos; }
-            set { squarePos = value; }
         }
 
         public override Vector2 Dimensions
@@ -49,16 +54,18 @@ namespace Squircle
 
         public override void Initialize(ConfigSection section)
         {
-            squarePos = section["position"].AsVector2();
+            var pos = section["position"].AsVector2();
             SideLength = section["sideLength"];
+            Speed = section["speed"];
             MaxSpeed = section["maxSpeed"];
             JumpImpulse = section["jumpImpulse"];
+            JumpThreshold = section["jumpThreshold"];
 
             var bodyDef = new BodyDef();
             bodyDef.type = BodyType.Dynamic;
 
             bodyDef.angle = 0;
-            bodyDef.position = squarePos;
+            bodyDef.position = Game.level.ConvertToBox2D(pos);
             bodyDef.inertiaScale = section["inertiaScale"];
             bodyDef.linearDamping = section["linearDamping"];
             bodyDef.angularDamping = section["angularDamping"];
@@ -70,10 +77,10 @@ namespace Squircle
             var shape = new PolygonShape();
             var offset = SideLength / 2;
             shape.Set(new Vector2[]{
-                new Vector2(-offset, -offset),
-                new Vector2(offset, -offset),
-                new Vector2(offset, offset),
-                new Vector2(-offset, offset)
+                Game.level.ConvertToBox2D(new Vector2(-offset, -offset)),
+                Game.level.ConvertToBox2D(new Vector2(offset, -offset)),
+                Game.level.ConvertToBox2D(new Vector2(offset, offset)),
+                Game.level.ConvertToBox2D(new Vector2(-offset, offset))
                 }
             , 4);
 
@@ -89,19 +96,18 @@ namespace Squircle
         {
             var input = Game.InputHandler;
 
-            float speed = MaxSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             var tempPos = Vector2.Zero;
-            tempPos.X = input.GamePadState.ThumbSticks.Right.X * speed;
+            tempPos.X = input.GamePadState.ThumbSticks.Right.X * Speed;
 
             if (input.IsDown(Keys.Right))
-                tempPos.X = speed;
+                tempPos.X = Speed;
             if (input.IsDown(Keys.Left))
-                tempPos.X = -speed;
-            if ((input.IsDown(Keys.Up) || input.IsDown(Buttons.RightShoulder)) && canJump)
+                tempPos.X = -Speed;
+            if ((input.IsDown(Keys.Up) || input.IsDown(Buttons.RightShoulder)) && CanJump)
             {
                 Body.ApplyLinearImpulse(new Vector2(0.0f, -JumpImpulse), Body.GetPosition());
             }
-            canJump = false;
+            JumpingEnabled = false;
 
             if (input.WasTriggered(Keys.Down) || input.WasTriggered(Buttons.RightTrigger))
             {
@@ -114,53 +120,58 @@ namespace Squircle
 
             var velocity = Body.GetLinearVelocity() + tempPos;
 
+            if (Math.Abs(velocity.X) >= MaxSpeed)
+            {
+                velocity.X = Math.Sign(velocity.X) * MaxSpeed;
+            }
+
             Body.SetLinearVelocity(velocity);
         }
 
         public override void Update(GameTime gameTime)
         {
-            squarePos = Body.GetPosition();
+            UpdateAbilityToJump();
             base.Update(gameTime);
+        }
+
+        private void UpdateAbilityToJump()
+        {
+            for (var contact = Body.GetContactList(); contact != null; contact = contact.Next)
+            {
+                if (!contact.Contact.IsTouching()) { continue; }
+
+                var circle = contact.Other.GetUserData() as Circle;
+                if (circle != null)
+                {
+                    JumpingEnabled = true;
+                    return;
+                }
+
+                var fixtureA = contact.Contact.GetFixtureA();
+                var fixtureB = contact.Contact.GetFixtureB();
+
+                Fixture otherFixture;
+                if (fixtureA.GetBody() == Body)
+                {
+                    otherFixture = fixtureB;
+                }
+                else
+                {
+                    Debug.Assert(fixtureB.GetBody() == Body);
+                    otherFixture = fixtureA;
+                }
+
+                var elementInfo = otherFixture.GetUserData() as LevelElementInfo;
+                if (elementInfo != null && elementInfo.type == LevelElementType.Ground)
+                {
+                    JumpingEnabled = true;
+                }
+            }
         }
        
         public override void Draw (SpriteBatch spriteBatch)
         {
-            var pos = squarePos + new Vector2(-SideLength / 2, -SideLength / 2);
-            spriteBatch.Draw(squareTexture, squarePos, null, Color.White, Body.Rotation, new Vector2(SideLength / 2, SideLength / 2), 1.0f, SpriteEffects.None, 0.0f);
-        }
-
-        public override void BeginContact(ContactInfo contactInfo)
-        {
-            Manifold manifold;
-            contactInfo.contact.GetManifold(out manifold);
-            Fixture fixture;
-            if (contactInfo.fixtureType == FixtureType.A)
-            {
-                fixture = contactInfo.contact.GetFixtureB();
-            }
-            else
-            {
-                fixture = contactInfo.contact.GetFixtureA();
-            }
-
-            var gameObjectUserData = (GameObject)fixture.GetBody().GetUserData();
-            var circle = gameObjectUserData as Circle;
-
-            if (circle != null)
-            {
-                // TODO: check if above circle.
-                canJump = true;
-                return;
-            }
-
-            var elementInfo = fixture.GetUserData() as LevelElementInfo;
-            if (elementInfo != null && elementInfo.type == LevelElementType.Ground)
-            {
-                canJump = true;
-                return;
-            }
-
-
+            spriteBatch.Draw(squareTexture, Pos, null, Color.White, Body.Rotation, new Vector2(SideLength / 2, SideLength / 2), 1.0f, SpriteEffects.None, 0.0f);
         }
     }
 }

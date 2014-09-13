@@ -18,7 +18,12 @@ namespace Squircle
         [IgnoreDebugData]
         public Body Body { get; set; }
 
-        public override Vector2 Pos { get { return Body.Position; } set { Body.Position = value; } }
+        public override Vector2 Pos
+        {
+            get { return Game.level.ConvertFromBox2D(Body.Position); }
+            set { Body.Position = Game.level.ConvertToBox2D(value); }
+        }
+
         public Vector2 PreviousPos { get; set; }
 
         public override Vector2 Dimensions
@@ -91,11 +96,11 @@ namespace Squircle
             var bodyDef = new BodyDef();
             var fixtureDef = new FixtureDef();
             var shape = new PolygonShape();
-            shape.SetAsBox(Dimensions.X / 2, Dimensions.Y / 2);
+            shape.SetAsBox(Game.level.ConvertToBox2D(Dimensions.X / 2), Game.level.ConvertToBox2D(Dimensions.Y / 2));
             fixtureDef.shape = shape;
             fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground };
             bodyDef.type = BodyType.Kinematic;
-            bodyDef.position = section["position"].AsVector2();
+            bodyDef.position = Game.level.ConvertToBox2D(section["position"].AsVector2());
             bodyDef.active = State.IsActive;
             Body = Game.level.World.CreateBody(bodyDef);
             Body.CreateFixture(fixtureDef);
@@ -162,7 +167,7 @@ namespace Squircle
             diff.Normalize();
             var velocity = diff * (float)(MovementSpeed);
 
-            Body.SetLinearVelocity(velocity);
+            Body.SetLinearVelocity(Game.level.ConvertToBox2D(velocity));
 
             PreviousPos = Pos;
         }
