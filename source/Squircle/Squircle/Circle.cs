@@ -15,8 +15,7 @@ namespace Squircle
     {
         private Texture2D circleTexture;
         private Vector2 circlePos;
-        private float circleRadius = 20.0f;
-        public float Radius { get { return circleRadius; } set { circleRadius = value; } }
+        public float Radius { get; set; }
 
         public override Texture2D Texture
         {
@@ -34,7 +33,7 @@ namespace Squircle
 
         public override Vector2 Dimensions
         {
-            get { return new Vector2(circleRadius * 2, circleRadius * 2); }
+            get { return new Vector2(Radius * 2, Radius * 2); }
         }
 
         public Circle(Game game) : base(game) {}
@@ -47,28 +46,28 @@ namespace Squircle
         public override void Initialize(ConfigSection section)
         {
             circlePos = section["position"].AsVector2();
+            Radius = section["radius"];
 
             var bodyDef = new BodyDef();
             bodyDef.type = BodyType.Dynamic;
 
-            bodyDef.angle = 0;
             bodyDef.position = circlePos;
-            bodyDef.inertiaScale = 1.0f;
-            bodyDef.linearDamping = 0.0f;
-            bodyDef.angularDamping = 10.0f;
+            bodyDef.inertiaScale = section["inertiaScale"];
+            bodyDef.linearDamping = section["linearDamping"];
+            bodyDef.angularDamping = section["angularDamping"];
 
             bodyDef.userData = this;
 
             Body = Game.level.World.CreateBody(bodyDef);
 
             var shape = new CircleShape();
-            shape._radius = circleRadius;
+            shape._radius = Radius;
 
             var fixture = new FixtureDef();
-            fixture.restitution = 0.1f;
-            fixture.density = 1.0f;
+            fixture.restitution = section["restitution"];
+            fixture.density = section["density"];
             fixture.shape = shape;
-            fixture.friction = 10.0f;
+            fixture.friction = section["friction"];
             Body.CreateFixture(fixture);
         }
 
@@ -105,9 +104,9 @@ namespace Squircle
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            var pos = circlePos + new Vector2(-circleRadius, -circleRadius);
+            var pos = circlePos + new Vector2(-Radius, -Radius);
 
-            spriteBatch.Draw(circleTexture, circlePos, null, Color.White, Body.Rotation, new Vector2(circleRadius, circleRadius), 1.0f, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(circleTexture, circlePos, null, Color.White, Body.Rotation, new Vector2(Radius, Radius), 1.0f, SpriteEffects.None, 0.0f);
         }
     }
 

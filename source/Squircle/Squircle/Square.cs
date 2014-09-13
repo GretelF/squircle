@@ -15,8 +15,7 @@ namespace Squircle
     {
         private Texture2D squareTexture;
         private Vector2 squarePos;
-        private float squareSideLength = 50.0f;
-        public float SideLength { get { return squareSideLength; } set { squareSideLength = value; } }
+        public float SideLength { get; set; }
         private Boolean canJump = false;
 
         public override Texture2D Texture
@@ -35,7 +34,7 @@ namespace Squircle
 
         public override Vector2 Dimensions
         {
-            get { return new Vector2(squareSideLength, squareSideLength); }
+            get { return new Vector2(SideLength, SideLength); }
         }
 
         public Square(Game game) :  base(game) {}
@@ -48,22 +47,23 @@ namespace Squircle
         public override void Initialize(ConfigSection section)
         {
             squarePos = section["position"].AsVector2();
+            SideLength = section["sideLength"];
 
             var bodyDef = new BodyDef();
             bodyDef.type = BodyType.Dynamic;
 
             bodyDef.angle = 0;
             bodyDef.position = squarePos;
-            bodyDef.inertiaScale = 1.0f;
-            bodyDef.linearDamping = 0.0f;
-            bodyDef.angularDamping = 10.0f;
+            bodyDef.inertiaScale = section["inertiaScale"];
+            bodyDef.linearDamping = section["linearDamping"];
+            bodyDef.angularDamping = section["angularDamping"];
 
             bodyDef.userData = this;
 
             Body = Game.level.World.CreateBody(bodyDef);
 
             var shape = new PolygonShape();
-            var offset = squareSideLength / 2;
+            var offset = SideLength / 2;
             shape.Set(new Vector2[]{
                 new Vector2(-offset, -offset),
                 new Vector2(offset, -offset),
@@ -73,10 +73,10 @@ namespace Squircle
             , 4);
 
             var fixture = new FixtureDef();
-            fixture.restitution = 0.1f;
-            fixture.density = 1.0f;
+            fixture.restitution = section["restitution"];
+            fixture.density = section["density"];
             fixture.shape = shape;
-            fixture.friction = .2f;
+            fixture.friction = section["friction"];
             Body.CreateFixture(fixture);
         }
 
@@ -117,8 +117,8 @@ namespace Squircle
        
         public override void Draw (SpriteBatch spriteBatch)
         {
-            var pos = squarePos + new Vector2(-squareSideLength/2, -squareSideLength/2);
-            spriteBatch.Draw(squareTexture, squarePos, null, Color.White, Body.Rotation, new Vector2(squareSideLength / 2, squareSideLength / 2), 1.0f, SpriteEffects.None, 0.0f);
+            var pos = squarePos + new Vector2(-SideLength / 2, -SideLength / 2);
+            spriteBatch.Draw(squareTexture, squarePos, null, Color.White, Body.Rotation, new Vector2(SideLength / 2, SideLength / 2), 1.0f, SpriteEffects.None, 0.0f);
         }
 
         public override void BeginContact(ContactInfo contactInfo)
