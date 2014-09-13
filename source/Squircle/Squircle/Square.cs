@@ -17,8 +17,6 @@ namespace Squircle
         private Vector2 squarePos;
         private float squareSideLength = 50.0f;
         public float SideLength { get { return squareSideLength; } set { squareSideLength = value; } }
-        private Body body;
-        public Body Body { get { return body; } }
         private Boolean canJump = false;
 
         public override Texture2D Texture
@@ -62,7 +60,7 @@ namespace Squircle
 
             bodyDef.userData = this;
 
-            body = Game.level.World.CreateBody(bodyDef);
+            Body = Game.level.World.CreateBody(bodyDef);
 
             var shape = new PolygonShape();
             var offset = squareSideLength / 2;
@@ -79,7 +77,7 @@ namespace Squircle
             fixture.density = 1.0f;
             fixture.shape = shape;
             fixture.friction = .2f;
-            body.CreateFixture(fixture);
+            Body.CreateFixture(fixture);
         }
 
         public override void PrePhysicsUpdate(GameTime gameTime)
@@ -93,7 +91,7 @@ namespace Squircle
                 tempPos.X -= speed;
             if (Game.InputHandler.IsDown(Keys.Up) && canJump)
             {
-                body.ApplyLinearImpulse(new Vector2(0.0f, -10000000.0f), body.GetPosition());
+                Body.ApplyLinearImpulse(new Vector2(0.0f, -10000000.0f), Body.GetPosition());
             }
             canJump = false;
 
@@ -106,21 +104,21 @@ namespace Squircle
                 Game.EventSystem.getEvent("playerButtonRelease").trigger(Name);
             }
 
-            var velocity = body.GetLinearVelocity() + tempPos - squarePos;
+            var velocity = Body.GetLinearVelocity() + tempPos - squarePos;
 
-            body.SetLinearVelocity(velocity);
+            Body.SetLinearVelocity(velocity);
         }
 
         public override void Update(GameTime gameTime)
         {
-            squarePos = body.GetPosition();
+            squarePos = Body.GetPosition();
             base.Update(gameTime);
         }
        
         public override void Draw (SpriteBatch spriteBatch)
         {
             var pos = squarePos + new Vector2(-squareSideLength/2, -squareSideLength/2);
-            spriteBatch.Draw(squareTexture, squarePos, null, Microsoft.Xna.Framework.Color.White, body.Rotation, new Vector2(squareSideLength/2, squareSideLength/2), 1.0f, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(squareTexture, squarePos, null, Color.White, Body.Rotation, new Vector2(squareSideLength / 2, squareSideLength / 2), 1.0f, SpriteEffects.None, 0.0f);
         }
 
         public override void BeginContact(ContactInfo contactInfo)

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Box2D.XNA;
 
 namespace Squircle
 {
@@ -18,11 +19,11 @@ namespace Squircle
 
     public abstract class Player : GameObject
     {
+        [IgnoreDebugData]
+        public virtual Body Body { get; protected set; }
 
         public Player(Game game) : base(game)
         {
-
         }
-
     }
 }

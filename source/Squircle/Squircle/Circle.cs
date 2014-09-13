@@ -17,8 +17,6 @@ namespace Squircle
         private Vector2 circlePos;
         private float circleRadius = 20.0f;
         public float Radius { get { return circleRadius; } set { circleRadius = value; } }
-        private Body body;
-        public Body Body { get { return body; } }
 
         public override Texture2D Texture
         {
@@ -61,7 +59,7 @@ namespace Squircle
 
             bodyDef.userData = this;
 
-            body = Game.level.World.CreateBody(bodyDef);
+            Body = Game.level.World.CreateBody(bodyDef);
 
             var shape = new CircleShape();
             shape._radius = circleRadius;
@@ -71,7 +69,7 @@ namespace Squircle
             fixture.density = 1.0f;
             fixture.shape = shape;
             fixture.friction = 10.0f;
-            body.CreateFixture(fixture);
+            Body.CreateFixture(fixture);
         }
 
         public override void PrePhysicsUpdate(GameTime gameTime)
@@ -96,12 +94,12 @@ namespace Squircle
                 Game.EventSystem.getEvent("playerButtonRelease").trigger(Name);
             }
 
-            body.ApplyTorque(tempDir * 50000000);
+            Body.ApplyTorque(tempDir * 50000000);
         }
 
         public override void Update(GameTime gameTime)
         {
-            circlePos = body.GetPosition();
+            circlePos = Body.GetPosition();
             base.Update(gameTime);
         }
 
@@ -109,7 +107,7 @@ namespace Squircle
         {
             var pos = circlePos + new Vector2(-circleRadius, -circleRadius);
 
-            spriteBatch.Draw(circleTexture, circlePos, null, Microsoft.Xna.Framework.Color.White, body.Rotation, new Vector2(circleRadius, circleRadius), 1.0f, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(circleTexture, circlePos, null, Color.White, Body.Rotation, new Vector2(circleRadius, circleRadius), 1.0f, SpriteEffects.None, 0.0f);
         }
     }
 

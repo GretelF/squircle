@@ -113,12 +113,9 @@ namespace Squircle
         /// </summary>
         public abstract Vector2 Dimensions { get; }
 
-        public bool IsEnabled { get; set; }
-
         public GameObject(Game game)
         {
             Game = game;
-            IsEnabled = true;
         }
 
         public abstract void Initialize(ConfigSection section);
