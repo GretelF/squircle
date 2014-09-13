@@ -95,7 +95,6 @@ namespace Squircle
             var fixtureDef = new FixtureDef();
             var shape = new PolygonShape();
             shape.SetAsBox(Game.level.ConvertToBox2D(Dimensions.X / 2), Game.level.ConvertToBox2D(Dimensions.Y / 2));
-            fixtureDef.friction = 0.5f;
             fixtureDef.shape = shape;
             fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground };
             bodyDef.type = BodyType.Kinematic;
@@ -152,7 +151,7 @@ namespace Squircle
             }
 
             diff.Normalize();
-            var velocity = diff * (float)(MovementSpeed);
+            var velocity = diff * MovementSpeed;
 
             Body.SetLinearVelocity(Game.level.ConvertToBox2D(velocity));
 
