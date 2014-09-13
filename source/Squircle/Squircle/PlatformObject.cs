@@ -48,7 +48,7 @@ namespace Squircle
 
         public GameObject Target { get; set; }
 
-        public bool IsAtTarget { get { return Pos == Target.Pos; } }
+        public bool IsAtTarget { get { return Pos.EpsilonCompare(Target.Pos); } }
 
         public PlatformObject(Game game)
             : base(game)
@@ -110,27 +110,23 @@ namespace Squircle
                 opt => WaypointEnd = opt.AsVector2(),
                 () => WaypointEnd = Pos);
 
-            if (section.Options.ContainsKey("target"))
-            {
-                var targetName = section["target"];
-
-                if (targetName == "start")
+            section.IfOptionExists("target",
+                targetName =>
                 {
-                    Target.Pos = WaypointStart;
-                }
-                else if (targetName == "end")
-                {
-                    Target.Pos = WaypointEnd;
-                }
-                else
-                {
-                    throw new ArgumentException("Unsupported target name: " + targetName);
-                }
-            }
-            else
-            {
-                Target.Pos = WaypointEnd;
-            }
+                    if (targetName == "start")
+                    {
+                        Target.Pos = WaypointStart;
+                    }
+                    else if (targetName == "end")
+                    {
+                        Target.Pos = WaypointEnd;
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Unsupported target name: " + targetName);
+                    }
+                },
+                () => Target.Pos = WaypointEnd);
         }
 
         public override void Update(GameTime gameTime)
@@ -144,7 +140,7 @@ namespace Squircle
             var diff = Target.Pos - Pos;
             var diffBefore = Target.Pos - PreviousPos;
 
-            if (Math.Sign(diff.X) != Math.Sign(diffBefore.X) || Math.Sign(diff.Y) != Math.Sign(diffBefore.Y))
+            if (!diff.IsInSameQuadrant(diffBefore))
             {
                 Body.SetLinearVelocity(Vector2.Zero);
                 Pos = Target.Pos;
