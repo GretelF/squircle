@@ -113,6 +113,11 @@ namespace Squircle
             }
         }
 
+        public T GetUserInterfaceElement<T>(string name) where T : UserInterfaceElement
+        {
+            return Children.FirstOrDefault(ui => ui.Name == name) as T;
+        }
+
         public override string ToString()
         {
             return string.Format("{0}", Name);
@@ -196,7 +201,31 @@ namespace Squircle
 
     public class UserInterfaceScreen : UserInterfaceElement
     {
+        public Texture2D Texture { get; set; }
+        public string TextureName { get; set; }
+
         public UserInterfaceScreen(Game game) : base(game) { }
+
+        public override void Initialize(ConfigSection section)
+        {
+            base.Initialize(section);
+
+            TextureName = section["texture"];
+        }
+
+        public override void LoadContent(ContentManager content)
+        {
+            Texture = content.Load<Texture2D>(TextureName);
+
+            base.LoadContent(content);
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(Texture, Position - Dimensions / 2, Color.White);
+
+            base.Draw(spriteBatch);
+        }
     }
 
     public class UserInterface : UserInterfaceElement
@@ -205,6 +234,10 @@ namespace Squircle
         public string BackgroundName { get; set; }
 
         public IList<UserInterfaceButton> PressButtons { get; set; }
+
+        public UserInterfaceScreen ActiveScreen { get; set; }
+        public Event ShowScreenEvent { get; set; }
+        public Event HideScreenEvent { get; set; }
 
         public int SelectedButtonIndex { get; set; }
         public UserInterfaceButton SelectedButton
@@ -224,6 +257,14 @@ namespace Squircle
             Position = -Dimensions / 2;
 
             BackgroundName = section["background"];
+
+            Game.EventSystem.getEvent("toggleRunningAndInMenu").addListener(onToggleRunningAndInMenu);
+
+            ShowScreenEvent = Game.EventSystem.getEvent("showScreen");
+            ShowScreenEvent.addListener(OnShowScreen);
+
+            HideScreenEvent = Game.EventSystem.getEvent("hideScreen");
+            HideScreenEvent.addListener(OnHideScreen);
         }
 
         public void InitializeFromConfigFile(ConfigFile config)
@@ -247,8 +288,6 @@ namespace Squircle
                 SelectedButtonIndex = 0;
                 SelectedButton.OnOffState.setActive();
             }
-
-            Game.EventSystem.getEvent("toggleRunningAndInMenu").addListener(onToggleRunningAndInMenu);
         }
 
         private void onToggleRunningAndInMenu(string data)
@@ -256,6 +295,7 @@ namespace Squircle
             SelectedButton.ToggleOnOff();
             SelectedButtonIndex = 0;
             SelectedButton.ToggleOnOff();
+            HideScreenEvent.trigger(null);
         }
 
         public override void LoadContent(ContentManager content)
@@ -269,6 +309,23 @@ namespace Squircle
         {
             var input = Game.InputHandler;
 
+            if (input.WasTriggered(Keys.Enter) || input.WasTriggered(Buttons.A))
+            {
+                if (ActiveScreen == null)
+                {
+                    SelectedButton.Activate();
+                }
+                else
+                {
+                    HideScreenEvent.trigger(null);
+                }
+            }
+
+            if (ActiveScreen != null)
+            {
+                return;
+            }
+
             if (input.WasTriggered(Keys.Down) || input.WasTriggered(Buttons.DPadDown))
             {
                 SelectNextButton();
@@ -278,16 +335,17 @@ namespace Squircle
             {
                 SelectPreviousButton();
             }
-
-            if (input.WasTriggered(Keys.Enter) || input.WasTriggered(Buttons.A))
-            {
-                SelectedButton.Activate();
-            }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(Background, Vector2.Zero, Color.White);
+
+            if (ActiveScreen != null)
+            {
+                ActiveScreen.Draw(spriteBatch);
+                return;
+            }
 
             foreach (var button in PressButtons)
             {
@@ -319,6 +377,16 @@ namespace Squircle
             --SelectedButtonIndex;
             if (SelectedButtonIndex < 0) SelectedButtonIndex = PressButtons.Count - 1;
             SelectedButton.OnOffState.toggle();
+        }
+
+        private void OnShowScreen(string data)
+        {
+            ActiveScreen = GetUserInterfaceElement<UserInterfaceScreen>(data);
+        }
+
+        private void OnHideScreen(string data)
+        {
+            ActiveScreen = null;
         }
     }
 }
