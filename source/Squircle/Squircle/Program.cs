@@ -1,4 +1,5 @@
-using System;
+using System.Globalization;
+using System.Threading;
 
 namespace Squircle
 {
@@ -10,6 +11,7 @@ namespace Squircle
         /// </summary>
         static void Main(string[] args)
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             using (Game game = new Game())
             {
                 game.Run();
