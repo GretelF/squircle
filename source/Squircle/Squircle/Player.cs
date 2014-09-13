@@ -19,7 +19,7 @@ namespace Squircle
 
     public abstract class Player : GameObject
     {
-        [IgnoreDebugData]
+        [DebugData(Ignore = true)]
         public virtual Body Body { get; protected set; }
 
         public override Vector2 Pos

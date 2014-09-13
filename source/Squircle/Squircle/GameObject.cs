@@ -58,6 +58,7 @@ namespace Squircle
         }
     }
 
+    [DebugData]
     public abstract class GameObject
     {
         public static GameObject Create(Game game, string gameObjectName, ConfigSection section)
@@ -99,16 +100,18 @@ namespace Squircle
             return resultObject;
         }
 
+        [DebugData(Ignore = true)]
         protected Game Game { get; private set; }
 
-        [IgnoreDebugData]
+        [DebugData(Ignore = true)]
         public string Name { get; set; }
 
-        [IgnoreDebugData]
+        [DebugData(Ignore = true)]
         public abstract Texture2D Texture { get; }
 
         public abstract Vector2 Pos { get; set; }
 
+        [DebugData(Ignore = true)]
         public int DrawOrder { get; set; }
 
         /// <summary>

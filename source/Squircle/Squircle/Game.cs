@@ -16,12 +16,19 @@ using System.Diagnostics;
 
 namespace Squircle
 {
+
     /// <summary>
-    /// Prevents a property of a game object to be used as debug data.
+    /// Declare some debug infos about a class or a specific property of an object.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-    public class IgnoreDebugData : System.Attribute
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
+    public class DebugData : System.Attribute
     {
+        public bool Ignore { get; set; }
+
+        public DebugData()
+        {
+            Ignore = false;
+        }
     }
 
     public enum GameStateType
@@ -81,9 +88,8 @@ namespace Squircle
         public Level level;
         public ConfigFile gameConfig { get; set; }
         public bool drawPhysics { get; set; }                   ///< Draws the physical world.
-        public bool drawDebugData { get; set; }                 ///< Draws textual game object data above them.
-        public bool drawMoreDebugData { get; set; }             ///< Up to the specific game object to use.
-        public bool drawVisualHelpers { get; set; }             ///< Draws some visual helpers for game objects.
+        public DebugLevel drawDebugData { get; set; }           ///< Draws textual game object data above them.
+        public DebugLevel drawVisualHelpers { get; set; }       ///< Draws some visual helpers for game objects.
         public SpriteFont debugFont { get; set; }
         public EventSystem EventSystem { get; set; }
         public InputHandler InputHandler { get; set; }
@@ -91,7 +97,7 @@ namespace Squircle
 
         public PhysicsDebugDraw PhysicsDebugDrawer { get; set; }
 
-        public StringBuilder DebugData { get; set; }
+        public StringBuilder DebugInfo { get; set; }
 
         public bool LoadingScreenDrawn { get; set; }
 
@@ -102,11 +108,10 @@ namespace Squircle
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             drawPhysics = false;
-            drawVisualHelpers = false;
-            drawMoreDebugData = false;
-            drawDebugData = false;
+            drawVisualHelpers = new DebugLevel();
+            drawDebugData = new DebugLevel();
 
-            DebugData = new StringBuilder();
+            DebugInfo = new StringBuilder();
 
             GameState = new GameState();
             GameState.SetLoading();
@@ -193,7 +198,7 @@ namespace Squircle
             // Allows the game to exit
             if (InputHandler.WasTriggered(Keys.Escape) || InputHandler.WasTriggered(Buttons.Start))
             {
-                ToggleRunningAndInMenuEvent.trigger("");
+                ToggleRunningAndInMenuEvent.trigger(null);
             }
 
             if (InputHandler.WasTriggered(Keys.R) || InputHandler.WasTriggered(Buttons.Back))
@@ -209,17 +214,12 @@ namespace Squircle
 
             if (InputHandler.WasTriggered(Keys.F10))
             {
-                drawDebugData = !drawDebugData;
+                drawDebugData.CycleForward();
             }
 
             if (InputHandler.WasTriggered(Keys.F11))
             {
-                drawMoreDebugData = !drawMoreDebugData;
-            }
-
-            if (InputHandler.WasTriggered(Keys.F12))
-            {
-                drawVisualHelpers = !drawVisualHelpers;
+                drawVisualHelpers.CycleForward();
             }
 
             level.Update(gameTime);
@@ -272,22 +272,26 @@ namespace Squircle
                 DrawOnScreen("Drawing physical world");
             }
 
-            if (drawVisualHelpers)
+            if (!drawVisualHelpers.IsNone)
             {
-                DrawBoundingBoxes(gameTime);
                 DrawOnScreen("Drawing visual helpers");
+
+                if (drawVisualHelpers.IsVerbose)
+                {
+                    DrawBoundingBoxes(gameTime);
+                }
             }
 
-            if (drawDebugData)
+            if (!drawDebugData.IsNone)
             {
                 DrawDebugData(gameTime);
                 DrawOnScreen("Drawing debug data");
                 DrawOnScreen(string.Format("Game state: {0}", GameState));
-            }
 
-            if (drawMoreDebugData)
-            {
-                DrawOnScreen("Drawing more debug data");
+                if (drawDebugData.IsVerbose)
+                {
+                    // TODO draw more verbose data.
+                }
             }
 
             spriteBatch.End();
@@ -298,8 +302,8 @@ namespace Squircle
 
             level.DrawUserInterface(spriteBatch);
 
-            spriteBatch.DrawString(debugFont, DebugData, new Vector2(20, 20), Color.White);
-            DebugData.Clear();
+            spriteBatch.DrawString(debugFont, DebugInfo, new Vector2(20, 20), Color.White);
+            DebugInfo.Clear();
 
             spriteBatch.End();
         }
@@ -323,14 +327,14 @@ namespace Squircle
                 debugMessage.AppendFormat("[{0}]", go.Name);
 
                 var type = go.GetType();
+                var goDebugData = (DebugData)Attribute.GetCustomAttribute(type, typeof(DebugData), true);
+                if (goDebugData == null || goDebugData.Ignore) { continue; }
+
                 var properties = type.GetProperties();
                 foreach (var prop in properties)
                 {
-                    var propIsIgnored = Attribute.GetCustomAttribute(prop, typeof(IgnoreDebugData), true) != null;
-                    if (propIsIgnored)
-                    {
-                        continue;
-                    }
+                    var debugData = (DebugData)Attribute.GetCustomAttribute(prop, typeof(DebugData), true);
+                    if (!drawDebugData.IsVerbose && (debugData == null || debugData.Ignore)) { continue; }
 
                     var key = prop.Name;
                     var value = prop.GetValue(go, null);
@@ -350,7 +354,7 @@ namespace Squircle
         {
             if (position == null)
             {
-                DebugData.AppendLine(message);
+                DebugInfo.AppendLine(message);
                 return;
             }
 

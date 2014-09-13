@@ -124,6 +124,7 @@ namespace Squircle
         }
     }
 
+    [DebugData(Ignore = true)]
     public class ButtonObjectBase : GameObject
     {
         public override Vector2 Pos { get; set; }
@@ -134,11 +135,11 @@ namespace Squircle
             get { return OnOffState.IsActive ? TextureOn : TextureOff; }
         }
 
-        [IgnoreDebugData]
+        [DebugData(Ignore = true)]
         public Texture2D TextureOn { get; set; }
         public string TextureOnName { get; set; }
 
-        [IgnoreDebugData]
+        [DebugData(Ignore = true)]
         public Texture2D TextureOff { get; set; }
         public string TextureOffName { get; set; }
 
@@ -155,7 +156,7 @@ namespace Squircle
 
         public float ProximityRadius { get; set; }
 
-        [IgnoreDebugData]
+        [DebugData(Ignore = true)]
         public float ProximityRadiusSquared { get { return ProximityRadius * ProximityRadius; } }
 
         public Event OnEvent { get; set; }
@@ -246,7 +247,7 @@ namespace Squircle
             var pos = Pos - new Vector2(tex.Width / 2, tex.Height / 2);
             spriteBatch.Draw(tex, pos, Color.White);
 
-            if (Game.drawVisualHelpers)
+            if (!Game.drawVisualHelpers.IsNone)
             {
                 spriteBatch.DrawLine(Pos, Master.Pos, Color.Red);
                 spriteBatch.DrawCircle(Pos, ProximityRadius, 16, Color.Yellow);

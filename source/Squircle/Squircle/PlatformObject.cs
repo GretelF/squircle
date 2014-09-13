@@ -15,7 +15,7 @@ namespace Squircle
         private Vector2 _dimensions;
         private Texture2D _texture;
 
-        [IgnoreDebugData]
+        [DebugData(Ignore = true)]
         public Body Body { get; set; }
 
         public override Vector2 Pos
@@ -33,7 +33,7 @@ namespace Squircle
 
         public State State { get; set; }
 
-        [IgnoreDebugData]
+        [DebugData(Ignore = true)]
         public override Texture2D Texture
         {
             get { return _texture; }
@@ -46,9 +46,10 @@ namespace Squircle
         public Vector2 WaypointStart { get; set; }
         public Vector2 WaypointEnd { get; set; }
 
+        [DebugData]
         public GameObject Target { get; set; }
 
-        public bool IsAtTarget { get { return Pos == Target.Pos; } }
+        public bool IsAtTarget { get { return Pos.EpsilonCompare(Target.Pos); } }
 
         public PlatformObject(Game game)
             : base(game)
@@ -94,6 +95,7 @@ namespace Squircle
             var fixtureDef = new FixtureDef();
             var shape = new PolygonShape();
             shape.SetAsBox(Game.level.ConvertToBox2D(Dimensions.X / 2), Game.level.ConvertToBox2D(Dimensions.Y / 2));
+            fixtureDef.friction = 0.5f;
             fixtureDef.shape = shape;
             fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground };
             bodyDef.type = BodyType.Kinematic;
@@ -110,27 +112,25 @@ namespace Squircle
                 opt => WaypointEnd = opt.AsVector2(),
                 () => WaypointEnd = Pos);
 
-            if (section.Options.ContainsKey("target"))
-            {
-                var targetName = section["target"];
+            section.IfOptionExists("target",
+                targetName =>
+                {
+                    if (targetName == "start")
+                    {
+                        Target.Pos = WaypointStart;
+                    }
+                    else if (targetName == "end")
+                    {
+                        Target.Pos = WaypointEnd;
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Unsupported target name: " + targetName);
+                    }
+                },
+                () => Target.Pos = WaypointEnd);
 
-                if (targetName == "start")
-                {
-                    Target.Pos = WaypointStart;
-                }
-                else if (targetName == "end")
-                {
-                    Target.Pos = WaypointEnd;
-                }
-                else
-                {
-                    throw new ArgumentException("Unsupported target name: " + targetName);
-                }
-            }
-            else
-            {
-                Target.Pos = WaypointEnd;
-            }
+            Target.Name = string.Format("{0}_target", Name);
         }
 
         public override void Update(GameTime gameTime)
@@ -144,7 +144,7 @@ namespace Squircle
             var diff = Target.Pos - Pos;
             var diffBefore = Target.Pos - PreviousPos;
 
-            if (Math.Sign(diff.X) != Math.Sign(diffBefore.X) || Math.Sign(diff.Y) != Math.Sign(diffBefore.Y))
+            if (!diff.IsInSameQuadrant(diffBefore))
             {
                 Body.SetLinearVelocity(Vector2.Zero);
                 Pos = Target.Pos;
@@ -163,8 +163,23 @@ namespace Squircle
         {
             if (State.IsInactive) { return; }
 
-            var pos = Pos - new Vector2(_texture.Width / 2, _texture.Height / 2);
-            spriteBatch.Draw(_texture, pos, Microsoft.Xna.Framework.Color.White);
+            var pos = Pos;
+            spriteBatch.Draw(_texture,
+                             pos,
+                             null,
+                             Color.White,
+                             Body.Rotation,
+                             new Vector2(_texture.Width / 2, _texture.Height / 2),
+                             1.0f,
+                             SpriteEffects.None,
+                             0.0f);
+
+            if (!Game.drawVisualHelpers.IsNone)
+            {
+                spriteBatch.DrawLine(pos, WaypointStart, Color.Blue);
+                spriteBatch.DrawLine(pos, WaypointEnd, Color.Blue);
+                if(!IsAtTarget) spriteBatch.DrawLine(pos, Target.Pos, Color.Red);
+            }
         }
 
         public void onToggleEvent(String data)

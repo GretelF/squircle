@@ -110,25 +110,17 @@ namespace Squircle
 
             var debugSection = levelConfig["Debug"];
 
-            if (debugSection.Options.ContainsKey("drawPhysics"))
+            debugSection.IfOptionExists("drawPhysics", opt => game.drawPhysics = opt.AsBool());
+            debugSection.IfOptionExists("drawVisualHelpers", opt =>
+                {
+                    if (opt.AsBool()) game.drawVisualHelpers.SetNormal();
+                    else              game.drawVisualHelpers.SetNone();
+                });
+            debugSection.IfOptionExists("drawDebugData", opt =>
             {
-                game.drawPhysics = debugSection.Options["drawPhysics"].AsBool();
-            }
-
-            if (debugSection.Options.ContainsKey("drawVisualHelpers"))
-            {
-                game.drawVisualHelpers = debugSection.Options["drawVisualHelpers"].AsBool();
-            }
-
-            if (debugSection.Options.ContainsKey("drawDebugData"))
-            {
-                game.drawDebugData = debugSection.Options["drawDebugData"].AsBool();
-            }
-
-            if (debugSection.Options.ContainsKey("drawMoreDebugData"))
-            {
-                game.drawMoreDebugData = debugSection.Options["drawMoreDebugData"].AsBool();
-            }
+                if (opt.AsBool()) game.drawDebugData.SetNormal();
+                else game.drawDebugData.SetNone();
+            });
         }
 
         private void InitializePlayers()
@@ -222,7 +214,7 @@ namespace Squircle
                 contact = contact.GetNext();
             }
 
-            if (game.drawMoreDebugData)
+            if (game.drawDebugData.IsVerbose)
             {
                 game.DrawOnScreen("Physical contacts: " + numContacts.ToString());
             }
