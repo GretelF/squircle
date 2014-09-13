@@ -68,7 +68,8 @@ namespace Squircle
 
             TextureName = section["texture"];
             _dimensions = section["dimensions"].AsVector2();
-            Game.EventSystem.getEvent(section["toggleEvent"]).addListener(onToggleEvent);
+            section.IfOptionExists("toggleEvent",
+                opt => Game.EventSystem.getEvent(opt).addListener(onToggleEvent));
 
             var stateName = section["state"];
 
