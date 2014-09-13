@@ -138,12 +138,12 @@ namespace Squircle
             InputHandler.Update(gameTime);
 
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || InputHandler.IsDown(Keys.Escape))
+            if (InputHandler.WasTriggered(Keys.Escape) || InputHandler.WasTriggered(Buttons.Start))
             {
                 this.Exit();
             }
 
-            if (InputHandler.WasTriggered(Keys.R))
+            if (InputHandler.WasTriggered(Keys.R) || InputHandler.WasTriggered(Buttons.Back))
             {
                 StartLoadingLevel(level.Name);
                 return;

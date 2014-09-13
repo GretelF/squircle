@@ -18,6 +18,9 @@ namespace Squircle
         public float SideLength { get; set; }
         private Boolean canJump = false;
 
+        public float MaxSpeed { get; set; }
+        public float JumpImpulse { get; set; }
+
         public override Texture2D Texture
         {
             get
@@ -48,6 +51,8 @@ namespace Squircle
         {
             squarePos = section["position"].AsVector2();
             SideLength = section["sideLength"];
+            MaxSpeed = section["maxSpeed"];
+            JumpImpulse = section["jumpImpulse"];
 
             var bodyDef = new BodyDef();
             bodyDef.type = BodyType.Dynamic;
@@ -82,29 +87,32 @@ namespace Squircle
 
         public override void PrePhysicsUpdate(GameTime gameTime)
         {
-            Vector2 tempPos = squarePos;
-            float speed = 300f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var input = Game.InputHandler;
 
-            if (Game.InputHandler.IsDown(Keys.Right))
-                tempPos.X += speed;
-            if (Game.InputHandler.IsDown(Keys.Left))
-                tempPos.X -= speed;
-            if (Game.InputHandler.IsDown(Keys.Up) && canJump)
+            float speed = MaxSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var tempPos = Vector2.Zero;
+            tempPos.X = input.GamePadState.ThumbSticks.Right.X * speed;
+
+            if (input.IsDown(Keys.Right))
+                tempPos.X = speed;
+            if (input.IsDown(Keys.Left))
+                tempPos.X = -speed;
+            if ((input.IsDown(Keys.Up) || input.IsDown(Buttons.RightShoulder)) && canJump)
             {
-                Body.ApplyLinearImpulse(new Vector2(0.0f, -10000000.0f), Body.GetPosition());
+                Body.ApplyLinearImpulse(new Vector2(0.0f, -JumpImpulse), Body.GetPosition());
             }
             canJump = false;
 
-            if (Game.InputHandler.WasTriggered(Keys.Down))
+            if (input.WasTriggered(Keys.Down) || input.WasTriggered(Buttons.RightTrigger))
             {
                 Game.EventSystem.getEvent("playerButtonPress").trigger(Name);
             }
-            else if (Game.InputHandler.WasReleased(Keys.Down))
+            else if (input.WasReleased(Keys.Down) || input.WasReleased(Buttons.RightTrigger))
             {
                 Game.EventSystem.getEvent("playerButtonRelease").trigger(Name);
             }
 
-            var velocity = Body.GetLinearVelocity() + tempPos - squarePos;
+            var velocity = Body.GetLinearVelocity() + tempPos;
 
             Body.SetLinearVelocity(velocity);
         }

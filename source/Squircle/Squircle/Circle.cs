@@ -16,6 +16,7 @@ namespace Squircle
         private Texture2D circleTexture;
         private Vector2 circlePos;
         public float Radius { get; set; }
+        public float MaxTorque { get; set; }
 
         public override Texture2D Texture
         {
@@ -47,6 +48,7 @@ namespace Squircle
         {
             circlePos = section["position"].AsVector2();
             Radius = section["radius"];
+            MaxTorque = section["torque"];
 
             var bodyDef = new BodyDef();
             bodyDef.type = BodyType.Dynamic;
@@ -73,27 +75,28 @@ namespace Squircle
 
         public override void PrePhysicsUpdate(GameTime gameTime)
         {
-            float tempDir = 0.0f;
-            float speed = 300f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var input = Game.InputHandler;
 
-            if (Game.InputHandler.IsDown(Keys.D))
+            float tempDir = input.GamePadState.ThumbSticks.Left.X;
+
+            if (input.IsDown(Keys.D))
             {
                 tempDir = 1.0f;
             }
-            if (Game.InputHandler.IsDown(Keys.A))
+            if (input.IsDown(Keys.A))
             {
                 tempDir = -1.0f;
             }
-            if (Game.InputHandler.WasTriggered(Keys.S))
+            if (input.WasTriggered(Keys.S) || input.WasTriggered(Buttons.LeftTrigger))
             {
                 Game.EventSystem.getEvent("playerButtonPress").trigger(Name);
             }
-            else if (Game.InputHandler.WasReleased(Keys.S))
+            else if (input.WasReleased(Keys.S) || input.WasReleased(Buttons.LeftTrigger))
             {
                 Game.EventSystem.getEvent("playerButtonRelease").trigger(Name);
             }
 
-            Body.ApplyTorque(tempDir * 50000000);
+            Body.ApplyTorque(tempDir * MaxTorque);
         }
 
         public override void Update(GameTime gameTime)
