@@ -128,10 +128,7 @@ namespace Squircle
             InputHandler = new InputHandler();
 
             EventSystem = new EventSystem();
-            EventSystem.getEvent("endLevel").addListener(onEndLevel);
-            EventSystem.getEvent("exit").addListener(onExit);
-            ToggleRunningAndInMenuEvent = EventSystem.getEvent("toggleRunningAndInMenu");
-            ToggleRunningAndInMenuEvent.addListener(onToggleRunningAndInMenu);
+            InitializeEvents();
 
             PhysicsDebugDrawer = new PhysicsDebugDraw();
 
@@ -150,6 +147,14 @@ namespace Squircle
             base.Initialize();
 
             GameState.SetInMenu();
+        }
+
+        private void InitializeEvents()
+        {
+            EventSystem.getEvent("endLevel").addListener(onEndLevel);
+            EventSystem.getEvent("exit").addListener(onExit);
+            ToggleRunningAndInMenuEvent = EventSystem.getEvent("toggleRunningAndInMenu");
+            ToggleRunningAndInMenuEvent.addListener(onToggleRunningAndInMenu);
         }
 
         /// <summary>
@@ -377,6 +382,8 @@ namespace Squircle
 
             level = new Level(this);
             level.Name = name;
+
+            InitializeEvents();
         }
 
         private void EndLoadLevel()
