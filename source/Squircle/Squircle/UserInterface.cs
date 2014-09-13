@@ -188,7 +188,7 @@ namespace Squircle
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(Texture, Position - Dimensions / 2, Color.White);
+            spriteBatch.Draw(Texture, PositionAbsolute - Dimensions / 2, Color.White);
 
             base.Draw(spriteBatch);
         }
@@ -222,7 +222,7 @@ namespace Squircle
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(Texture, Position - Dimensions / 2, Color.White);
+            spriteBatch.Draw(Texture, PositionAbsolute - Dimensions / 2, Color.White);
 
             base.Draw(spriteBatch);
         }
@@ -254,7 +254,7 @@ namespace Squircle
         {
             Name = "root";
             Dimensions = new Vector2(Game.GraphicsDevice.Viewport.Width, Game.GraphicsDevice.Viewport.Height);
-            Position = -Dimensions / 2;
+            Position = Vector2.Zero;
 
             BackgroundName = section["background"];
 

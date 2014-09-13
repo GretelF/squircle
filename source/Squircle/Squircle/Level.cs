@@ -173,12 +173,17 @@ namespace Squircle
                 go.Update(gameTime);
             }
 
-            var center = circle.Pos + (square.Pos - circle.Pos) / 2;                // calculate center between circle and square.
-            camera.Focus.Pos = new Vector2(center.X , center.Y);
+            UpdateCameraFocus();
 
             camera.Update(gameTime);
 
             playerBounds.Position = camera.Position;
+        }
+
+        private void UpdateCameraFocus()
+        {
+            var center = circle.Pos + (square.Pos - circle.Pos) / 2;                // calculate center between circle and square.
+            camera.Focus.Pos = new Vector2(center.X, center.Y);
         }
 
         public void DrawPhysicalContacts(SpriteBatch spriteBatch)
@@ -227,7 +232,10 @@ namespace Squircle
                 World.DrawDebugData();
                 DrawPhysicalContacts(spriteBatch);
             }
+        }
 
+        public void DrawUserInterface(SpriteBatch spriteBatch)
+        {
             if (game.GameState.IsInMenu)
             {
                 Menu.Draw(spriteBatch);

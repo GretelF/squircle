@@ -91,7 +91,7 @@ namespace Squircle
 
         public PhysicsDebugDraw PhysicsDebugDrawer { get; set; }
 
-        public IList<Vector2> DebugScreenDataStack { get; set; }
+        public StringBuilder DebugData { get; set; }
 
         public bool LoadingScreenDrawn { get; set; }
 
@@ -106,7 +106,7 @@ namespace Squircle
             drawMoreDebugData = false;
             drawDebugData = false;
 
-            DebugScreenDataStack = new List<Vector2>();
+            DebugData = new StringBuilder();
 
             GameState = new GameState();
             GameState.SetLoading();
@@ -143,7 +143,7 @@ namespace Squircle
 
             base.Initialize();
 
-            GameState.SetRunning();
+            GameState.SetInMenu();
         }
 
         /// <summary>
@@ -178,8 +178,6 @@ namespace Squircle
 
         protected override void Update(GameTime gameTime)
         {
-            DebugScreenDataStack.Clear();
-
             if (GameState.IsLoading)
             {
                 if (LoadingScreenDrawn)
@@ -292,6 +290,17 @@ namespace Squircle
             }
 
             spriteBatch.End();
+
+            // Draw user interface related stuff
+
+            spriteBatch.Begin();
+
+            level.DrawUserInterface(spriteBatch);
+
+            spriteBatch.DrawString(debugFont, DebugData, new Vector2(20, 20), Color.White);
+            DebugData.Clear();
+
+            spriteBatch.End();
         }
 
         private void DrawBoundingBoxes(GameTime gameTime)
@@ -338,24 +347,13 @@ namespace Squircle
 
         public void DrawOnScreen(string message, Vector2? position = null)
         {
-            Vector2 pos;
             if (position == null)
             {
-                if (DebugScreenDataStack.Count == 0)
-                {
-                    pos = new Vector2(20, 20);
-                }
-                else
-                {
-                    pos = DebugScreenDataStack.Last();
-                    pos.Y += 20;
-                }
-                DebugScreenDataStack.Add(pos);
+                DebugData.AppendLine(message);
+                return;
             }
-            else
-            {
-                pos = position.Value;
-            }
+
+            var pos = position.Value;
 
             var upperLeft = Vector2.Zero;
 
@@ -386,12 +384,6 @@ namespace Squircle
 
         private void onEndLevel(String data)
         {
-            if (data == "credits")
-            {
-                // TODO show credits.
-                throw new NotImplementedException();
-            }
-
             StartLoadingLevel(data);
         }
 
