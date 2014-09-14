@@ -48,7 +48,7 @@ namespace Squircle
         public float PhysicsScale { get; set; }
         public float GroundFriction { get; set; }
 
-        public string AmbientMusicName { get; set; }
+        public string AmbientMusicCue { get; set; }
 
         public Level(Game game)
         {
@@ -105,7 +105,11 @@ namespace Squircle
             var userInterfaceConfig = ConfigFile.FromFile(levelConfig.GlobalSection["userInterface"]);
             Menu.InitializeFromConfigFile(userInterfaceConfig);
 
-            levelConfig.GlobalSection.IfOptionExists("ambientMusic", opt => AmbientMusicName = opt);
+            levelConfig.IfSectionExists("Audio",
+                section =>
+                {
+                    section.IfOptionExists("ambientCue", opt => AmbientMusicCue = opt);
+                });
 
             if (!levelConfig.Sections.ContainsKey("Debug"))
             {
@@ -153,9 +157,9 @@ namespace Squircle
 
             if (game.Audio != null)
             {
-                if (AmbientMusicName != null)
+                if (AmbientMusicCue != null)
                 {
-                    game.Audio.PlayCueAndStopAllOthers(AmbientMusicName);
+                    game.Audio.PlayCueAndStopAllOthers(AmbientMusicCue);
                 }
                 else
                 {
