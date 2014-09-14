@@ -95,7 +95,7 @@ namespace Squircle
                 UpperBound = Waypoints.Length - 1
             };
             Faders = new PlatformFader[4];
-            FadeTime = 0.5f;
+            FadeTime = 0.2f;
             Faders[0] = dt => { /* Do nothing.*/ };
             Faders[1] = dt => // Fading in
             {
