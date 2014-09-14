@@ -24,10 +24,23 @@ namespace Microsoft.Xna.Framework
                 && Math.Abs(lhs.Y - rhs.Y) <= e;
         }
 
+        public static int GetQuadrant(this Vector2 vec)
+        {
+            if (vec.X >= 0) // Right-hand side, i.e. 0 or 3
+            {
+                if (vec.Y >= 0) return 0;
+                else            return 3;
+            }
+            else // Left-hand side, i.e. 1 or 2
+            {
+                if (vec.Y >= 0) return 1;
+                else            return 2;
+            }
+        }
+
         public static bool IsInSameQuadrant(this Vector2 lhs, Vector2 rhs)
         {
-            return Math.Sign(lhs.X) == Math.Sign(rhs.X)
-                && Math.Sign(lhs.Y) == Math.Sign(rhs.Y);
+            return lhs.GetQuadrant() == rhs.GetQuadrant();
         }
     }
 }

@@ -53,7 +53,8 @@ namespace Squircle
         [DebugData(Ignore = true)]
         public Vector2 Target { get { return Waypoints[_targetIndex]; } }
 
-        public bool IsAtTarget { get { return Pos.EpsilonCompare(Target); } }
+        public bool WasAtTarget { get; set; }
+        public bool IsAtTarget { get { return Pos.EpsilonCompare(Target, 0.25f); } }
 
         [DebugData]
         public float TargetDistance { get { return Vector2.Distance(Pos, Target); } }
@@ -145,29 +146,34 @@ namespace Squircle
 
         public override void Update(GameTime gameTime)
         {
-            if (State.IsInactive || IsAtTarget) 
+            UpdateDetails(gameTime);
+            PreviousPos = Pos;
+        }
+
+        private void UpdateDetails(GameTime gameTime)
+        {
+            if (State.IsInactive)
             {
-                PreviousPos = Pos; 
-                return; 
+                return;
+            }
+
+            if (IsAtTarget)
+            {
+                if (!WasAtTarget)
+                {
+                    Body.SetLinearVelocity(Vector2.Zero);
+                    Pos = Target;
+                    WasAtTarget = true;
+                }
+                return;
             }
 
             var diff = Target - Pos;
-            var diffBefore = Target - PreviousPos;
-
-            if (!diff.IsInSameQuadrant(diffBefore))
-            {
-                Body.SetLinearVelocity(Vector2.Zero);
-                Pos = Target;
-                PreviousPos = Pos;
-                return; 
-            }
 
             diff.Normalize();
             var velocity = diff * MovementSpeed;
 
             Body.SetLinearVelocity(Game.level.ConvertToBox2D(velocity));
-
-            PreviousPos = Pos;
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -201,12 +207,10 @@ namespace Squircle
 
         public void onToggleWaypointEvent(String data)
         {
-            if (State.IsInactive)
-            {
-                return;
-            }
+            if (State.IsInactive) { return; }
 
             _targetIndex.Increment();
+            WasAtTarget = false;
         }
     }
 }

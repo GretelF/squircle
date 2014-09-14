@@ -111,7 +111,8 @@ namespace Squircle
             drawVisualHelpers = new DebugLevel();
             drawDebugData = new DebugLevel();
 
-            DebugInfo = new StringBuilder();
+            level = new Level(this);
+            level.Name = "level_01";
 
             GameState = new GameState();
             GameState.SetLoading();
@@ -125,12 +126,18 @@ namespace Squircle
         /// </summary>
         protected override void Initialize()
         {
+            DebugInfo = new StringBuilder();
+
             InputHandler = new InputHandler();
 
             EventSystem = new EventSystem();
-            InitializeEvents();
+            EventSystem.getEvent("endLevel").addListener(onEndLevel);
+            EventSystem.getEvent("exit").addListener(onExit);
+            ToggleRunningAndInMenuEvent = EventSystem.getEvent("toggleRunningAndInMenu");
+            ToggleRunningAndInMenuEvent.addListener(onToggleRunningAndInMenu);
 
             PhysicsDebugDrawer = new PhysicsDebugDraw();
+            PhysicsDebugDrawer.Level = level;
 
             PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.AABB);
             PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.CenterOfMass);
@@ -139,22 +146,11 @@ namespace Squircle
             PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.Shape);
 
             gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
-            level = new Level(this);
-            level.Name = "level_01";
-            PhysicsDebugDrawer.Level = level;
-            level.Initialize(gameConfig["Levels"]["level_01"]);
+            level.Initialize(gameConfig["Levels"][level.Name]);
 
             base.Initialize();
 
             GameState.SetInMenu();
-        }
-
-        private void InitializeEvents()
-        {
-            EventSystem.getEvent("endLevel").addListener(onEndLevel);
-            EventSystem.getEvent("exit").addListener(onExit);
-            ToggleRunningAndInMenuEvent = EventSystem.getEvent("toggleRunningAndInMenu");
-            ToggleRunningAndInMenuEvent.addListener(onToggleRunningAndInMenu);
         }
 
         /// <summary>
@@ -339,7 +335,15 @@ namespace Squircle
                 foreach (var prop in properties)
                 {
                     var debugData = (DebugData)Attribute.GetCustomAttribute(prop, typeof(DebugData), true);
-                    if (!drawDebugData.IsVerbose && (debugData == null || debugData.Ignore)) { continue; }
+
+                    if (debugData == null)
+                    {
+                        if (!drawDebugData.IsVerbose) continue; // No debug data and we are not verbose today.
+                    }
+                    else
+                    {
+                        if (debugData.Ignore) continue; // Debug data says, we should ignore it.
+                    }
 
                     var key = prop.Name;
                     var value = prop.GetValue(go, null);
@@ -382,13 +386,11 @@ namespace Squircle
 
             level = new Level(this);
             level.Name = name;
-
-            InitializeEvents();
         }
 
         private void EndLoadLevel()
         {
-            level.Initialize(gameConfig["Levels"][level.Name]);
+            Initialize();
             level.LoadContent(Content);
             GameState.SetRunning();
             LoadingScreenDrawn = false;
@@ -406,6 +408,11 @@ namespace Squircle
 
         private void onToggleRunningAndInMenu(String data)
         {
+            if (GameState.IsRunning)
+            {
+                if(InputHandler.KeyboardState.GetPressedKeys().Any(key => key != Keys.Escape)) return;
+            }
+
             GameState.ToggleRunningAndInMenu();
         }
     }

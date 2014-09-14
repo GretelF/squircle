@@ -15,6 +15,8 @@ namespace Squircle
         GamePadState _currentGamepadState;
         GamePadState _previousGamepadState;
 
+        public KeyboardState KeyboardState { get { return _currentKeyboardState; } }
+
         public GamePadState GamePadState { get { return _currentGamepadState; } }
 
         public InputHandler()
