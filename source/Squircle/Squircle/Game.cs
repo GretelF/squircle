@@ -204,7 +204,7 @@ namespace Squircle
 
             if (InputHandler.WasTriggered(Keys.R) || InputHandler.WasTriggered(Buttons.Back))
             {
-                StartLoadingLevel(level.Name);
+                EventSystem.getEvent("endLevel").trigger(level.Name);
                 return;
             }
 
@@ -249,7 +249,12 @@ namespace Squircle
             if (GameState.IsLoading)
             {
                 spriteBatch.Begin();
-                DrawOnScreen("Loading...");
+                var toDraw = "Loading...";
+                var measurements = debugFont.MeasureString(toDraw);
+                spriteBatch.DrawString(debugFont,
+                    toDraw,
+                    new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2) - measurements / 2,
+                    Color.White);
                 spriteBatch.End();
                 LoadingScreenDrawn = true;
                 return;
@@ -391,7 +396,6 @@ namespace Squircle
         private void EndLoadLevel()
         {
             Initialize();
-            level.LoadContent(Content);
             GameState.SetRunning();
             LoadingScreenDrawn = false;
         }

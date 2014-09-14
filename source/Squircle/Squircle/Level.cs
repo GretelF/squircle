@@ -48,11 +48,15 @@ namespace Squircle
         public float PhysicsScale { get; set; }
         public float GroundFriction { get; set; }
 
+        public AudioManager Audio { get; set; }
+        public string AmbientMusicName { get; set; }
+
         public Level(Game game)
         {
             this.game = game;
             GameObjects = new List<GameObject>();
             PhysicsScale = 1.0f;
+            Audio = new AudioManager(game);
         }
 
         public void Initialize(ConfigOption option)
@@ -103,6 +107,9 @@ namespace Squircle
             var userInterfaceConfig = ConfigFile.FromFile(levelConfig.GlobalSection["userInterface"]);
             Menu.InitializeFromConfigFile(userInterfaceConfig);
 
+            levelConfig.GlobalSection.IfOptionExists("ambientMusic", opt => AmbientMusicName = opt);
+            levelConfig.IfSectionExists("Audio", sec => Audio.Initialize(sec));
+
             if (!levelConfig.Sections.ContainsKey("Debug"))
             {
                 return;
@@ -147,6 +154,13 @@ namespace Squircle
         {
             background = content.Load<Texture2D>(levelConfig.GlobalSection["background"]);
 
+            Audio.LoadContent(content);
+
+            if (AmbientMusicName != null)
+            {
+                Audio.Sounds.PlayCue(AmbientMusicName);
+            }
+
             foreach (var go in GameObjects)
             {
                 go.LoadContent(content);
@@ -157,6 +171,8 @@ namespace Squircle
 
         public void Update(GameTime gameTime)
         {
+            Audio.Update(gameTime);
+
             if (game.GameState.IsInMenu)
             {
                 Menu.Update(gameTime);

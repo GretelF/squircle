@@ -9,26 +9,33 @@ namespace Squircle
 {
     public static class ConfigFileExtensions
     {
-        public static void IfOptionExists(this ConfigSection section, string optionName, Action<ConfigOption> action)
+        public static void IfSectionExists(this ConfigFile cfg,
+                                           string sectionName,
+                                           Action<ConfigSection> thenAction,
+                                           Action elseAction = null)
         {
-            ConfigOption option;
-            if (section.Options.TryGetValue(optionName, out option))
+            ConfigSection section;
+            if (cfg.Sections.TryGetValue(sectionName, out section))
             {
-                action(option);
+                thenAction(section);
+            }
+            else if (elseAction != null)
+            {
+                elseAction();
             }
         }
 
         public static void IfOptionExists(this ConfigSection section,
                                           string optionName,
                                           Action<ConfigOption> thenAction,
-                                          Action elseAction)
+                                          Action elseAction = null)
         {
             ConfigOption option;
             if (section.Options.TryGetValue(optionName, out option))
             {
                 thenAction(option);
             }
-            else
+            else if (elseAction != null)
             {
                 elseAction();
             }
