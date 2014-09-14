@@ -111,7 +111,8 @@ namespace Squircle
             drawVisualHelpers = new DebugLevel();
             drawDebugData = new DebugLevel();
 
-            DebugInfo = new StringBuilder();
+            level = new Level(this);
+            level.Name = "level_01";
 
             GameState = new GameState();
             GameState.SetLoading();
@@ -125,6 +126,8 @@ namespace Squircle
         /// </summary>
         protected override void Initialize()
         {
+            DebugInfo = new StringBuilder();
+
             InputHandler = new InputHandler();
 
             EventSystem = new EventSystem();
@@ -134,6 +137,7 @@ namespace Squircle
             ToggleRunningAndInMenuEvent.addListener(onToggleRunningAndInMenu);
 
             PhysicsDebugDrawer = new PhysicsDebugDraw();
+            PhysicsDebugDrawer.Level = level;
 
             PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.AABB);
             PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.CenterOfMass);
@@ -142,10 +146,7 @@ namespace Squircle
             PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.Shape);
 
             gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
-            level = new Level(this);
-            level.Name = "level_01";
-            PhysicsDebugDrawer.Level = level;
-            level.Initialize(gameConfig["Levels"]["level_01"]);
+            level.Initialize(gameConfig["Levels"][level.Name]);
 
             base.Initialize();
 
@@ -203,7 +204,7 @@ namespace Squircle
 
             if (InputHandler.WasTriggered(Keys.R) || InputHandler.WasTriggered(Buttons.Back))
             {
-                StartLoadingLevel(level.Name);
+                EventSystem.getEvent("endLevel").trigger(level.Name);
                 return;
             }
 
@@ -248,7 +249,12 @@ namespace Squircle
             if (GameState.IsLoading)
             {
                 spriteBatch.Begin();
-                DrawOnScreen("Loading...");
+                var toDraw = "Loading...";
+                var measurements = debugFont.MeasureString(toDraw);
+                spriteBatch.DrawString(debugFont,
+                    toDraw,
+                    new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2) - measurements / 2,
+                    Color.White);
                 spriteBatch.End();
                 LoadingScreenDrawn = true;
                 return;
@@ -334,7 +340,15 @@ namespace Squircle
                 foreach (var prop in properties)
                 {
                     var debugData = (DebugData)Attribute.GetCustomAttribute(prop, typeof(DebugData), true);
-                    if (!drawDebugData.IsVerbose && (debugData == null || debugData.Ignore)) { continue; }
+
+                    if (debugData == null)
+                    {
+                        if (!drawDebugData.IsVerbose) continue; // No debug data and we are not verbose today.
+                    }
+                    else
+                    {
+                        if (debugData.Ignore) continue; // Debug data says, we should ignore it.
+                    }
 
                     var key = prop.Name;
                     var value = prop.GetValue(go, null);
@@ -381,8 +395,7 @@ namespace Squircle
 
         private void EndLoadLevel()
         {
-            level.Initialize(gameConfig["Levels"][level.Name]);
-            level.LoadContent(Content);
+            Initialize();
             GameState.SetRunning();
             LoadingScreenDrawn = false;
         }
@@ -399,6 +412,11 @@ namespace Squircle
 
         private void onToggleRunningAndInMenu(String data)
         {
+            if (GameState.IsRunning)
+            {
+                if(InputHandler.KeyboardState.GetPressedKeys().Any(key => key != Keys.Escape)) return;
+            }
+
             GameState.ToggleRunningAndInMenu();
         }
     }

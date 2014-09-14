@@ -43,19 +43,33 @@ namespace Squircle
 
         public float MovementSpeed { get; set; }
 
-        public Vector2 WaypointStart { get; set; }
-        public Vector2 WaypointEnd { get; set; }
+        private Vector2[] Waypoints { get; set; }
+
+        public Vector2 WaypointStart { get { return Waypoints[0]; } set { Waypoints[0] = value; } }
+        public Vector2 WaypointEnd { get { return Waypoints[1]; } set { Waypoints[1] = value; } }
+
+        private RingIndex _targetIndex;
+
+        [DebugData(Ignore = true)]
+        public Vector2 Target { get { return Waypoints[_targetIndex]; } }
+
+        public bool WasAtTarget { get; set; }
+        public bool IsAtTarget { get { return Pos.EpsilonCompare(Target, 0.25f); } }
 
         [DebugData]
-        public GameObject Target { get; set; }
-
-        public bool IsAtTarget { get { return Pos.EpsilonCompare(Target.Pos); } }
+        public float TargetDistance { get { return Vector2.Distance(Pos, Target); } }
 
         public PlatformObject(Game game)
             : base(game)
         {
             State = new State();
-            Target = new PhantomObject(Game);
+            Waypoints = new Vector2[2];
+            _targetIndex = new RingIndex()
+            {
+                Value = 0,
+                LowerBound = 0,
+                UpperBound = Waypoints.Length - 1
+            };
         }
 
         public override void LoadContent(ContentManager content)
@@ -95,7 +109,6 @@ namespace Squircle
             var fixtureDef = new FixtureDef();
             var shape = new PolygonShape();
             shape.SetAsBox(Game.level.ConvertToBox2D(Dimensions.X / 2), Game.level.ConvertToBox2D(Dimensions.Y / 2));
-            fixtureDef.friction = 0.5f;
             fixtureDef.shape = shape;
             fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground };
             bodyDef.type = BodyType.Kinematic;
@@ -117,46 +130,50 @@ namespace Squircle
                 {
                     if (targetName == "start")
                     {
-                        Target.Pos = WaypointStart;
+                        _targetIndex.Value = 0;
                     }
                     else if (targetName == "end")
                     {
-                        Target.Pos = WaypointEnd;
+                        _targetIndex.Value = 1;
                     }
                     else
                     {
                         throw new ArgumentException("Unsupported target name: " + targetName);
                     }
                 },
-                () => Target.Pos = WaypointEnd);
-
-            Target.Name = string.Format("{0}_target", Name);
+                () => _targetIndex.Value = 1);
         }
 
         public override void Update(GameTime gameTime)
         {
-            if (State.IsInactive || IsAtTarget) 
+            UpdateDetails(gameTime);
+            PreviousPos = Pos;
+        }
+
+        private void UpdateDetails(GameTime gameTime)
+        {
+            if (State.IsInactive)
             {
-                PreviousPos = Pos; 
-                return; 
+                return;
             }
 
-            var diff = Target.Pos - Pos;
-            var diffBefore = Target.Pos - PreviousPos;
-
-            if (!diff.IsInSameQuadrant(diffBefore))
+            if (IsAtTarget)
             {
-                Body.SetLinearVelocity(Vector2.Zero);
-                Pos = Target.Pos;
-                return; 
+                if (!WasAtTarget)
+                {
+                    Body.SetLinearVelocity(Vector2.Zero);
+                    Pos = Target;
+                    WasAtTarget = true;
+                }
+                return;
             }
+
+            var diff = Target - Pos;
 
             diff.Normalize();
-            var velocity = diff * (float)(MovementSpeed);
+            var velocity = diff * MovementSpeed;
 
             Body.SetLinearVelocity(Game.level.ConvertToBox2D(velocity));
-
-            PreviousPos = Pos;
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -178,7 +195,7 @@ namespace Squircle
             {
                 spriteBatch.DrawLine(pos, WaypointStart, Color.Blue);
                 spriteBatch.DrawLine(pos, WaypointEnd, Color.Blue);
-                if(!IsAtTarget) spriteBatch.DrawLine(pos, Target.Pos, Color.Red);
+                if(!IsAtTarget) spriteBatch.DrawLine(pos, Target, Color.Red);
             }
         }
 
@@ -190,19 +207,10 @@ namespace Squircle
 
         public void onToggleWaypointEvent(String data)
         {
-            if (State.IsInactive)
-            {
-                return;
-            }
+            if (State.IsInactive) { return; }
 
-            if (Target.Pos == WaypointStart)
-            {
-                Target.Pos = WaypointEnd;
-            }
-            else
-            {
-                Target.Pos = WaypointStart;
-            }
+            _targetIndex.Increment();
+            WasAtTarget = false;
         }
     }
 }
