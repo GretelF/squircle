@@ -90,6 +90,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="RingIndex.cs" />
     <Compile Include="Square.cs" />
     <Compile Include="TriggerObjects.cs" />
     <Compile Include="UserInterface.cs" />

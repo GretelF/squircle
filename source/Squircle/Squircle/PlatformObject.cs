@@ -43,19 +43,32 @@ namespace Squircle
 
         public float MovementSpeed { get; set; }
 
-        public Vector2 WaypointStart { get; set; }
-        public Vector2 WaypointEnd { get; set; }
+        private Vector2[] Waypoints { get; set; }
+
+        public Vector2 WaypointStart { get { return Waypoints[0]; } set { Waypoints[0] = value; } }
+        public Vector2 WaypointEnd { get { return Waypoints[1]; } set { Waypoints[1] = value; } }
+
+        private RingIndex _targetIndex;
+
+        [DebugData(Ignore = true)]
+        public Vector2 Target { get { return Waypoints[_targetIndex]; } }
+
+        public bool IsAtTarget { get { return Pos.EpsilonCompare(Target); } }
 
         [DebugData]
-        public GameObject Target { get; set; }
-
-        public bool IsAtTarget { get { return Pos.EpsilonCompare(Target.Pos); } }
+        public float TargetDistance { get { return Vector2.Distance(Pos, Target); } }
 
         public PlatformObject(Game game)
             : base(game)
         {
             State = new State();
-            Target = new PhantomObject(Game);
+            Waypoints = new Vector2[2];
+            _targetIndex = new RingIndex()
+            {
+                Value = 0,
+                LowerBound = 0,
+                UpperBound = Waypoints.Length - 1
+            };
         }
 
         public override void LoadContent(ContentManager content)
@@ -116,20 +129,18 @@ namespace Squircle
                 {
                     if (targetName == "start")
                     {
-                        Target.Pos = WaypointStart;
+                        _targetIndex.Value = 0;
                     }
                     else if (targetName == "end")
                     {
-                        Target.Pos = WaypointEnd;
+                        _targetIndex.Value = 1;
                     }
                     else
                     {
                         throw new ArgumentException("Unsupported target name: " + targetName);
                     }
                 },
-                () => Target.Pos = WaypointEnd);
-
-            Target.Name = string.Format("{0}_target", Name);
+                () => _targetIndex.Value = 1);
         }
 
         public override void Update(GameTime gameTime)
@@ -140,13 +151,14 @@ namespace Squircle
                 return; 
             }
 
-            var diff = Target.Pos - Pos;
-            var diffBefore = Target.Pos - PreviousPos;
+            var diff = Target - Pos;
+            var diffBefore = Target - PreviousPos;
 
             if (!diff.IsInSameQuadrant(diffBefore))
             {
                 Body.SetLinearVelocity(Vector2.Zero);
-                Pos = Target.Pos;
+                Pos = Target;
+                PreviousPos = Pos;
                 return; 
             }
 
@@ -177,7 +189,7 @@ namespace Squircle
             {
                 spriteBatch.DrawLine(pos, WaypointStart, Color.Blue);
                 spriteBatch.DrawLine(pos, WaypointEnd, Color.Blue);
-                if(!IsAtTarget) spriteBatch.DrawLine(pos, Target.Pos, Color.Red);
+                if(!IsAtTarget) spriteBatch.DrawLine(pos, Target, Color.Red);
             }
         }
 
@@ -194,14 +206,7 @@ namespace Squircle
                 return;
             }
 
-            if (Target.Pos == WaypointStart)
-            {
-                Target.Pos = WaypointEnd;
-            }
-            else
-            {
-                Target.Pos = WaypointStart;
-            }
+            _targetIndex.Increment();
         }
     }
 }
