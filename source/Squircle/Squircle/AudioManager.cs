@@ -81,6 +81,10 @@ namespace Squircle
 
         public void PlayCue(Cue cue)
         {
+            if (cue.IsStopped)
+            {
+                cue = AddOrReplaceCue(cue);
+            }
             if (!cue.IsPlaying)
             {
                 cue.Play();
@@ -120,6 +124,24 @@ namespace Squircle
         public bool IsPlayingAnyCue()
         {
             return PlayedCues.Any(c => c.IsPlaying);
+        }
+
+        private Cue AddOrReplaceCue(Cue cue)
+        {
+            for (int i = 0; i < PlayedCues.Count; i++)
+            {
+                var current = PlayedCues[i];
+                if (current.Name == cue.Name)
+                {
+                    // Replace existing cue
+                    cue = Sounds.GetCue(cue.Name);
+                    PlayedCues[i] = cue;
+                    return cue;
+                }
+            }
+
+            PlayedCues.Add(cue);
+            return cue;
         }
     }
 }
