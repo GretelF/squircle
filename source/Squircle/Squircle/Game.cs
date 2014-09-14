@@ -103,6 +103,8 @@ namespace Squircle
 
         public Event ToggleRunningAndInMenuEvent { get; set; }
 
+        public AudioManager Audio { get; set; }
+
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -111,11 +113,18 @@ namespace Squircle
             drawVisualHelpers = new DebugLevel();
             drawDebugData = new DebugLevel();
 
+            GameState = new GameState();
+            GameState.SetLoading();
+
             level = new Level(this);
             level.Name = "level_01";
 
-            GameState = new GameState();
-            GameState.SetLoading();
+            gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
+            gameConfig.IfSectionExists("Audio", section =>
+            {
+                Audio = new AudioManager(this);
+                Audio.Initialize(section);
+            });
         }
 
         /// <summary>
@@ -145,7 +154,6 @@ namespace Squircle
             PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.Pair);
             PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.Shape);
 
-            gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
             level.Initialize(gameConfig["Levels"][level.Name]);
 
             base.Initialize();
@@ -164,6 +172,8 @@ namespace Squircle
             PhysicsDebugDrawer.spriteBatch = spriteBatch;
             debugFont = Content.Load<SpriteFont>(gameConfig.GlobalSection["debugFont"]);
 
+            if (Audio != null) Audio.LoadContent(Content);
+
             level.LoadContent(Content);
         }
 
@@ -173,7 +183,10 @@ namespace Squircle
         /// </summary>
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
+            if (Audio != null)
+            {
+                Audio.CleanUp();
+            }
         }
 
         /// <summary>
@@ -185,6 +198,8 @@ namespace Squircle
 
         protected override void Update(GameTime gameTime)
         {
+            if (Audio != null) Audio.Update(gameTime);
+
             if (GameState.IsLoading)
             {
                 if (LoadingScreenDrawn)
@@ -395,9 +410,12 @@ namespace Squircle
 
         private void EndLoadLevel()
         {
+            // Keep the reference to the current event system because the call to this.Ininitialize() will create a new one.
+            var eventSystem = EventSystem;
             Initialize();
             GameState.SetRunning();
             LoadingScreenDrawn = false;
+            eventSystem.getEvent("levelInitialized").trigger(level.Name);
         }
 
         private void onEndLevel(String data)

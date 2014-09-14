@@ -21,9 +21,12 @@ namespace Squircle
         public string WaveBankFileName { get; set; }
         public string SoundBankFileName { get; set; }
 
+        public IList<Cue> PlayedCues { get; set; }
+
         public AudioManager(Game game)
         {
             Game = game;
+            PlayedCues = new List<Cue>();
         }
 
         public void Initialize(ConfigSection section)
@@ -31,11 +34,9 @@ namespace Squircle
             GlobalSettingsFileName = section["settings"];
             WaveBankFileName = section["waveBank"];
             SoundBankFileName = section["soundBank"];
-
-            Game.EventSystem.getEvent("endLevel").addListener(OnEndLevel);
         }
 
-        private void OnEndLevel(string data)
+        public void CleanUp()
         {
             Sounds.Dispose();
             Waves.Dispose();
@@ -44,7 +45,7 @@ namespace Squircle
 
         public void LoadContent(ContentManager content)
         {
-            if (GlobalSettingsFileName == null) return;
+            if (GlobalSettingsFileName == null || Engine != null) return;
 
             Engine = new AudioEngine(GlobalSettingsFileName);
             Waves = new WaveBank(Engine, WaveBankFileName);
@@ -56,6 +57,69 @@ namespace Squircle
             if (Engine == null) return;
 
             Engine.Update();
+        }
+
+        public void PlayCueAndStopAllOthers(string cueName)
+        {
+            foreach (var cue in PlayedCues.Where(c => c.Name != cueName))
+            {
+                StopCue(cue);
+            }
+            PlayCue(cueName);
+        }
+
+        public void PlayCue(string cueName)
+        {
+            var cue = PlayedCues.SingleOrDefault(c => c.Name == cueName);
+            if (cue == null)
+            {
+                cue = Sounds.GetCue(cueName);
+                PlayedCues.Add(cue);
+            }
+            PlayCue(cue);
+        }
+
+        public void PlayCue(Cue cue)
+        {
+            if (!cue.IsPlaying)
+            {
+                cue.Play();
+            }
+        }
+
+        public void StopCue(string cueName, AudioStopOptions options = AudioStopOptions.AsAuthored)
+        {
+            var cue = PlayedCues.SingleOrDefault(c => c.Name == cueName);
+            if (cue == null) { return; }
+
+            StopCue(cue, options);
+        }
+
+        public void StopCue(Cue cue, AudioStopOptions options = AudioStopOptions.AsAuthored)
+        {
+            if (!cue.IsStopped)
+            {
+                cue.Stop(options);
+            }
+        }
+
+        public void StopAllCues()
+        {
+            foreach (var cue in PlayedCues)
+            {
+                StopCue(cue);
+            }
+        }
+
+        public bool IsPlayingCue(string cueName)
+        {
+            var cue = PlayedCues.SingleOrDefault(c => c.Name == cueName);
+            return cue != null && cue.IsPlaying;
+        }
+
+        public bool IsPlayingAnyCue()
+        {
+            return PlayedCues.Any(c => c.IsPlaying);
         }
     }
 }
