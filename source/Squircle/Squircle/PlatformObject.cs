@@ -10,6 +10,15 @@ using Configuration;
 
 namespace Squircle
 {
+    public delegate void PlatformFader(GameTime gameTime);
+
+    public enum FadeState
+    {
+        Off,
+        FadeIn,
+        FadeOut
+    }
+
     public class PlatformObject : GameObject
     {
         private Vector2 _dimensions;
@@ -59,6 +68,21 @@ namespace Squircle
         [DebugData]
         public float TargetDistance { get { return Vector2.Distance(Pos, Target); } }
 
+        /// <summary>
+        /// In seconds.
+        /// </summary>
+        public float FadeTime { get; set; }
+        public float CurrentFadeTime { get; set; }
+
+        [DebugData]
+        public Color DrawColor { get { return new Color(1.0f, 1.0f, 1.0f, CurrentFadeTime / FadeTime); } }
+
+        private PlatformFader[] Faders { get; set; }
+        public PlatformFader CurrentFader { get { return Faders[(int)FadeState]; } }
+
+        [DebugData]
+        public FadeState FadeState { get; private set; }
+
         public PlatformObject(Game game)
             : base(game)
         {
@@ -69,6 +93,28 @@ namespace Squircle
                 Value = 0,
                 LowerBound = 0,
                 UpperBound = Waypoints.Length - 1
+            };
+            Faders = new PlatformFader[4];
+            FadeTime = 0.5f;
+            Faders[0] = dt => { /* Do nothing.*/ };
+            Faders[1] = dt => // Fading in
+            {
+                CurrentFadeTime += (float)dt.ElapsedGameTime.TotalSeconds;
+                if (CurrentFadeTime > FadeTime)
+                {
+                    CurrentFadeTime = FadeTime;
+                    Body.SetActive(true);
+                    DisableFading();
+                }
+            };
+            Faders[2] = dt => // Fading out
+            {
+                CurrentFadeTime -= (float)dt.ElapsedGameTime.TotalSeconds;
+                if (CurrentFadeTime < 0.0f)
+                {
+                    CurrentFadeTime = 0.0f;
+                    DisableFading();
+                }
             };
         }
 
@@ -86,15 +132,19 @@ namespace Squircle
             section.IfOptionExists("toggleEvent",
                 opt => Game.EventSystem.getEvent(opt).addListener(onToggleEvent));
 
+            section.IfOptionExists("fadeTime", opt => FadeTime = opt);
+
             var stateName = section["state"];
 
             if (stateName == "active")
             {
                 State.setActive();
+                CurrentFadeTime = FadeTime;
             }
             else if (stateName == "inactive")
             {
                 State.setInactive();
+                CurrentFadeTime = 0.0f;
             }
             else
             {
@@ -146,16 +196,9 @@ namespace Squircle
 
         public override void Update(GameTime gameTime)
         {
-            UpdateDetails(gameTime);
-            PreviousPos = Pos;
-        }
+            CurrentFader(gameTime);
 
-        private void UpdateDetails(GameTime gameTime)
-        {
-            if (State.IsInactive)
-            {
-                return;
-            }
+            if (State.IsInactive) { return; }
 
             if (IsAtTarget)
             {
@@ -176,20 +219,25 @@ namespace Squircle
             Body.SetLinearVelocity(Game.level.ConvertToBox2D(velocity));
         }
 
+        private void UpdateDetails(GameTime gameTime)
+        {
+        }
+
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (State.IsInactive) { return; }
 
             var pos = Pos;
             spriteBatch.Draw(_texture,
                              pos,
                              null,
-                             Color.White,
+                             DrawColor,
                              Body.Rotation,
                              new Vector2(_texture.Width / 2, _texture.Height / 2),
                              1.0f,
                              SpriteEffects.None,
                              0.0f);
+
+            if (State.IsInactive) { return; }
 
             if (!Game.drawVisualHelpers.IsNone)
             {
@@ -202,7 +250,9 @@ namespace Squircle
         public void onToggleEvent(String data)
         {
             State.toggle();
-            Body.SetActive(State.IsActive);
+
+            if (State.IsActive) { FadeIn(); }
+            else                { FadeOut(); }
         }
 
         public void onToggleWaypointEvent(String data)
@@ -211,6 +261,24 @@ namespace Squircle
 
             _targetIndex.Increment();
             WasAtTarget = false;
+        }
+
+        private void DisableFading()
+        {
+            FadeState = Squircle.FadeState.Off;
+        }
+
+        private void FadeIn()
+        {
+            CurrentFadeTime = 0.0f;
+            FadeState = Squircle.FadeState.FadeIn;
+        }
+
+        private void FadeOut()
+        {
+            CurrentFadeTime = FadeTime;
+            FadeState = Squircle.FadeState.FadeOut;
+            Body.SetActive(false);
         }
     }
 }

@@ -10,8 +10,8 @@ namespace Squircle
             get { return _value; }
             set
             {
-                if      (value > UpperBound) _value = LowerBound;
-                else if (value < LowerBound) _value = UpperBound;
+                if      (value > UpperBound) _value = value % UpperBound;
+                else if (value < LowerBound) _value = value % LowerBound;
                 else                         _value = value;
             }
         }
@@ -31,6 +31,11 @@ namespace Squircle
         public static implicit operator int(RingIndex ring)
         {
             return ring.Value;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0} ({1}:{2})", Value, LowerBound, UpperBound);
         }
     }
 }
