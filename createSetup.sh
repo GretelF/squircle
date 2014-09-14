@@ -8,7 +8,7 @@ binDir="source/Squircle/Squircle/bin/x86/Release/"
 # grep -E patterns to ignore files from the $binDir
 ignorePattern='.*\.pdb|.*\.application|.*\.manifest|XnaExtensions\.xml'
 # Additional files to include in the archive that are not located in the $binDir
-additionalFiles='README.md art/docu/readme.pdf'
+additionalFiles='README.md docu/documentation.pdf'
 
 function must_have_7zip_installed()
 {

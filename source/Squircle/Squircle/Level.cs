@@ -244,7 +244,7 @@ namespace Squircle
         {
             spriteBatch.Draw(background, new Vector2(0.0f, 0.0f), Microsoft.Xna.Framework.Color.White);
 
-            foreach (var go in GameObjects.OrderByDescending(go => go.DrawOrder))
+            foreach (var go in GameObjects.OrderBy(go => go.DrawOrder))
             {
                 go.Draw(spriteBatch);
             }

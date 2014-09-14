@@ -124,7 +124,6 @@ namespace Squircle
         }
     }
 
-    [DebugData(Ignore = true)]
     public class ButtonObjectBase : GameObject
     {
         public override Vector2 Pos { get; set; }
@@ -178,6 +177,7 @@ namespace Squircle
             InitialOnOffState = new State();
             OnOffState = new State();
             PressedState = new State() { Value = StateType.Inactive };
+            DrawOrder = 20;
         }
 
         public override void LoadContent(ContentManager content)
