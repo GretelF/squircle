@@ -430,12 +430,6 @@ namespace Squircle
 
         private void onToggleRunningAndInMenu(String data)
         {
-            if (GameState.IsRunning)
-            {
-                var pressedKeys = InputHandler.KeyboardState.GetPressedKeys();
-                if (pressedKeys.Any(key => key != Keys.Escape)) return;
-            }
-
             GameState.ToggleRunningAndInMenu();
         }
     }
