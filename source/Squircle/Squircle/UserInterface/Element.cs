@@ -29,6 +29,7 @@ namespace Squircle.UserInterface
                                       typeName));
             }
 
+            result.Type = typeName;
             result.ParentWindow = parent;
             result.Name = name;
             result.Initialize(section);
@@ -37,6 +38,8 @@ namespace Squircle.UserInterface
         }
 
         public Game Game { get; set; }
+
+        public string Type { get; set; }
 
         public string Name { get; set; }
 
@@ -54,6 +57,16 @@ namespace Squircle.UserInterface
         public Element(Game game)
         {
             Game = game;
+        }
+
+        public Element(Element other)
+        {
+            Game = other.Game;
+            Type = other.Type;
+            Name = other.Name;
+            Position = other.Position;
+            Dimensions = other.Dimensions;
+            ParentWindow = other.ParentWindow;
         }
 
         public virtual void Initialize(ConfigSection section)

@@ -30,6 +30,23 @@ namespace Squircle.UserInterface
             Buttons = new List<Button>();
         }
 
+        public Window(Window other) : base(other)
+        {
+            SelectedButtonIndex = new RingIndex();
+            SelectedButtonIndex.UpperBound = other.SelectedButtonIndex.UpperBound;
+            SelectedButtonIndex.Value = other.SelectedButtonIndex.Value;
+
+            Buttons = new List<Button>();
+            foreach (var button in other.Buttons)
+            {
+                // Add a copy
+                Buttons.Add(new Button(button));
+            }
+
+            BackgroundTexture = other.BackgroundTexture;
+            BackgroundTextureName = other.BackgroundTextureName;
+        }
+
         public override void Initialize(ConfigSection section)
         {
             base.Initialize(section);

@@ -30,6 +30,19 @@ namespace Squircle.UserInterface
             OnOffState.setInactive();
         }
 
+        public Button(Button other) : base(other)
+        {
+            TextureOn = other.TextureOn;
+            TextureOnName = other.TextureOnName;
+            TextureOff = other.TextureOff;
+            TextureOffName = other.TextureOffName;
+            EventActivate = other.EventActivate;
+            EventActivateData = other.EventActivateData;
+
+            OnOffState = new State();
+            OnOffState.Value = other.OnOffState.Value;
+        }
+
         public void ToggleOnOff()
         {
             OnOffState.toggle();

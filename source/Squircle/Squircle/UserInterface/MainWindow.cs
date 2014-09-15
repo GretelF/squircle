@@ -16,8 +16,15 @@ namespace Squircle.UserInterface
             get { return Position; }
         }
 
+        /// <summary>
+        /// A list of unique window instances.
+        /// </summary>
         public IList<Window> Windows { get; set; }
 
+        /// <summary>
+        /// A stack of copies of the active windows.
+        /// <remarks>The windows need to be copy in order to preserve their state.</remarks>
+        /// </summary>
         public Stack<Window> ActiveWindows { get; set; }
 
         public Window ActiveWindow
@@ -58,14 +65,6 @@ namespace Squircle.UserInterface
 
         private void onToggleRunningAndInMenu(string data)
         {
-            //SelectedButton.ToggleOnOff();
-            //SelectedButtonIndex = 0;
-            //SelectedButton.ToggleOnOff();
-            //HideScreenEvent.trigger(null);
-            foreach (var window in ActiveWindows)
-            {
-                window.Reset();
-            }
             ActiveWindows.Clear();
             Reset();
         }
@@ -118,16 +117,19 @@ namespace Squircle.UserInterface
 
         private void OnShowScreen(string data)
         {
-            if (ActiveWindow.Name == data) { return; }
+            if (data == ActiveWindow.Name) { return; }
 
-            var window = Windows.Single(w => w.Name == data);
-            ActiveWindows.Push(window);
+            var window = data == Name ? this : Windows.Single(w => w.Name == data);
+
+            // Make a copy
+            ActiveWindows.Push(new Window(window));
         }
 
         private void OnHideScreen(string data)
         {
             if (ActiveWindows.Count > 0)
             {
+                ActiveWindow.Reset();
                 ActiveWindows.Pop();
             }
         }
