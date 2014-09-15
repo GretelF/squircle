@@ -108,7 +108,10 @@
     <Compile Include="RingIndex.cs" />
     <Compile Include="GameObjects\Square.cs" />
     <Compile Include="GameObjects\TriggerObjects.cs" />
-    <Compile Include="UserInterface\UserInterface.cs" />
+    <Compile Include="UserInterface\Button.cs" />
+    <Compile Include="UserInterface\MainWindow.cs" />
+    <Compile Include="UserInterface\Element.cs" />
+    <Compile Include="UserInterface\Screen.cs" />
     <Compile Include="Vector2Extensions.cs" />
   </ItemGroup>
   <ItemGroup>

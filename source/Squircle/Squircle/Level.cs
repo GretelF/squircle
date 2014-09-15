@@ -44,7 +44,7 @@ namespace Squircle
         public Circle circle { get { if (_cachedCircle == null) _cachedCircle = (Circle)GetGameObject("circle"); return _cachedCircle; } }
         public IList<GameObject> GameObjects { get; set; }
         public Body playerBounds { get; set; }
-        public UserInterface Menu { get; set; }
+        public UserInterface.MainWindow Menu { get; set; }
         public float PhysicsScale { get; set; }
         public float GroundFriction { get; set; }
 
@@ -101,7 +101,7 @@ namespace Squircle
                 GameObjects.Add(go);
             }
 
-            Menu = new UserInterface(game);
+            Menu = new UserInterface.MainWindow(game);
             var userInterfaceConfig = ConfigFile.FromFile(levelConfig.GlobalSection["userInterface"]);
             Menu.InitializeFromConfigFile(userInterfaceConfig);
 
