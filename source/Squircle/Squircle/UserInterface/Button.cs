@@ -35,6 +35,14 @@ namespace Squircle.UserInterface
             OnOffState.toggle();
         }
 
+        public void SetOnOff(bool value)
+        {
+            if (value)
+                OnOffState.setActive();
+            else
+                OnOffState.setInactive();
+        }
+
         public void Activate()
         {
             if (EventActivate == null) { return; }
@@ -49,30 +57,22 @@ namespace Squircle.UserInterface
             TextureOnName = section["textureOn"];
             TextureOffName = section["textureOff"];
 
-            if (section.Options.ContainsKey("onActivate"))
-            {
-                EventActivate = Game.EventSystem.getEvent(section["onActivate"]);
-            }
+            section.IfOptionExists("onActivate",
+                opt => EventActivate = Game.EventSystem.getEvent(opt));
 
-            if (section.Options.ContainsKey("onActivateData"))
-            {
-                EventActivateData = section["onActivateData"];
-            }
+            section.IfOptionExists("onActivateData",
+                opt => EventActivateData = opt);
         }
 
         public override void LoadContent(ContentManager content)
         {
             TextureOn = content.Load<Texture2D>(TextureOnName);
             TextureOff = content.Load<Texture2D>(TextureOffName);
-
-            base.LoadContent(content);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(Texture, PositionAbsolute - Dimensions / 2, Color.White);
-
-            base.Draw(spriteBatch);
         }
 
         public override string ToString()

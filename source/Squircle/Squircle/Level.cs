@@ -102,8 +102,7 @@ namespace Squircle
             }
 
             Menu = new UserInterface.MainWindow(game);
-            var userInterfaceConfig = ConfigFile.FromFile(levelConfig.GlobalSection["userInterface"]);
-            Menu.InitializeFromConfigFile(userInterfaceConfig);
+            Menu.InitializeFromConfigFile(levelConfig.GlobalSection["userInterface"].AsConfigFile());
 
             levelConfig.IfSectionExists("Audio",
                 section =>

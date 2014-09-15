@@ -59,6 +59,22 @@
       <Name>level_credits_objects</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="menu\creditsWindow.cfg">
+      <Name>creditsWindow</Name>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="menu\creditsWindowButtons.cfg">
+      <Name>creditsWindowButtons</Name>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="menu\mainWindow.cfg">
+      <Name>mainWindow</Name>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="menu\mainWindowButtons.cfg">
+      <Name>mainWindowButtons</Name>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="menu\userInterface.cfg">
       <Name>userInterface</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

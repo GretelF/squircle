@@ -4,171 +4,132 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
 
 namespace Squircle.UserInterface
 {
-    public class MainWindow : Element
+    public class MainWindow : Window
     {
-        public Texture2D Background { get; set; }
-        public string BackgroundName { get; set; }
-
-        public IList<Button> PressButtons { get; set; }
-
-        public Screen ActiveScreen { get; set; }
-        public Event ShowScreenEvent { get; set; }
-        public Event HideScreenEvent { get; set; }
-
-        public int SelectedButtonIndex { get; set; }
-        public Button SelectedButton
+        public override Vector2 PositionAbsolute
         {
-            get { return PressButtons[SelectedButtonIndex]; }
+            get { return Position; }
+        }
+
+        public IList<Window> Windows { get; set; }
+
+        public Stack<Window> ActiveWindows { get; set; }
+
+        public Window ActiveWindow
+        {
+            get { return ActiveWindows.Count == 0 ? this : ActiveWindows.Peek(); }
         }
 
         public MainWindow(Game game)
             : base(game)
         {
-            PressButtons = new List<Button>();
+            Windows = new List<Window>();
+            ActiveWindows = new Stack<Window>();
         }
 
-        public override void Initialize(ConfigSection section)
+        public void InitializeFromConfigFile(ConfigFile cfg)
         {
-            Name = "root";
-            Dimensions = new Vector2(Game.GraphicsDevice.Viewport.Width, Game.GraphicsDevice.Viewport.Height);
-            Position = Vector2.Zero;
+            Name = "mainWindow";
 
-            BackgroundName = section["background"];
+            foreach (var opt in cfg["Windows"].Options)
+            {
+                if (opt.Key == Name)
+                {
+                    Initialize(opt.Value.AsConfigFile().GlobalSection);
+                }
+                else
+                {
+                    var window = Element.Create(this, opt.Key, opt.Value.AsConfigFile().GlobalSection) as Window;
+                    Debug.Assert(window != null,
+                        "non-window in [Windows] section of user interface definition!");
+                    Windows.Add(window);
+                }
+            }
 
             Game.EventSystem.getEvent("toggleRunningAndInMenu").addListener(onToggleRunningAndInMenu);
-
-            ShowScreenEvent = Game.EventSystem.getEvent("showScreen");
-            ShowScreenEvent.addListener(OnShowScreen);
-
-            HideScreenEvent = Game.EventSystem.getEvent("hideScreen");
-            HideScreenEvent.addListener(OnHideScreen);
-        }
-
-        public void InitializeFromConfigFile(ConfigFile config)
-        {
-            Initialize(config.GlobalSection);
-            InitializeChildren(config.Sections, config.GlobalSection);
-
-            foreach (var child in Children)
-            {
-                var button = child as Button;
-                if (button == null)
-                {
-                    continue;
-                }
-
-                PressButtons.Add(button);
-            }
-
-            if (PressButtons.Count > 0)
-            {
-                SelectedButtonIndex = 0;
-                SelectedButton.OnOffState.setActive();
-            }
+            Game.EventSystem.getEvent("ui.show").addListener(OnShowScreen);
+            Game.EventSystem.getEvent("ui.hide").addListener(OnHideScreen);
         }
 
         private void onToggleRunningAndInMenu(string data)
         {
-            SelectedButton.ToggleOnOff();
-            SelectedButtonIndex = 0;
-            SelectedButton.ToggleOnOff();
-            HideScreenEvent.trigger(null);
+            //SelectedButton.ToggleOnOff();
+            //SelectedButtonIndex = 0;
+            //SelectedButton.ToggleOnOff();
+            //HideScreenEvent.trigger(null);
+            foreach (var window in ActiveWindows)
+            {
+                window.Reset();
+            }
+            ActiveWindows.Clear();
+            Reset();
         }
 
         public override void LoadContent(ContentManager content)
         {
-            Background = content.Load<Texture2D>(BackgroundName);
-
             base.LoadContent(content);
+
+            foreach (var window in Windows)
+            {
+                window.LoadContent(content);
+            }
         }
 
-        public override void Update(GameTime gameTime)
+        public new void Update(GameTime gameTime)
         {
             var input = Game.InputHandler;
 
-            if (input.WasTriggered(Keys.Enter) || input.WasTriggered(Buttons.A))
+            if (input.WasTriggered(Keys.Back)
+             || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.B))
             {
-                if (ActiveScreen == null)
-                {
-                    SelectedButton.Activate();
-                }
-                else
-                {
-                    HideScreenEvent.trigger(null);
-                }
+                Game.EventSystem.getEvent("ui.hide").trigger(null);
             }
 
-            if (ActiveScreen != null)
+            if (input.WasTriggered(Keys.Enter)
+             || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.A))
             {
-                return;
+                ActiveWindow.ActivateSelectedButton();
             }
 
-            if (input.WasTriggered(Keys.Down) || input.WasTriggered(Buttons.DPadDown))
+            if (input.WasTriggered(Keys.Down)
+             || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.DPadDown))
             {
-                SelectNextButton();
+                ActiveWindow.Navigate(Direction.Down);
             }
 
-            if (input.WasTriggered(Keys.Up) || input.WasTriggered(Buttons.DPadUp))
+            if (input.WasTriggered(Keys.Up)
+             || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.DPadUp))
             {
-                SelectPreviousButton();
+                ActiveWindow.Navigate(Direction.Up);
             }
+
+            ActiveWindow.Update(gameTime);
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public new void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(Background, Vector2.Zero, Color.White);
-
-            if (ActiveScreen != null)
-            {
-                ActiveScreen.Draw(spriteBatch);
-                return;
-            }
-
-            foreach (var button in PressButtons)
-            {
-                button.Draw(spriteBatch);
-            }
-        }
-
-        private void SelectNextButton()
-        {
-            if (PressButtons.Count < 2)
-            {
-                return;
-            }
-
-            SelectedButton.OnOffState.toggle();
-            ++SelectedButtonIndex;
-            if (SelectedButtonIndex >= PressButtons.Count)
-                SelectedButtonIndex = 0;
-            SelectedButton.OnOffState.toggle();
-        }
-
-        private void SelectPreviousButton()
-        {
-            if (PressButtons.Count < 2)
-            {
-                return;
-            }
-
-            SelectedButton.OnOffState.toggle();
-            --SelectedButtonIndex;
-            if (SelectedButtonIndex < 0)
-                SelectedButtonIndex = PressButtons.Count - 1;
-            SelectedButton.OnOffState.toggle();
+            ActiveWindow.Draw(spriteBatch);
         }
 
         private void OnShowScreen(string data)
         {
-            ActiveScreen = GetChild<Screen>(data);
+            if (ActiveWindow.Name == data) { return; }
+
+            var window = Windows.Single(w => w.Name == data);
+            ActiveWindows.Push(window);
         }
 
         private void OnHideScreen(string data)
         {
-            ActiveScreen = null;
+            if (ActiveWindows.Count > 0)
+            {
+                ActiveWindows.Pop();
+            }
         }
     }
 }

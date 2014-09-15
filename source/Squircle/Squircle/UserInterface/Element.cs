@@ -10,7 +10,7 @@ namespace Squircle.UserInterface
 {
     public class Element
     {
-        public static Element Create(Element parent, string name, ConfigSection section)
+        public static Element Create(Window parent, string name, ConfigSection section)
         {
             var typeName = (string)section["type"];
             Element result;
@@ -20,8 +20,8 @@ namespace Squircle.UserInterface
                 case "button":
                     result = new Button(parent.Game);
                     break;
-                case "screen":
-                    result = new Screen(parent.Game);
+                case "window":
+                    result = new Window(parent.Game);
                     break;
                 default:
                     throw new NotSupportedException(
@@ -29,91 +29,49 @@ namespace Squircle.UserInterface
                                       typeName));
             }
 
-            result.Parent = parent;
+            result.ParentWindow = parent;
             result.Name = name;
             result.Initialize(section);
 
             return result;
         }
+
         public Game Game { get; set; }
 
         public string Name { get; set; }
 
         public Vector2 Position { get; set; }
 
-        public Vector2 PositionAbsolute
+        public virtual Vector2 PositionAbsolute
         {
-            get { return Parent == null ? Position : Position + Parent.PositionAbsolute; }
+            get { return ParentWindow == null ? Position : Position + ParentWindow.PositionAbsolute; }
         }
 
         public Vector2 Dimensions { get; set; }
 
-        public Element Parent { get; set; }
-
-        public IList<Element> Children { get; set; }
+        public Window ParentWindow { get; set; }
 
         public Element(Game game)
         {
             Game = game;
-            Children = new List<Element>();
         }
-        
+
         public virtual void Initialize(ConfigSection section)
         {
             Position = section["position"].AsVector2();
             Dimensions = section["dimensions"].AsVector2();
-
-            if (!section.Options.ContainsKey("children"))
-            {
-                return;
-            }
-
-            var childrenConfigName = section["children"];
-            var childrenConfig = ConfigFile.FromFile(childrenConfigName);
-            InitializeChildren(childrenConfig.Sections, childrenConfig.GlobalSection);
-        }
-
-        public void InitializeChildren(IDictionary<string, ConfigSection> sections, ConfigSection globalSection)
-        {
-            foreach (var section in sections)
-            {
-                if (section.Value == globalSection)
-                {
-                    continue;
-                }
-
-                var child = Element.Create(this, section.Key, section.Value);
-                Children.Add(child);
-            }
         }
 
         public virtual void LoadContent(ContentManager content)
         {
-            foreach (var child in Children)
-            {
-                child.LoadContent(content);
-            }
         }
 
         public virtual void Update(GameTime gameTime)
         {
-            foreach (var child in Children)
-            {
-                child.Update(gameTime);
-            }
         }
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            foreach (var child in Children)
-            {
-                child.Draw(spriteBatch);
-            }
-        }
-
-        public T GetChild<T>(string name) where T : Element
-        {
-            return Children.First(ui => ui.Name == name) as T;
         }
 
         public override string ToString()

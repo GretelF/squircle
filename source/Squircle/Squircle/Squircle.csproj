@@ -111,7 +111,7 @@
     <Compile Include="UserInterface\Button.cs" />
     <Compile Include="UserInterface\MainWindow.cs" />
     <Compile Include="UserInterface\Element.cs" />
-    <Compile Include="UserInterface\Screen.cs" />
+    <Compile Include="UserInterface\Window.cs" />
     <Compile Include="Vector2Extensions.cs" />
   </ItemGroup>
   <ItemGroup>

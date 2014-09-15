@@ -65,5 +65,10 @@ namespace Squircle
         {
             return bool.Parse(cfg);
         }
+
+        public static ConfigFile AsConfigFile(this ConfigOption opt)
+        {
+            return ConfigFile.FromFile(opt);
+        }
     }
 }

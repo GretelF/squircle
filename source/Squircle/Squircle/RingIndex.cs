@@ -1,8 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Diagnostics;
 
 namespace Squircle
 {
-    public struct RingIndex
+    public class RingIndex
     {
         private int _value;
         public int Value
@@ -10,9 +11,8 @@ namespace Squircle
             get { return _value; }
             set
             {
-                if      (value > UpperBound) _value = value % UpperBound;
-                else if (value < LowerBound) _value = value % LowerBound;
-                else                         _value = value;
+                _value = value;
+                Normalize();
             }
         }
         public int LowerBound { get; set; }
@@ -36,6 +36,23 @@ namespace Squircle
         public override string ToString()
         {
             return string.Format("{0} ({1}:{2})", Value, LowerBound, UpperBound);
+        }
+
+        private void Normalize()
+        {
+            Debug.Assert(LowerBound <= UpperBound);
+
+            while (_value > UpperBound)
+            {
+                var diff = _value - UpperBound;
+                _value = LowerBound - 1 + diff;
+            }
+
+            while(_value < LowerBound)
+            {
+                var diff = LowerBound - _value;
+                _value = UpperBound + 1 - diff;
+            }
         }
     }
 }
