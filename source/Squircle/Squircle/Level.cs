@@ -55,6 +55,7 @@ namespace Squircle
             this.game = game;
             GameObjects = new List<GameObject>();
             PhysicsScale = 1.0f;
+            Menu = new UserInterface.MainWindow(game);
         }
 
         public void Initialize(ConfigOption option)
@@ -101,7 +102,6 @@ namespace Squircle
                 GameObjects.Add(go);
             }
 
-            Menu = new UserInterface.MainWindow(game);
             Menu.InitializeFromConfigFile(levelConfig.GlobalSection["userInterface"].AsConfigFile());
 
             levelConfig.IfSectionExists("Audio",
@@ -176,12 +176,6 @@ namespace Squircle
 
         public void Update(GameTime gameTime)
         {
-            if (game.GameState.IsInMenu)
-            {
-                Menu.Update(gameTime);
-                return;
-            }
-
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             foreach (var go in GameObjects)

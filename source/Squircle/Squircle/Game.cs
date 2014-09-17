@@ -105,6 +105,8 @@ namespace Squircle
 
         public AudioManager Audio { get; set; }
 
+        public Vector2 ViewportDimensions { get; set; }
+
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -116,8 +118,11 @@ namespace Squircle
             GameState = new GameState();
             GameState.SetLoading();
 
+            ViewportDimensions = new Vector2(800, 480);
+
             level = new Level(this);
             level.Name = "level_01";
+            level.Menu.InitialWindowName = "mainWindow";
 
             gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
             gameConfig.IfSectionExists("Audio", section =>
@@ -135,6 +140,9 @@ namespace Squircle
         /// </summary>
         protected override void Initialize()
         {
+            ViewportDimensions = new Vector2(GraphicsDevice.Viewport.Width,
+                                             GraphicsDevice.Viewport.Height);
+
             DebugInfo = new StringBuilder();
 
             InputHandler = new InputHandler();
@@ -142,8 +150,8 @@ namespace Squircle
             EventSystem = new EventSystem();
             EventSystem.getEvent("endLevel").addListener(onEndLevel);
             EventSystem.getEvent("exit").addListener(onExit);
-            ToggleRunningAndInMenuEvent = EventSystem.getEvent("toggleRunningAndInMenu");
-            ToggleRunningAndInMenuEvent.addListener(onToggleRunningAndInMenu);
+            EventSystem.getEvent("ui.show").addListener(OnUIShow);
+            EventSystem.getEvent("ui.close").addListener(OnUIClose);
 
             PhysicsDebugDrawer = new PhysicsDebugDraw();
             PhysicsDebugDrawer.Level = level;
@@ -198,6 +206,10 @@ namespace Squircle
 
         protected override void Update(GameTime gameTime)
         {
+            base.Update(gameTime);
+
+            InputHandler.Update(gameTime);
+
             if (Audio != null) Audio.Update(gameTime);
 
             if (GameState.IsLoading)
@@ -208,13 +220,16 @@ namespace Squircle
                 }
                 return;
             }
+            else if (GameState.IsInMenu)
+            {
+                level.Menu.Update(gameTime);
+                return;
+            }
 
-            InputHandler.Update(gameTime);
-
-            // Allows the game to exit
             if (InputHandler.WasTriggered(Keys.Escape) || InputHandler.WasTriggered(Buttons.Start))
             {
-                ToggleRunningAndInMenuEvent.trigger(null);
+                // Show the main menu.
+                EventSystem.getEvent("ui.show").trigger("mainWindow");
             }
 
             if (InputHandler.WasTriggered(Keys.R) || InputHandler.WasTriggered(Buttons.Back))
@@ -249,8 +264,6 @@ namespace Squircle
             {
                 level.camera.Scale -= 0.01f;
             }
-
-            base.Update(gameTime);
         }
 
         /// <summary>
@@ -428,9 +441,14 @@ namespace Squircle
             Exit();
         }
 
-        private void onToggleRunningAndInMenu(String data)
+        private void OnUIShow(String data)
         {
-            GameState.ToggleRunningAndInMenu();
+            GameState.SetInMenu();
+        }
+
+        private void OnUIClose(String data)
+        {
+            GameState.SetRunning();
         }
     }
 }

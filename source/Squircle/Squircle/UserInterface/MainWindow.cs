@@ -9,12 +9,24 @@ using System.Diagnostics;
 
 namespace Squircle.UserInterface
 {
-    public class MainWindow : Window
+    public class RootElement : Element
     {
         public override Vector2 PositionAbsolute
         {
             get { return Position; }
         }
+
+        public RootElement(Game game) : base(game)
+        {
+            Name = Type = "root";
+            Position = Game.ViewportDimensions / 2;
+            Dimensions = Game.ViewportDimensions;
+        }
+    }
+
+    public class MainWindow
+    {
+        public Game Game { get; set; }
 
         /// <summary>
         /// A list of unique window instances.
@@ -29,97 +41,69 @@ namespace Squircle.UserInterface
 
         public Window ActiveWindow
         {
-            get { return ActiveWindows.Count == 0 ? this : ActiveWindows.Peek(); }
+            get { return ActiveWindows.Peek(); }
         }
 
+        public string InitialWindowName { get; set; }
+
+        /// <summary>
+        /// More or less a dummy object to act as root of the ui.
+        /// </summary>
+        public Element Root { get; set; }
+
         public MainWindow(Game game)
-            : base(game)
         {
+            Game = game;
+            Root = new RootElement(Game);
             Windows = new List<Window>();
             ActiveWindows = new Stack<Window>();
         }
 
         public void InitializeFromConfigFile(ConfigFile cfg)
         {
-            Name = "mainWindow";
-
             foreach (var opt in cfg["Windows"].Options)
             {
-                if (opt.Key == Name)
-                {
-                    Initialize(opt.Value.AsConfigFile().GlobalSection);
-                }
-                else
-                {
-                    var window = Element.Create(this, opt.Key, opt.Value.AsConfigFile().GlobalSection) as Window;
-                    Debug.Assert(window != null,
-                        "non-window in [Windows] section of user interface definition!");
-                    Windows.Add(window);
-                }
+                var window = Element.Create(Root, opt.Key, opt.Value.AsConfigFile().GlobalSection) as Window;
+                Debug.Assert(window != null,
+                    "non-window in [Windows] section of user interface definition!");
+                Windows.Add(window);
             }
 
-            Game.EventSystem.getEvent("toggleRunningAndInMenu").addListener(onToggleRunningAndInMenu);
             Game.EventSystem.getEvent("ui.show").addListener(OnShowScreen);
             Game.EventSystem.getEvent("ui.hide").addListener(OnHideScreen);
+            Game.EventSystem.getEvent("ui.close").addListener(OnClose);
         }
 
-        private void onToggleRunningAndInMenu(string data)
+        public void LoadContent(ContentManager content)
         {
-            ActiveWindows.Clear();
-            Reset();
-        }
-
-        public override void LoadContent(ContentManager content)
-        {
-            base.LoadContent(content);
-
             foreach (var window in Windows)
             {
                 window.LoadContent(content);
             }
+
+            if (InitialWindowName != null)
+            {
+                Game.EventSystem.getEvent("ui.show").trigger(InitialWindowName);
+                InitialWindowName = null;
+            }
         }
 
-        public new void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
-            var input = Game.InputHandler;
-
-            if (input.WasTriggered(Keys.Back)
-             || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.B))
-            {
-                Game.EventSystem.getEvent("ui.hide").trigger(null);
-            }
-
-            if (input.WasTriggered(Keys.Enter)
-             || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.A))
-            {
-                ActiveWindow.ActivateSelectedButton();
-            }
-
-            if (input.WasTriggered(Keys.Down)
-             || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.DPadDown))
-            {
-                ActiveWindow.Navigate(Direction.Down);
-            }
-
-            if (input.WasTriggered(Keys.Up)
-             || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.DPadUp))
-            {
-                ActiveWindow.Navigate(Direction.Up);
-            }
-
             ActiveWindow.Update(gameTime);
         }
 
-        public new void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch)
         {
             ActiveWindow.Draw(spriteBatch);
         }
 
         private void OnShowScreen(string data)
         {
-            if (data == ActiveWindow.Name) { return; }
+            // Don't stack the same window on itself.
+            if (ActiveWindows.Count > 0 && data == ActiveWindow.Name) { return; }
 
-            var window = data == Name ? this : Windows.Single(w => w.Name == data);
+            var window = Windows.Single(w => w.Name == data);
 
             // Make a copy
             ActiveWindows.Push(new Window(window));
@@ -129,9 +113,18 @@ namespace Squircle.UserInterface
         {
             if (ActiveWindows.Count > 0)
             {
-                ActiveWindow.Reset();
                 ActiveWindows.Pop();
+
+                if (ActiveWindows.Count == 0)
+                {
+                    Game.EventSystem.getEvent("ui.close").trigger(null);
+                }
             }
+        }
+
+        private void OnClose(string data)
+        {
+            ActiveWindows.Clear();
         }
     }
 }

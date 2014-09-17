@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -62,11 +63,6 @@ namespace Squircle.UserInterface
                 Buttons.Add(button);
             }
 
-            Reset();
-        }
-
-        public void Reset()
-        {
             Debug.Assert(Buttons.Count > 0, "A windows needs at least 1 button!");
             SelectedButtonIndex.UpperBound = Buttons.Count - 1;
             SelectedButtonIndex.Value = 0;
@@ -85,6 +81,41 @@ namespace Squircle.UserInterface
             foreach (var button in Buttons)
             {
                 button.LoadContent(content);
+            }
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            var input = Game.InputHandler;
+
+            if (input.WasTriggered(Keys.Enter)
+             || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.A))
+            {
+                ActivateSelectedButton();
+            }
+
+            if (input.WasTriggered(Keys.Down)
+             || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.DPadDown))
+            {
+                Navigate(Direction.Down);
+            }
+
+            if (input.WasTriggered(Keys.Up)
+             || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.DPadUp))
+            {
+                Navigate(Direction.Up);
+            }
+
+            if (input.WasTriggered(Keys.Back)
+             || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.B))
+            {
+                Game.EventSystem.getEvent("ui.hide").trigger(Name);
+            }
+
+            if (input.WasTriggered(Keys.Escape)
+             || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.Start))
+            {
+                Game.EventSystem.getEvent("ui.close").trigger(null);
             }
         }
 

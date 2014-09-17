@@ -4,15 +4,19 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Squircle.UserInterface
 {
     public class Element
     {
-        public static Element Create(Window parent, string name, ConfigSection section)
+        public static Element Create(Element parent, string name, ConfigSection section)
         {
             var typeName = (string)section["type"];
+
+            Debug.Assert(typeName != "root");
+
             Element result;
 
             switch (typeName)
@@ -30,7 +34,7 @@ namespace Squircle.UserInterface
             }
 
             result.Type = typeName;
-            result.ParentWindow = parent;
+            result.Parent = parent;
             result.Name = name;
             result.Initialize(section);
 
@@ -47,12 +51,12 @@ namespace Squircle.UserInterface
 
         public virtual Vector2 PositionAbsolute
         {
-            get { return ParentWindow == null ? Position : Position + ParentWindow.PositionAbsolute; }
+            get { return Position + Parent.PositionAbsolute; }
         }
 
         public Vector2 Dimensions { get; set; }
 
-        public Window ParentWindow { get; set; }
+        public Element Parent { get; set; }
 
         public Element(Game game)
         {
@@ -61,12 +65,14 @@ namespace Squircle.UserInterface
 
         public Element(Element other)
         {
+            Debug.Assert(Type != "root");
+
             Game = other.Game;
             Type = other.Type;
             Name = other.Name;
             Position = other.Position;
             Dimensions = other.Dimensions;
-            ParentWindow = other.ParentWindow;
+            Parent = other.Parent;
         }
 
         public virtual void Initialize(ConfigSection section)
