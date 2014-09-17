@@ -71,7 +71,7 @@ namespace Squircle.UserInterface
             TextureOffName = section["textureOff"];
 
             section.IfOptionExists("onActivate",
-                opt => EventActivate = Game.EventSystem.getEvent(opt));
+                opt => EventActivate = Game.EventSystem[opt]);
 
             section.IfOptionExists("onActivateData",
                 opt => EventActivateData = opt);

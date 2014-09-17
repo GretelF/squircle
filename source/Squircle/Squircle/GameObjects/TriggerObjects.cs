@@ -99,7 +99,7 @@ namespace Squircle
         {
             if (_enterEvent != null)
             {
-                Game.EventSystem.getEvent(_enterEvent).trigger(_enterEventData);
+                Game.EventSystem[_enterEvent].trigger(_enterEventData);
             }
         }
 
@@ -107,7 +107,7 @@ namespace Squircle
         {
             if (_leaveEvent != null)
             {
-                Game.EventSystem.getEvent(_leaveEvent).trigger(_leaveEventData);
+                Game.EventSystem[_leaveEvent].trigger(_leaveEventData);
             }
         }
 
@@ -218,7 +218,7 @@ namespace Squircle
 
             if (section.Options.ContainsKey("onButtonOn"))
             {
-                OnEvent = Game.EventSystem.getEvent(section["onButtonOn"]);
+                OnEvent = Game.EventSystem[section["onButtonOn"]];
             }
 
             if (section.Options.ContainsKey("onButtonOnData"))
@@ -228,7 +228,7 @@ namespace Squircle
 
             if (section.Options.ContainsKey("onButtonOff"))
             {
-                OffEvent = Game.EventSystem.getEvent(section["onButtonOff"]);
+                OffEvent = Game.EventSystem[section["onButtonOff"]];
             }
 
             if (section.Options.ContainsKey("onButtonOffData"))
@@ -236,8 +236,8 @@ namespace Squircle
                 OffEventData = section["onButtonOffData"];
             }
 
-            Game.EventSystem.getEvent("playerButtonPress").addListener(OnPlayerButtonPress);
-            Game.EventSystem.getEvent("playerButtonRelease").addListener(OnPlayerButtonRelease);
+            Game.EventSystem["playerButtonPress"].addListener(OnPlayerButtonPress);
+            Game.EventSystem["playerButtonRelease"].addListener(OnPlayerButtonRelease);
         }
 
         public override void Draw(SpriteBatch spriteBatch)

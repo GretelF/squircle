@@ -49,18 +49,20 @@ namespace Squircle
             Events = new List<Event>();
         }
 
-        public Event getEvent(String name)
+        public Event this[String name]
         {
-            Event result = Events.SingleOrDefault(e => e.Name == name);
-
-            if (result == null)
+            get
             {
-                result = new Event() { Name = name };
-                Events.Add(result);
+                Event result = Events.SingleOrDefault(e => e.Name == name);
+
+                if (result == null)
+                {
+                    result = new Event() { Name = name };
+                    Events.Add(result);
+                }
+
+                return result;
             }
-
-            return result;
         }
-
     }
 }

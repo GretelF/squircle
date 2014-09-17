@@ -69,9 +69,9 @@ namespace Squircle.UserInterface
                 Windows.Add(window);
             }
 
-            Game.EventSystem.getEvent("ui.show").addListener(OnShowScreen);
-            Game.EventSystem.getEvent("ui.hide").addListener(OnHideScreen);
-            Game.EventSystem.getEvent("ui.close").addListener(OnClose);
+            Game.EventSystem["ui.show"].addListener(OnShowScreen);
+            Game.EventSystem["ui.hide"].addListener(OnHideScreen);
+            Game.EventSystem["ui.close"].addListener(OnClose);
         }
 
         public void LoadContent(ContentManager content)
@@ -83,7 +83,7 @@ namespace Squircle.UserInterface
 
             if (InitialWindowName != null)
             {
-                Game.EventSystem.getEvent("ui.show").trigger(InitialWindowName);
+                Game.EventSystem["ui.show"].trigger(InitialWindowName);
                 InitialWindowName = null;
             }
         }
@@ -117,7 +117,7 @@ namespace Squircle.UserInterface
 
                 if (ActiveWindows.Count == 0)
                 {
-                    Game.EventSystem.getEvent("ui.close").trigger(null);
+                    Game.EventSystem["ui.close"].trigger(null);
                 }
             }
         }

@@ -109,13 +109,13 @@ namespace Squircle.UserInterface
             if (input.WasTriggered(Keys.Back)
              || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.B))
             {
-                Game.EventSystem.getEvent("ui.hide").trigger(Name);
+                Game.EventSystem["ui.hide"].trigger(Name);
             }
 
             if (input.WasTriggered(Keys.Escape)
              || input.WasTriggered(Microsoft.Xna.Framework.Input.Buttons.Start))
             {
-                Game.EventSystem.getEvent("ui.close").trigger(null);
+                Game.EventSystem["ui.close"].trigger(null);
             }
         }
 
