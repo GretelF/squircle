@@ -85,11 +85,11 @@ namespace Squircle
             }
             if (input.WasTriggered(Keys.S) || input.WasTriggered(Buttons.LeftTrigger))
             {
-                Game.EventSystem["playerButtonPress"].trigger(Name);
+                Game.Events["playerButtonPress"].trigger(Name);
             }
             else if (input.WasReleased(Keys.S) || input.WasReleased(Buttons.LeftTrigger))
             {
-                Game.EventSystem["playerButtonRelease"].trigger(Name);
+                Game.Events["playerButtonRelease"].trigger(Name);
             }
 
             Body.ApplyTorque(tempDir * MaxTorque);

@@ -91,7 +91,7 @@ namespace Squircle
         public DebugLevel drawDebugData { get; set; }           ///< Draws textual game object data above them.
         public DebugLevel drawVisualHelpers { get; set; }       ///< Draws some visual helpers for game objects.
         public SpriteFont debugFont { get; set; }
-        public EventSystem EventSystem { get; set; }
+        public EventSystem Events { get; set; }
         public InputHandler InputHandler { get; set; }
         public GameState GameState { get; set; }
 
@@ -147,11 +147,11 @@ namespace Squircle
 
             InputHandler = new InputHandler();
 
-            EventSystem = new EventSystem();
-            EventSystem["endLevel"].addListener(onEndLevel);
-            EventSystem["exit"].addListener(onExit);
-            EventSystem["ui.show"].addListener(OnUIShow);
-            EventSystem["ui.close"].addListener(OnUIClose);
+            Events = new EventSystem();
+            Events["endLevel"].addListener(onEndLevel);
+            Events["exit"].addListener(onExit);
+            Events["ui.show"].addListener(OnUIShow);
+            Events["ui.close"].addListener(OnUIClose);
 
             PhysicsDebugDrawer = new PhysicsDebugDraw();
             PhysicsDebugDrawer.Level = level;
@@ -229,12 +229,12 @@ namespace Squircle
             if (InputHandler.WasTriggered(Keys.Escape) || InputHandler.WasTriggered(Buttons.Start))
             {
                 // Show the main menu.
-                EventSystem["ui.show"].trigger("mainWindow");
+                Events["ui.show"].trigger("mainWindow");
             }
 
             if (InputHandler.WasTriggered(Keys.R) || InputHandler.WasTriggered(Buttons.Back))
             {
-                EventSystem["endLevel"].trigger(level.Name);
+                Events["endLevel"].trigger(level.Name);
                 return;
             }
 
@@ -424,11 +424,10 @@ namespace Squircle
         private void EndLoadLevel()
         {
             // Keep the reference to the current event system because the call to this.Ininitialize() will create a new one.
-            var eventSystem = EventSystem;
             Initialize();
             GameState.SetRunning();
             LoadingScreenDrawn = false;
-            eventSystem["levelInitialized"].trigger(level.Name);
+            Events["levelInitialized"].trigger(level.Name);
         }
 
         private void onEndLevel(String data)

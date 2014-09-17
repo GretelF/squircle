@@ -113,11 +113,11 @@ namespace Squircle
 
             if (input.WasTriggered(Keys.Down) || input.WasTriggered(Buttons.RightTrigger))
             {
-                Game.EventSystem["playerButtonPress"].trigger(Name);
+                Game.Events["playerButtonPress"].trigger(Name);
             }
             else if (input.WasReleased(Keys.Down) || input.WasReleased(Buttons.RightTrigger))
             {
-                Game.EventSystem["playerButtonRelease"].trigger(Name);
+                Game.Events["playerButtonRelease"].trigger(Name);
             }
 
             var velocity = Body.GetLinearVelocity() + tempPos;

@@ -130,7 +130,7 @@ namespace Squircle
             TextureName = section["texture"];
             _dimensions = section["dimensions"].AsVector2();
             section.IfOptionExists("toggleEvent",
-                opt => Game.EventSystem[opt].addListener(onToggleEvent));
+                opt => Game.Events[opt].addListener(onToggleEvent));
 
             section.IfOptionExists("fadeTime", opt => FadeTime = opt);
 
@@ -153,7 +153,7 @@ namespace Squircle
 
             section.IfOptionExists("movementSpeed", opt => MovementSpeed = opt);
 
-            section.IfOptionExists("toggleWaypointEvent", opt => Game.EventSystem[opt].addListener(onToggleWaypointEvent));
+            section.IfOptionExists("toggleWaypointEvent", opt => Game.Events[opt].addListener(onToggleWaypointEvent));
 
             var bodyDef = new BodyDef();
             var fixtureDef = new FixtureDef();
