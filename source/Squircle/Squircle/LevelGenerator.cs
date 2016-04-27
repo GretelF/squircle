@@ -43,7 +43,6 @@ namespace Squircle
             var vertices = new Vector2[4];
 
             var startPointsStatic = new List<Vector2>();
-            var startPointsDynamic = new List<Vector2>();
 
             var grays = new List<Vector2>();
 
@@ -58,34 +57,7 @@ namespace Squircle
                     {
                         startPointsStatic.Add(new Vector2(x, y));
                     }
-                    if (isGreen(pixel))
-                    {
-                        startPointsDynamic.Add(new Vector2(x, y));
-                    }
                 }
-            }
-
-            foreach (var startPoint in startPointsDynamic)
-            {
-                vertices = GetVertices(map, startPoint);
-                var bodyDef = new BodyDef();
-                bodyDef.type = BodyType.Dynamic;
-
-                bodyDef.angle = 0;
-                bodyDef.position = level.ConvertToBox2D(startPoint);
-                bodyDef.inertiaScale = 1.0f;
-
-                var body = level.World.CreateBody(bodyDef);
-
-                var polygon = new PolygonShape();
-                polygon.Set(vertices, vertices.Length);
-
-                var fixture = new FixtureDef();
-                fixture.restitution = 0.7f;
-                fixture.shape = polygon;
-                body.CreateFixture(fixture);
-
-                bodyList.Add(body);
             }
 
             foreach (var startPoint in startPointsStatic)
