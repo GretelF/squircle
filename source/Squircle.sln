@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squircle", "Squircle\Squircle\Squircle.csproj", "{D274C6D5-470D-4053-939C-F8D53D4A04B6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquircleContent", "Squircle\SquircleContent\SquircleContent.contentproj", "{0529B4E9-95E3-437B-8B7D-ACA437DE9C90}"
@@ -12,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Primitives2D", "..\thirdparty\2d-xna-primitives\Primitives2D.csproj", "{39AD1482-1881-4852-A05D-DC61B0D3446A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigFile", "..\thirdparty\config-file-net\ConfigFile\ConfigFile.csproj", "{BDEBF242-E9EF-4868-BBB9-FF473A1B8A00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquircleCustomPhysics", "Squircle\SquircleCustomPhysics\SquircleCustomPhysics.csproj", "{A5EAE2DC-923C-4233-8A7D-5D79C0A713DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +73,16 @@ Global
 		{BDEBF242-E9EF-4868-BBB9-FF473A1B8A00}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{BDEBF242-E9EF-4868-BBB9-FF473A1B8A00}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{BDEBF242-E9EF-4868-BBB9-FF473A1B8A00}.Release|x86.ActiveCfg = Release|Any CPU
+		{A5EAE2DC-923C-4233-8A7D-5D79C0A713DE}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{A5EAE2DC-923C-4233-8A7D-5D79C0A713DE}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{A5EAE2DC-923C-4233-8A7D-5D79C0A713DE}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{A5EAE2DC-923C-4233-8A7D-5D79C0A713DE}.Debug|x86.ActiveCfg = Debug|x86
+		{A5EAE2DC-923C-4233-8A7D-5D79C0A713DE}.Debug|x86.Build.0 = Debug|x86
+		{A5EAE2DC-923C-4233-8A7D-5D79C0A713DE}.Release|Any CPU.ActiveCfg = Release|x86
+		{A5EAE2DC-923C-4233-8A7D-5D79C0A713DE}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{A5EAE2DC-923C-4233-8A7D-5D79C0A713DE}.Release|Mixed Platforms.Build.0 = Release|x86
+		{A5EAE2DC-923C-4233-8A7D-5D79C0A713DE}.Release|x86.ActiveCfg = Release|x86
+		{A5EAE2DC-923C-4233-8A7D-5D79C0A713DE}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
