@@ -13,10 +13,12 @@ namespace Squircle
 {
     public class Circle : Player
     {
+        private string textureName;
         private Texture2D circleTexture;
         private Vector2 circlePos;
         public float Radius { get; set; }
         public float MaxTorque { get; set; }
+
 
         public override Texture2D Texture
         {
@@ -35,13 +37,14 @@ namespace Squircle
 
         public override void LoadContent(ContentManager content)
         {
-            circleTexture = content.Load<Texture2D>("player/circle_40px");
+            circleTexture = content.Load<Texture2D>(textureName);
         }
 
         public override void Initialize(ConfigSection section)
         {
             base.Initialize(section);
 
+            textureName = section["texture"];
             circlePos = section["position"].AsVector2();
             Radius = section["radius"];
             MaxTorque = section["torque"];

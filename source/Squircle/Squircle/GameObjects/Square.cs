@@ -14,6 +14,7 @@ namespace Squircle
 {
     public class Square : Player
     {
+        private string textureName;
         private Texture2D squareTexture;
         public float SideLength { get; set; }
 
@@ -49,13 +50,14 @@ namespace Squircle
 
         public override void LoadContent(ContentManager content)
         {
-            squareTexture = content.Load<Texture2D>("player/square_50px");
+            squareTexture = content.Load<Texture2D>(textureName);
         }
 
         public override void Initialize(ConfigSection section)
         {
             base.Initialize(section);
 
+            textureName = section["texture"];
             var pos = section["position"].AsVector2();
             SideLength = section["sideLength"];
             Speed = section["speed"];
