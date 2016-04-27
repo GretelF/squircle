@@ -16,8 +16,17 @@ function must_have_7zip_installed()
 	exit 1
 }
 
+function must_have_built_release()
+{
+  echo "Binary directory for the Release build does not exist."\
+       "Please build the Release version and run this script again."
+  exit 1
+}
+
 # Check that 7z is installed and available on the commandline
 which 7z &> /dev/null || must_have_7zip_installed
+
+[ -d "$binDir" ] || must_have_built_release
 
 # Go into the $binDir
 cd "$binDir" &> /dev/null
