@@ -105,8 +105,11 @@
     <Compile Include="GameObjects\PlatformObject.cs" />
     <Compile Include="GameObjects\Player.cs" />
     <Compile Include="Physics\Body.cs" />
+    <Compile Include="Physics\BoundingVolume.cs" />
+    <Compile Include="Physics\PhysicsWorldDebugRenderer.cs" />
     <Compile Include="Physics\Shapes.cs" />
     <Compile Include="Physics\PhysicsWorld.cs" />
+    <Compile Include="Physics\Transform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game.cs" />

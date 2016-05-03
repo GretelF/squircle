@@ -14,6 +14,8 @@ using Configuration;
 using System.Text;
 using System.Diagnostics;
 
+using Squircle.Physics;
+
 namespace Squircle
 {
 
@@ -107,6 +109,9 @@ namespace Squircle
 
         public Vector2 ViewportDimensions { get; set; }
 
+        public scPhysicsWorld physicsWorld;
+        public scPhysicsWorldDebugRenderer physicsWorldDebugRenderer;
+
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -124,12 +129,17 @@ namespace Squircle
             level.Name = "level_01";
             level.Menu.InitialWindowName = "mainWindow";
 
-            gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
+            gameConfig = ConfigFile.FromFile("Content/level/game_experiments.cfg");
             gameConfig.IfSectionExists("Audio", section =>
             {
                 Audio = new AudioManager(this);
                 Audio.Initialize(section);
             });
+
+            physicsWorld = new scPhysicsWorld();
+            physicsWorldDebugRenderer = new scPhysicsWorldDebugRenderer();
+            physicsWorldDebugRenderer.world = physicsWorld;
+
         }
 
         /// <summary>
@@ -167,6 +177,17 @@ namespace Squircle
             base.Initialize();
 
             GameState.SetInMenu();
+
+            var shape = new scCircleShape();
+            shape.radius = 75;
+            var bodyPartDescription = new scBodyPartDescription();
+            bodyPartDescription.shape = shape;
+            var bodyDescription = new scBodyDescription();
+            bodyDescription.bodyType = scBodyType.Static;
+            bodyDescription.transform.position = new Vector2(400, 255);
+            var bodyPartDescriptions = new List<scBodyPartDescription>();
+            bodyPartDescriptions.Add(bodyPartDescription);
+            var body = physicsWorld.createBody(bodyDescription, bodyPartDescriptions);
         }
 
         /// <summary>
@@ -297,12 +318,13 @@ namespace Squircle
                 null,
                 level.camera.Transform);
 
-            level.Draw(spriteBatch, gameTime);
+            //level.Draw(spriteBatch, gameTime);
             
             base.Draw(gameTime);
 
-            if (drawPhysics)
+            //if (drawPhysics)
             {
+                physicsWorldDebugRenderer.Draw(spriteBatch);
                 DrawOnScreen("Drawing physical world");
             }
 

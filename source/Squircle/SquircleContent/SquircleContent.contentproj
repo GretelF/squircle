@@ -43,6 +43,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Name>game</Name>
     </None>
+    <None Include="level\game_experiments.cfg">
+      <Name>game_experiments</Name>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="level\level_03.cfg">
       <Name>level_03</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -5,36 +5,40 @@ using System.Text;
 
 namespace Squircle.Physics
 {
-    class scPhysicsWorld
+    public class scPhysicsWorld
     {
-        IList<scBody> bodies;
+        public IList<scBody> bodies;
 
-        scPhysicsWorld()
+        public scPhysicsWorld()
         {
             bodies = new List<scBody>();
         }
 
-        scBody createBody(scBodyDescription description)
+        public scBody createBody(scBodyDescription description, IList<scBodyPartDescription> bodypartDescriptions)
         {
-            var result = new scBody();
-            result.position = description.position;
-            result.bodyType = description.bodyType;
+            var body = new scBody();
+            body.transform = description.transform;
+            body.bodyType = description.bodyType;
 
-            foreach(var bodyPartDescription in description.bodypartDescriptions)
+            foreach(var bodyPartDescription in bodypartDescriptions)
             {
                 var bodyPart = new scBodyPart();
                 bodyPart.shape = bodyPartDescription.shape;
                 bodyPart.userData = bodyPartDescription.userData;
-                result.bodyParts.Add(bodyPart);
+
+                body.bodyParts.Add(bodyPart);
             }
 
-            bodies.Add(result);
-            return result;
+            bodies.Add(body);
+            return body;
         }
 
-        bool removeBody(scBody body)
+        public bool removeBody(scBody body)
         {
             return bodies.Remove(body);
         }
+
+
+
     }
 }

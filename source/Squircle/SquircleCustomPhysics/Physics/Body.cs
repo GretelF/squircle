@@ -6,41 +6,50 @@ using System.Text;
 
 namespace Squircle.Physics
 {
-    enum scBodyType
+    public enum scBodyType
     {
         Static,
         Dynamic,
         Kinematic,
     }
 
-    struct scBodyPartDescription
+    public struct scBodyPartDescription
     {
         public scShape shape;
         public object userData;
     }
 
-    class scBodyPart
+    public class scBodyPart
     {
         public scShape shape;
         public object userData;
     }
 
-    struct scBodyDescription
+    public struct scBodyDescription
     {
-        public IList<scBodyPartDescription> bodypartDescriptions;
         public scBodyType bodyType;
-        public Vector2 position;
+        public scTransform transform;
     }
 
-    class scBody
+    public class scBody
     {
         public IList<scBodyPart> bodyParts;
         public scBodyType bodyType;
-        public Vector2 position;
+        public scTransform transform;
 
         public scBody()
         {
             bodyParts = new List<scBodyPart>();
+        }
+
+        public scBoundingBox calculateBoundingBox()
+        {
+            scBoundingBox boundingBox = bodyParts[0].shape.getBoundingBox(transform);
+            foreach(var bodyPart in bodyParts.Skip(1))
+            {
+                boundingBox = scBoundingUtils.union(boundingBox, bodyPart.shape.getBoundingBox(transform));
+            }
+            return boundingBox;
         }
     }
 }
