@@ -199,8 +199,21 @@ namespace Squircle
 
         private void UpdateCameraFocus()
         {
-            var center = circle.Pos + (square.Pos - circle.Pos) / 2;                // calculate center between circle and square.
-            camera.Focus.Pos = new Vector2(center.X, center.Y);
+            var circle = this.circle;
+            var square = this.square;
+            if (square != null && circle != null)
+            {
+                var center = circle.Pos + (square.Pos - circle.Pos) / 2;                // calculate center between circle and square.
+                camera.Focus.Pos = new Vector2(center.X, center.Y);
+            }
+            else if (square != null)
+            {
+                camera.Focus.Pos = square.Pos;
+            }
+            else if (circle != null)
+            {
+                camera.Focus.Pos = circle.Pos;
+            }
         }
 
         public void DrawPhysicalContacts(SpriteBatch spriteBatch)
@@ -286,7 +299,12 @@ namespace Squircle
 
         public GameObject GetGameObject(string name)
         {
-            return GameObjects.First(go => go.Name == name);
+            try { return GameObjects.First(go => go.Name == name); }
+            catch(System.InvalidOperationException)
+            {
+                return null;
+            }
+            
         }
 
         public Vector2 ConvertFromBox2D(Vector2 vec)
