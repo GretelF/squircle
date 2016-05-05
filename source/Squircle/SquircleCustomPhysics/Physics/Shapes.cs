@@ -6,13 +6,22 @@ using System.Text;
 
 namespace Squircle.Physics
 {
+    public enum scShapeType
+    {
+        Circle,
+        Rectangle,
+        Edge
+    }
+
     public interface scShape
     {
+        scShapeType ShapeType { get; }
         scBoundingBox getBoundingBox(scTransform transform);
     }
 
     class scCircleShape : scShape
     {
+        public scShapeType ShapeType { get { return scShapeType.Circle; } }
         public float radius;
         public Vector2 localPosition;
 
@@ -24,6 +33,7 @@ namespace Squircle.Physics
 
     class scRectangleShape : scShape
     {
+        public scShapeType ShapeType { get { return scShapeType.Rectangle; } }
         public Vector2 localPosition;
         public Vector2 halfExtents;
 
@@ -34,6 +44,15 @@ namespace Squircle.Physics
             boundingBox.halfExtents = halfExtents;
             return boundingBox;
         }
+
+        public Rectangle asXNARectangle()
+        {
+            var rectangle = new Rectangle();
+            rectangle.Offset(localPosition.ToPoint());
+            rectangle.Width = (int)(2 * halfExtents.X);
+            rectangle.Height = (int)(2 * halfExtents.Y);
+            return rectangle;
+        }
     }
 
     /// <summary>
@@ -42,6 +61,7 @@ namespace Squircle.Physics
     /// </summary>
     class scEdgeShape : scShape
     {
+        public scShapeType ShapeType { get { return scShapeType.Edge; } }
         public Vector2 start;
         public Vector2 end;
 
