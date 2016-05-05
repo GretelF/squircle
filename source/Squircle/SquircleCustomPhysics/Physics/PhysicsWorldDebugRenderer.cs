@@ -28,9 +28,7 @@ namespace Squircle.Physics
         /// <summary>
         /// The radius of the arc to draw for the rotation.
         /// </summary>
-        static public float BodyTransformRotationArcRadius = 15.0f;
-        static public float BodyTransformRotationArcAngle = 0.2f * (float)Math.PI;
-        static public int   BodyTransformRotationArcSides = 90;
+        static public float BodyTransformRotationRadius = 20.0f;
 
         /// <summary>
         /// The color used to draw the body rotation arc.
@@ -102,9 +100,9 @@ namespace Squircle.Physics
                 var boundingBox = body.calculateBoundingBox();
                 spriteBatch.DrawRectangle(scBoundingUtils.toXNARectangle(boundingBox), BodyBoundingBoxColor);
 
-                // Draw rotation as a rotating arc.
-                scAngle startRotation = body.transform.rotation - scAngle.FromDegrees(0.5f * BodyTransformRotationArcAngle);
-                spriteBatch.DrawArc(body.transform.position, BodyTransformRotationArcRadius, BodyTransformRotationArcSides, startRotation.radians, BodyTransformRotationArcAngle, BodyTransformRotationColor);
+                // Draw rotation as a line.
+                var rotated = new Vector2(BodyTransformRotationRadius, 0).Rotate(body.transform.rotation.radians);
+                spriteBatch.DrawLine(body.transform.position, body.transform.position + rotated, BodyTransformRotationColor);
 
                 // Draw position.
                 var center = new Rectangle();
@@ -129,7 +127,17 @@ namespace Squircle.Physics
                 case scShapeType.Rectangle:
                 {
                     var rectangle = (scRectangleShape)shape;
-                    spriteBatch.DrawRectangle(rectangle.asXNARectangle(), RectangleShapeColor);
+                    
+                    var A = transform.position + rectangle.vertices[0].Rotate(transform.rotation.radians);
+                    var B = transform.position + rectangle.vertices[1].Rotate(transform.rotation.radians);
+                    var C = transform.position + rectangle.vertices[2].Rotate(transform.rotation.radians);
+                    var D = transform.position + rectangle.vertices[3].Rotate(transform.rotation.radians);
+
+                    spriteBatch.DrawLine(A, B, RectangleShapeColor);
+                    spriteBatch.DrawLine(B, C, RectangleShapeColor);
+                    spriteBatch.DrawLine(C, D, RectangleShapeColor);
+                    spriteBatch.DrawLine(D, A, RectangleShapeColor);
+
                     break;
                 }
                 case scShapeType.Edge:

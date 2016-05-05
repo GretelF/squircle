@@ -12,6 +12,13 @@ namespace Squircle.Physics
         public scAngle rotation;
     }
 
+    /// <summary>
+    /// Defines an angle in a unit-agnostic way. The user has to specifically state the unit when retrieving the float value.
+    /// 
+    /// Right now only degrees and radians are supported.
+    /// 
+    /// Note that the value stored is always normalized, i.e. the radians value is always greater than or equal to zero and less than or equal to two pi.
+    /// </summary>
     public struct scAngle
     {
         static public readonly float Pi     = (float)Math.PI;
@@ -22,27 +29,29 @@ namespace Squircle.Physics
         static public readonly float DegreesToRadiansFactor = Pi / 180.0f;
 
 
-        public float radians;
+        float _radians;
+
+        public float radians
+        {
+            get
+            {
+                return _radians;
+            }
+            set
+            {
+                _radians = value;
+
+                while (_radians < 0.0f)
+                    _radians += TwoPi;
+                while (_radians > TwoPi)
+                    _radians -= TwoPi;
+            }
+        }
+
         public float degrees
         {
             get { return radians * RadiansToDegreesFactor; }
             set { radians = DegreesToRadiansFactor * value; }
-        }
-
-        /// <summary>
-        /// Return an scAngle in a normalized range of 0-2pi (or 0-360 degrees).
-        /// </summary>
-        /// <returns></returns>
-        public scAngle getNormalized()
-        {
-            var angle = scAngle.FromRadians(radians);
-
-            while (angle.radians < 0.0f)
-                angle.radians += TwoPi;
-            while (angle.radians > TwoPi)
-                angle.radians -= TwoPi;
-
-            return angle;
         }
 
         #region Factory methods to explicitly create a rotation from either degrees or radians
@@ -65,14 +74,40 @@ namespace Squircle.Physics
 
         #region Operator overloads
 
+        // Add one angle to another.
         public static scAngle operator +(scAngle angleA, scAngle angleB)
         {
-            return scAngle.FromRadians(angleA.radians + angleB.radians).getNormalized();
+            return FromRadians(angleA.radians + angleB.radians);
         }
 
+        // Subtract one angle from another.
         public static scAngle operator -(scAngle angleA, scAngle angleB)
         {
-            return scAngle.FromRadians(angleA.radians - angleB.radians).getNormalized();
+            return FromRadians(angleA.radians - angleB.radians);
+        }
+
+        // Negate an angle.
+        public static scAngle operator -(scAngle angle)
+        {
+            return FromRadians(-angle.radians);
+        }
+
+        // Scale an angle.
+        public static scAngle operator *(scAngle angle, float scale)
+        {
+            return FromRadians(angle.radians * scale);
+        }
+
+        // Scale an angle.
+        public static scAngle operator *(float scale, scAngle angle)
+        {
+            return angle * scale;
+        }
+
+        // Scale an angle.
+        public static scAngle operator /(scAngle angle, float scale)
+        {
+            return FromRadians(angle.radians / scale);
         }
 
         #endregion Operator overloads

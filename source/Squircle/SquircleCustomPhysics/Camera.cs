@@ -154,6 +154,7 @@ namespace Squircle
 
             var targetPos = CalculateTarget();
 
+            //TODO: Test if dt should be multiplied after clamping
             _position.X += MathHelper.Clamp((targetPos.X - _position.X) * MoveSpeed * dt, -MaxMoveSpeed, MaxMoveSpeed);
             _position.Y += MathHelper.Clamp((targetPos.Y - _position.Y) * MoveSpeed * dt, -MaxMoveSpeed, MaxMoveSpeed);
 
@@ -195,10 +196,10 @@ namespace Squircle
 
         private Vector2 CalculateTarget()
         {
-            var target = Focus.Pos;
+            var target = new Vector2();
 
-            target.X = MathHelper.Clamp(target.X, _focusBounds.Left, _focusBounds.Right);
-            target.Y = MathHelper.Clamp(target.Y, _focusBounds.Top, _focusBounds.Bottom);
+            target.X = MathHelper.Clamp(Focus.Pos.X, _focusBounds.Left, _focusBounds.Right);
+            target.Y = MathHelper.Clamp(Focus.Pos.Y, _focusBounds.Top, _focusBounds.Bottom);
 
             return target;
         }

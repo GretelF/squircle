@@ -30,9 +30,6 @@ namespace Squircle
     {
         private Game game;
 
-        private Square _cachedSquare;
-        private Circle _cachedCircle;
-
         public string Name { get; set; }
         public World World { get; set; }
         LevelGenerator LevelGenerator;
@@ -40,8 +37,8 @@ namespace Squircle
         Texture2D background;
         public ConfigFile levelConfig { get; private set; }
         public Camera2D camera { get; set; }
-        public Square square { get { if (_cachedSquare == null) _cachedSquare = (Square)GetGameObject("square"); return _cachedSquare; } }
-        public Circle circle { get { if (_cachedCircle == null) _cachedCircle = (Circle)GetGameObject("circle"); return _cachedCircle; } }
+        public Square square;
+        public Circle circle;
         public IList<GameObject> GameObjects { get; set; }
         public Body playerBounds { get; set; }
         public UserInterface.MainWindow Menu { get; set; }
@@ -148,6 +145,9 @@ namespace Squircle
                 var go = GameObject.Create(game, playerName, section);
                 GameObjects.Add(go);
             }
+
+            square = (Square)GetGameObject("square");
+            circle = (Circle)GetGameObject("circle");
         }
 
         public void LoadContent(ContentManager content)
@@ -199,12 +199,10 @@ namespace Squircle
 
         private void UpdateCameraFocus()
         {
-            var circle = this.circle;
-            var square = this.square;
             if (square != null && circle != null)
             {
                 var center = circle.Pos + (square.Pos - circle.Pos) / 2;                // calculate center between circle and square.
-                camera.Focus.Pos = new Vector2(center.X, center.Y);
+                camera.Focus.Pos = center;
             }
             else if (square != null)
             {

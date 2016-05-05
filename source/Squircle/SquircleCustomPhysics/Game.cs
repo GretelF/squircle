@@ -62,7 +62,7 @@ namespace Squircle
         }
 
         public void SetLoading() { PreviousValue = Value; Value = GameStateType.Loading; }
-        public void SetInMenu()  { PreviousValue = Value; Value = GameStateType.Menu; }
+        public void SetInMenu() { PreviousValue = Value; Value = GameStateType.Menu; }
         public void SetRunning() { PreviousValue = Value; Value = GameStateType.Running; }
 
         public void ToggleRunningAndInMenu()
@@ -70,8 +70,14 @@ namespace Squircle
             Debug.Assert(IsRunning || IsInMenu,
                 "Cannot toggle between Running and InMenu if we are in another state.");
 
-            if (IsRunning) { SetInMenu(); }
-            else           { SetRunning(); }
+            if (IsRunning)
+            {
+                SetInMenu();
+            }
+            else
+            {
+                SetRunning();
+            }
         }
 
         public override string ToString()
@@ -111,6 +117,9 @@ namespace Squircle
 
         public scPhysicsWorld physicsWorld;
         public scPhysicsWorldDebugRenderer physicsWorldDebugRenderer;
+        
+        public Vector2 DebugCameraPosition;
+        public bool UseDebugCamera = true;
 
         public Game()
         {
@@ -124,6 +133,7 @@ namespace Squircle
             GameState.SetLoading();
 
             ViewportDimensions = new Vector2(800, 480);
+            DebugCameraPosition = -0.5f * ViewportDimensions;
 
             level = new Level(this);
             level.Name = "level_01";
@@ -139,7 +149,6 @@ namespace Squircle
             physicsWorld = new scPhysicsWorld();
             physicsWorldDebugRenderer = new scPhysicsWorldDebugRenderer();
             physicsWorldDebugRenderer.world = physicsWorld;
-
         }
 
         /// <summary>
@@ -178,16 +187,30 @@ namespace Squircle
 
             GameState.SetInMenu();
 
-            var shape = new scCircleShape();
-            shape.radius = 75;
-            var bodyPartDescription = new scBodyPartDescription();
-            bodyPartDescription.shape = shape;
-            var bodyDescription = new scBodyDescription();
-            bodyDescription.bodyType = scBodyType.Static;
-            bodyDescription.transform.position = new Vector2(400, 255);
-            var bodyPartDescriptions = new List<scBodyPartDescription>();
-            bodyPartDescriptions.Add(bodyPartDescription);
-            var body = physicsWorld.createBody(bodyDescription, bodyPartDescriptions);
+            {
+                var circleshape = new scCircleShape();
+                circleshape.radius = 75;
+                var bodyPartDescription = new scBodyPartDescription();
+                bodyPartDescription.shape = circleshape;
+                var bodyDescription = new scBodyDescription();
+                bodyDescription.bodyType = scBodyType.Static;
+                bodyDescription.transform.position = new Vector2(-150, 0);
+                var bodyPartDescriptions = new List<scBodyPartDescription>();
+                bodyPartDescriptions.Add(bodyPartDescription);
+                var body = physicsWorld.createBody(bodyDescription, bodyPartDescriptions);
+            }
+
+            {
+                var rectangleshape = scRectangleShape.fromLocalPositionAndHalfExtents(new Vector2(0, 0), new Vector2(75, 30));
+                var bodyPartDescription = new scBodyPartDescription();
+                bodyPartDescription.shape = rectangleshape;
+                var bodyDescription = new scBodyDescription();
+                bodyDescription.bodyType = scBodyType.Static;
+                bodyDescription.transform.position = new Vector2(150, 0);
+                var bodyPartDescriptions = new List<scBodyPartDescription>();
+                bodyPartDescriptions.Add(bodyPartDescription);
+                var body = physicsWorld.createBody(bodyDescription, bodyPartDescriptions);
+            }
         }
 
         /// <summary>
@@ -201,7 +224,8 @@ namespace Squircle
             PhysicsDebugDrawer.spriteBatch = spriteBatch;
             debugFont = Content.Load<SpriteFont>(gameConfig.GlobalSection["debugFont"]);
 
-            if (Audio != null) Audio.LoadContent(Content);
+            if (Audio != null)
+                Audio.LoadContent(Content);
 
             level.LoadContent(Content);
         }
@@ -227,11 +251,14 @@ namespace Squircle
 
         protected override void Update(GameTime gameTime)
         {
+            var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             base.Update(gameTime);
 
             InputHandler.Update(gameTime);
 
-            if (Audio != null) Audio.Update(gameTime);
+            if (Audio != null)
+                Audio.Update(gameTime);
 
             if (GameState.IsLoading)
             {
@@ -274,12 +301,42 @@ namespace Squircle
                 drawVisualHelpers.CycleForward();
             }
 
-            foreach(var body in physicsWorld.bodies)
+            foreach (var body in physicsWorld.bodies)
             {
-                body.transform.rotation += scAngle.FromRadians(0.05f);
+                var rotationAmountPerSecond = scAngle.FromDegrees(45);
+
+                if(InputHandler.IsDown(Keys.Left))
+                {
+                    body.transform.rotation -= rotationAmountPerSecond * dt;
+                }
+                if(InputHandler.IsDown(Keys.Right))
+                {
+                    body.transform.rotation += rotationAmountPerSecond * dt;
+                }
             }
 
             level.Update(gameTime);
+
+            if(UseDebugCamera)
+            {
+                var speed = 100.0f;
+                if(InputHandler.IsDown(Keys.W))
+                {
+                    DebugCameraPosition.Y -= dt * speed;
+                }
+                if(InputHandler.IsDown(Keys.A))
+                {
+                    DebugCameraPosition.X -= dt * speed;
+                }
+                if(InputHandler.IsDown(Keys.S))
+                {
+                    DebugCameraPosition.Y += dt * speed;
+                }
+                if(InputHandler.IsDown(Keys.D))
+                {
+                    DebugCameraPosition.X += dt * speed;
+                }
+            }
 
             if (InputHandler.IsDown(Keys.Add))
             {
@@ -314,6 +371,16 @@ namespace Squircle
                 return;
             }
 
+            Matrix transform;
+            if (UseDebugCamera)
+            {
+                transform = Matrix.CreateTranslation(-DebugCameraPosition.X, -DebugCameraPosition.Y, 0);
+            }
+            else
+            {
+                transform = level.camera.Transform;
+            }
+            //transform.Translation = new Vector3(ViewportDimensions / 2.0f, 0.0f);
             spriteBatch.Begin(
                 SpriteSortMode.Deferred,
                 BlendState.NonPremultiplied,
@@ -321,10 +388,10 @@ namespace Squircle
                 null,
                 null,
                 null,
-                level.camera.Transform);
+                transform);
 
             //level.Draw(spriteBatch, gameTime);
-            
+
             base.Draw(gameTime);
 
             //if (drawPhysics)
@@ -389,7 +456,8 @@ namespace Squircle
 
                 var type = go.GetType();
                 var goDebugData = (DebugData)Attribute.GetCustomAttribute(type, typeof(DebugData), true);
-                if (goDebugData == null || goDebugData.Ignore) { continue; }
+                if (goDebugData == null || goDebugData.Ignore)
+                { continue; }
 
                 var properties = type.GetProperties();
                 foreach (var prop in properties)
@@ -398,11 +466,13 @@ namespace Squircle
 
                     if (debugData == null)
                     {
-                        if (!drawDebugData.IsVerbose) continue; // No debug data and we are not verbose today.
+                        if (!drawDebugData.IsVerbose)
+                            continue; // No debug data and we are not verbose today.
                     }
                     else
                     {
-                        if (debugData.Ignore) continue; // Debug data says, we should ignore it.
+                        if (debugData.Ignore)
+                            continue; // Debug data says, we should ignore it.
                     }
 
                     var key = prop.Name;
@@ -459,6 +529,7 @@ namespace Squircle
 
         private void onEndLevel(String data)
         {
+            physicsWorld.bodies.Clear();
             StartLoadingLevel(data);
         }
 

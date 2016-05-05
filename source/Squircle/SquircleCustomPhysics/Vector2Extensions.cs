@@ -8,10 +8,12 @@ namespace Microsoft.Xna.Framework
 {
     public static class Vector2Extensions
     {
-        public static Vector2 Rotate(this Vector2 vec, float angle)
+        public static Vector2 Rotate(this Vector2 vec, float angleInRadians)
         {
-            var temp = (DVector2)vec;
-            return (Vector2)temp.Rotate(angle);
+            var rotated = new Vector2();
+            rotated.X = (float)(vec.X * Math.Cos(angleInRadians) - vec.Y * Math.Sin(angleInRadians));
+            rotated.Y = (float)(vec.X * Math.Sin(angleInRadians) + vec.Y * Math.Cos(angleInRadians));
+            return rotated;
         }
 
         public static Point ToPoint(this Vector2 vec)

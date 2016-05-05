@@ -34,25 +34,42 @@ namespace Squircle.Physics
     class scRectangleShape : scShape
     {
         public scShapeType ShapeType { get { return scShapeType.Rectangle; } }
-        public Vector2 localPosition;
-        public Vector2 halfExtents;
+        public readonly Vector2[] vertices = new Vector2[4];
 
         public scBoundingBox getBoundingBox(scTransform transform)
         {
-            var boundingBox = new scBoundingBox();
-            boundingBox.position = localPosition;
-            boundingBox.halfExtents = halfExtents;
-            return boundingBox;
+            var lower = new Vector2();
+            var upper = new Vector2();
+
+            var rotated = new Vector2[4];
+            rotated[0] = transform.position + vertices[0].Rotate(transform.rotation.radians);
+            rotated[1] = transform.position + vertices[1].Rotate(transform.rotation.radians);
+            rotated[2] = transform.position + vertices[2].Rotate(transform.rotation.radians);
+            rotated[3] = transform.position + vertices[3].Rotate(transform.rotation.radians);
+            
+            lower.X = rotated.Min(v => v.X);
+            lower.Y = rotated.Min(v => v.Y);
+            upper.X = rotated.Max(v => v.X);
+            upper.Y = rotated.Max(v => v.Y);
+
+            return scBoundingUtils.createFromBoundingVertices(lower, upper);
         }
 
-        public Rectangle asXNARectangle()
+        static public scRectangleShape fromLocalPositionAndHalfExtents(Vector2 localPosition, Vector2 halfExtents)
         {
-            var rectangle = new Rectangle();
-            rectangle.Offset(localPosition.ToPoint());
-            rectangle.Width = (int)(2 * halfExtents.X);
-            rectangle.Height = (int)(2 * halfExtents.Y);
-            return rectangle;
+            var rectangleShape = new scRectangleShape();
+            rectangleShape.vertices[0].X = localPosition.X - halfExtents.X;
+            rectangleShape.vertices[0].Y = localPosition.Y - halfExtents.Y;
+            rectangleShape.vertices[1].X = localPosition.X + halfExtents.X;
+            rectangleShape.vertices[1].Y = localPosition.Y - halfExtents.Y;
+            rectangleShape.vertices[2].X = localPosition.X + halfExtents.X;
+            rectangleShape.vertices[2].Y = localPosition.Y + halfExtents.Y;
+            rectangleShape.vertices[3].X = localPosition.X - halfExtents.X;
+            rectangleShape.vertices[3].Y = localPosition.Y + halfExtents.Y;
+
+            return rectangleShape;
         }
+
     }
 
     /// <summary>
