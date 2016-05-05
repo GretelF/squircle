@@ -274,6 +274,11 @@ namespace Squircle
                 drawVisualHelpers.CycleForward();
             }
 
+            foreach(var body in physicsWorld.bodies)
+            {
+                body.transform.rotation += scAngle.FromRadians(0.05f);
+            }
+
             level.Update(gameTime);
 
             if (InputHandler.IsDown(Keys.Add))
