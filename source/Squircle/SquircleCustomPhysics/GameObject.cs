@@ -162,20 +162,4 @@ namespace Squircle
             return string.Format("{0}@{1}", Name, Pos);
         }
     }
-
-    public class PhantomObject : GameObject
-    {
-        public override Texture2D Texture { get { return null; } }
-        public override Vector2 Pos { get; set; }
-        public override Vector2 Dimensions { get { return Vector2.Zero; } }
-
-        public PhantomObject(Game game) : base(game)
-        {
-        }
-
-        public override void LoadContent(ContentManager content)
-        {
-        }
-    }
-
 }

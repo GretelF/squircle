@@ -79,7 +79,6 @@ namespace Squircle
 
             camera = new Camera2D(game);
             camera.Initialize();
-            camera.Focus = new PhantomObject(game);
             camera.Position = levelConfig["Camera"]["startPos"].AsVector2();
             camera.ViewBounds = levelConfig["Camera"]["viewBounds"].AsRectangle();
             camera.MaxMoveSpeed = levelConfig["Camera"]["maxMoveSpeed"];
@@ -202,15 +201,15 @@ namespace Squircle
             if (square != null && circle != null)
             {
                 var center = circle.Pos + (square.Pos - circle.Pos) / 2;                // calculate center between circle and square.
-                camera.Focus.Pos = center;
+                camera.Focus = center;
             }
             else if (square != null)
             {
-                camera.Focus.Pos = square.Pos;
+                camera.Focus = square.Pos;
             }
             else if (circle != null)
             {
-                camera.Focus.Pos = circle.Pos;
+                camera.Focus = circle.Pos;
             }
         }
 

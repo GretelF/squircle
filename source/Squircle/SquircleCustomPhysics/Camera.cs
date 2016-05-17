@@ -65,7 +65,7 @@ namespace Squircle
         /// </summary>
         /// <seealso cref="IFocusable"/>
         /// <value>The focus.</value>
-        GameObject Focus { get; set; }
+        Vector2 Focus { get; set; }
 
         /// <summary>
         /// Determines whether the target is in view given the specified position.
@@ -104,7 +104,7 @@ namespace Squircle
         public float Scale { get; set; }
         public Vector2 ScreenCenter { get; protected set; }
         public Matrix Transform { get; set; }
-        public GameObject Focus { get; set; }
+        public Vector2 Focus { get; set; }
         public float MoveSpeed { get; set; }
         public float MaxMoveSpeed { get; set; }
         public Rectangle ViewBounds
@@ -198,8 +198,8 @@ namespace Squircle
         {
             var target = new Vector2();
 
-            target.X = MathHelper.Clamp(Focus.Pos.X, _focusBounds.Left, _focusBounds.Right);
-            target.Y = MathHelper.Clamp(Focus.Pos.Y, _focusBounds.Top, _focusBounds.Bottom);
+            target.X = MathHelper.Clamp(Focus.X, _focusBounds.Left, _focusBounds.Right);
+            target.Y = MathHelper.Clamp(Focus.Y, _focusBounds.Top, _focusBounds.Bottom);
 
             return target;
         }
