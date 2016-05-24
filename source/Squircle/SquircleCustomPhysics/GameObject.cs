@@ -7,6 +7,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Box2D.XNA;
 using Configuration;
+using Squircle.Physics;
+using System.Diagnostics;
 
 namespace Squircle
 {
@@ -97,6 +99,8 @@ namespace Squircle
             resultObject.Name = gameObjectName;
             resultObject.Initialize(section);
 
+            Debug.Assert(resultObject.Body != null, "Game objects have to have a valid physics body after initialization.");
+            
             return resultObject;
         }
 
@@ -104,12 +108,18 @@ namespace Squircle
         protected Game Game { get; private set; }
 
         [DebugData(Ignore = true)]
+        public scBody Body { get; protected set; }
+
+        [DebugData(Ignore = true)]
         public string Name { get; set; }
 
         [DebugData(Ignore = true)]
         public abstract Texture2D Texture { get; }
 
-        public abstract Vector2 Pos { get; set; }
+        public Vector2 Pos
+        {
+            get { return Body != null ? Body.transform.position : Vector2.Zero; }
+        }
 
         [DebugData(Ignore = true)]
         public int DrawOrder { get; set; }
@@ -128,6 +138,7 @@ namespace Squircle
         {
             section.IfOptionExists("name", opt => Name = opt);
             section.IfOptionExists("drawOrder", opt => DrawOrder = opt);
+
         }
 
         public abstract void LoadContent(ContentManager content);
@@ -144,6 +155,7 @@ namespace Squircle
         {
         }
 
+#if false
         public virtual void BeginContact(ContactInfo contactInfo)
         {
         }
@@ -151,6 +163,7 @@ namespace Squircle
         public virtual void EndContact(ContactInfo contactInfo)
         {
         }
+#endif
 
         public virtual DRectangle CalculateBoundingBox()
         {

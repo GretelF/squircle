@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Squircle
 {
-    public class Circle : Player
+    public class Circle : GameObject
     {
         private string textureName;
         private Texture2D circleTexture;
@@ -48,7 +48,7 @@ namespace Squircle
             circlePos = section["position"].AsVector2();
             Radius = section["radius"];
             MaxTorque = section["torque"];
-
+#if false
             var bodyDef = new BodyDef();
             bodyDef.type = BodyType.Dynamic;
 
@@ -70,6 +70,7 @@ namespace Squircle
             fixture.shape = shape;
             fixture.friction = section["friction"];
             Body.CreateFixture(fixture);
+#endif
         }
 
         public override void PrePhysicsUpdate(GameTime gameTime)
@@ -94,19 +95,22 @@ namespace Squircle
             {
                 Game.Events["playerButtonRelease"].trigger(Name);
             }
-
+#if false
             Body.ApplyTorque(tempDir * MaxTorque);
+#endif
         }
 
         public override void Update(GameTime gameTime)
         {
+#if false
             circlePos = Game.level.ConvertFromBox2D(Body.GetPosition());
+#endif
             base.Update(gameTime);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(circleTexture, Pos, null, Color.White, Body.Rotation, new Vector2(Radius, Radius), 1.0f, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(circleTexture, Pos, null, Color.White, Body.transform.rotation.radians, new Vector2(Radius, Radius), 1.0f, SpriteEffects.None, 0.0f);
         }
     }
 

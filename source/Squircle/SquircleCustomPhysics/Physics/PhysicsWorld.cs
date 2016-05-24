@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,13 +15,13 @@ namespace Squircle.Physics
             bodies = new List<scBody>();
         }
 
-        public scBody createBody(scBodyDescription description, IList<scBodyPartDescription> bodypartDescriptions)
+        public scBody createBody(scBodyDescription description, IList<scBodyPartDescription> bodyPartDescriptions)
         {
             var body = new scBody();
             body.transform = description.transform;
             body.bodyType = description.bodyType;
 
-            foreach(var bodyPartDescription in bodypartDescriptions)
+            foreach(var bodyPartDescription in bodyPartDescriptions)
             {
                 var bodyPart = new scBodyPart();
                 bodyPart.shape = bodyPartDescription.shape;
@@ -38,7 +39,9 @@ namespace Squircle.Physics
             return bodies.Remove(body);
         }
 
+        public void simulate(GameTime gameTime)
+        {
 
-
+        }
     }
 }

@@ -103,7 +103,6 @@
     <Compile Include="Level.cs" />
     <Compile Include="LevelGenerator.cs" />
     <Compile Include="GameObjects\PlatformObject.cs" />
-    <Compile Include="GameObjects\Player.cs" />
     <Compile Include="Physics\Body.cs" />
     <Compile Include="Physics\BoundingVolume.cs" />
     <Compile Include="Physics\PhysicsWorldDebugRenderer.cs" />

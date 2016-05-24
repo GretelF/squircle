@@ -6,6 +6,7 @@ using System.Drawing;
 using Box2D.XNA;
 using Microsoft.Xna.Framework;
 using Configuration;
+using Squircle.Physics;
 
 namespace Squircle
 {
@@ -22,7 +23,7 @@ namespace Squircle
 
     public class LevelGenerator
     {
-        private List<Body> bodyList = new List<Body>();
+        private List<scBody> bodyList = new List<scBody>();
         public Level level { get; set; }
 
         private struct EdgeInfo
@@ -36,7 +37,7 @@ namespace Squircle
             this.level = level;
         }
 
-        public List<Body> generateLevel()
+        public List<scBody> generateLevel()
         {
             String pathToCollisionFile = level.levelConfig.GlobalSection["collision"];
 
@@ -63,14 +64,7 @@ namespace Squircle
             foreach (var startPoint in startPointsStatic)
             {
                 vertices = GetVertices(map, startPoint);
-                var bodyDef = new BodyDef();
-                bodyDef.type = BodyType.Static;
-
-                bodyDef.angle = 0;
-                bodyDef.position = level.ConvertToBox2D(startPoint);
-
-                var body = level.World.CreateBody(bodyDef);
-
+              
                 var edges = new List<EdgeInfo>();
 
                 if (vertices.Length < 2)
@@ -91,6 +85,9 @@ namespace Squircle
                     
                 }
 
+                IList<scBodyPartDescription> bodyPartDescriptions = new List<scBodyPartDescription>();
+
+#if false
                 foreach (var edge in edges)
                 {
                     var fixture = new FixtureDef();
@@ -109,6 +106,14 @@ namespace Squircle
                     fixture.userData = elementInfo;
                     body.CreateFixture(fixture);
                 }
+#endif
+                var bodyDescription = new scBodyDescription();
+                bodyDescription.bodyType = scBodyType.Static;
+
+                bodyDescription.transform.rotation.radians = 0;
+                bodyDescription.transform.position = startPoint;
+
+                var body = level.World.createBody(bodyDescription, bodyPartDescriptions);
 
                 bodyList.Add(body);
             }
@@ -210,7 +215,7 @@ namespace Squircle
                     if (isBlack(getPixel(map, neighbor)))
                     {
                         next = neighbor;
-                        vertices.Add(level.ConvertToBox2D(next - start));       // subtract start, to transform to local space.
+                        vertices.Add(next - start);       // subtract start, to transform to local space.
                         visited.Add(neighbor);
                         break;
                     }

@@ -8,43 +8,31 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using Box2D.XNA;
 using Configuration;
 using System.Text;
+using Squircle.Physics;
 
 namespace Squircle
 {
-    public enum FixtureType
-    {
-        A,
-        B,
-    }
-    public struct ContactInfo
-    {
-        public Contact contact { get; set; }
-        public FixtureType fixtureType { get; set; }
-        public GameObject other { get; set; }
-    }
-
-    public class Level : IContactListener
+    public class Level
     {
         private Game game;
 
         public string Name { get; set; }
-        public World World { get; set; }
+        public scPhysicsWorld World { get; set; }
+        public scPhysicsWorldDebugRenderer physicsWorldDebugRenderer;
         LevelGenerator LevelGenerator;
-        List<Body> bodyList;
         Texture2D background;
         public ConfigFile levelConfig { get; private set; }
         public Camera2D camera { get; set; }
         public Square square;
         public Circle circle;
         public IList<GameObject> GameObjects { get; set; }
-        public Body playerBounds { get; set; }
+        public scBody playerBounds { get; set; }
         public UserInterface.MainWindow Menu { get; set; }
         public float PhysicsScale { get; set; }
         public float GroundFriction { get; set; }
-
+        
         public string AmbientMusicCue { get; set; }
 
         public Level(Game game)
@@ -64,14 +52,16 @@ namespace Squircle
 
                 PhysicsScale = physicsSection["scale"];
                 GroundFriction = physicsSection["groundFriction"];
-                World = new World(physicsSection["gravity"].AsVector2(), physicsSection["doSleep"].AsBool());
-                World.ContinuousPhysics = physicsSection["continuousPhysics"].AsBool();
-                World.ContactListener = this;
-                World.DebugDraw = game.PhysicsDebugDrawer;
+                World = new scPhysicsWorld();
+//                physicsSection["gravity"].AsVector2(), physicsSection["doSleep"].AsBool()
+//                World.ContinuousPhysics = physicsSection["continuousPhysics"].AsBool();
+
+                physicsWorldDebugRenderer = new scPhysicsWorldDebugRenderer();
+                physicsWorldDebugRenderer.world = World;
             }
 
             LevelGenerator = new LevelGenerator(this);
-            bodyList = LevelGenerator.generateLevel();
+//            bodyList = LevelGenerator.generateLevel();
 
             var viewport = game.GraphicsDevice.Viewport;
 
@@ -124,6 +114,33 @@ namespace Squircle
                 if (opt.AsBool()) game.drawDebugData.SetNormal();
                 else game.drawDebugData.SetNone();
             });
+
+            
+            {
+                var circleshape = new scCircleShape();
+                circleshape.radius = 75;
+                var bodyPartDescription = new scBodyPartDescription();
+                bodyPartDescription.shape = circleshape;
+                var bodyDescription = new scBodyDescription();
+                bodyDescription.bodyType = scBodyType.Static;
+                bodyDescription.transform.position = new Vector2(-150, 0);
+                var bodyPartDescriptions = new List<scBodyPartDescription>();
+                bodyPartDescriptions.Add(bodyPartDescription);
+                var body = World.createBody(bodyDescription, bodyPartDescriptions);
+            }
+
+            {
+                var rectangleshape = scRectangleShape.fromLocalPositionAndHalfExtents(new Vector2(0, 0), new Vector2(75, 30));
+                var bodyPartDescription = new scBodyPartDescription();
+                bodyPartDescription.shape = rectangleshape;
+                var bodyDescription = new scBodyDescription();
+                bodyDescription.bodyType = scBodyType.Static;
+                bodyDescription.transform.position = new Vector2(150, 0);
+                var bodyPartDescriptions = new List<scBodyPartDescription>();
+                bodyPartDescriptions.Add(bodyPartDescription);
+                var body = World.createBody(bodyDescription, bodyPartDescriptions);
+            }
+
         }
 
         private void InitializePlayers()
@@ -175,14 +192,12 @@ namespace Squircle
 
         public void Update(GameTime gameTime)
         {
-            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
             foreach (var go in GameObjects)
             {
                 go.PrePhysicsUpdate(gameTime);
             }
 
-            World.Step(deltaTime, 20, 10);
+            World.simulate(gameTime);
 
             foreach (var go in GameObjects)
             {
@@ -193,7 +208,25 @@ namespace Squircle
 
             camera.Update(gameTime);
 
-            playerBounds.Position = ConvertToBox2D(camera.Position);
+            playerBounds.transform.position = camera.Position;
+
+            
+            var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            foreach (var body in World.bodies)
+            {
+                var rotationAmountPerSecond = scAngle.FromDegrees(45);
+
+                if(game.InputHandler.IsDown(Keys.Left))
+                {
+                    body.transform.rotation -= rotationAmountPerSecond * dt;
+                }
+                if(game.InputHandler.IsDown(Keys.Right))
+                {
+                    body.transform.rotation += rotationAmountPerSecond * dt;
+                }
+            }
+
         }
 
         private void UpdateCameraFocus()
@@ -215,6 +248,7 @@ namespace Squircle
 
         public void DrawPhysicalContacts(SpriteBatch spriteBatch)
         {
+#if false
             var numContacts = 0;
             var contact = World.GetContactList();
             var drawingSize = new Vector2(4.0f, 4.0f);
@@ -241,6 +275,7 @@ namespace Squircle
             {
                 game.DrawOnScreen("Physical contacts: " + numContacts.ToString());
             }
+#endif
         }
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
@@ -254,7 +289,7 @@ namespace Squircle
 
             if (game.drawPhysics)
             {
-                World.DrawDebugData();
+                physicsWorldDebugRenderer.Draw(spriteBatch);
                 DrawPhysicalContacts(spriteBatch);
             }
         }
@@ -267,8 +302,30 @@ namespace Squircle
             }
         }
 
-        private Body CreatePhysicalViewBounds()
+        private scBody CreatePhysicalViewBounds()
         {
+            var bodyDescription = new scBodyDescription();
+            bodyDescription.bodyType = scBodyType.Kinematic;
+
+            IList<scBodyPartDescription> bodyPartDescriptions = new List<scBodyPartDescription>();
+            var bodyPartDescription = new scBodyPartDescription();
+
+            // the shape should probably not(!) be a rectangle, because we want circle 
+            // and square to be inside and not outside of it. So it should probably consist of vour edge shapes.
+            var shape = new scRectangleShape();
+            var viewport = game.GraphicsDevice.Viewport;
+            var X = viewport.Width / 2;
+            var Y = viewport.Height / 2;
+            shape.vertices[0] = new Vector2(-X, -Y);
+            shape.vertices[1] = new Vector2( X, -Y);
+            shape.vertices[2] = new Vector2( X,  Y);
+            shape.vertices[3] = new Vector2(-X,  Y);
+            bodyPartDescription.shape = shape;
+            bodyPartDescriptions.Add(bodyPartDescription);
+
+            var body = World.createBody(bodyDescription, bodyPartDescriptions);
+
+#if false
             var bodyDef = new BodyDef();
             bodyDef.type = BodyType.Static;
             var body = World.CreateBody(bodyDef);
@@ -292,6 +349,8 @@ namespace Squircle
             }
 
             return body;
+#endif
+            return null;
         }
 
         public GameObject GetGameObject(string name)
@@ -303,89 +362,5 @@ namespace Squircle
             }
             
         }
-
-        public Vector2 ConvertFromBox2D(Vector2 vec)
-        {
-            return vec / PhysicsScale;
-        }
-
-        public float ConvertFromBox2D(float f)
-        {
-            return f / PhysicsScale;
-        }
-
-        public Vector2 ConvertToBox2D(Vector2 vec)
-        {
-            return vec * PhysicsScale;
-        }
-
-        public float ConvertToBox2D(float f)
-        {
-            return f * PhysicsScale;
-        }
-
-        #region IContactListener interface
-
-        public void BeginContact(Contact contact)
-        {
-            while (contact != null)
-            {
-                var lhsInfo = new ContactInfo();
-                var rhsInfo = new ContactInfo();
-
-                lhsInfo.contact = contact;
-                rhsInfo.contact = contact;
-
-                lhsInfo.fixtureType = FixtureType.A;
-                rhsInfo.fixtureType = FixtureType.B;
-
-                var lhsGo = contact.GetFixtureA().GetBody().GetUserData() as GameObject;
-                var rhsGo = contact.GetFixtureB().GetBody().GetUserData() as GameObject;
-
-                lhsInfo.other = rhsGo;
-                rhsInfo.other = lhsGo;
-
-                if (lhsGo != null) { lhsGo.BeginContact(lhsInfo); }
-                if (rhsGo != null) { rhsGo.BeginContact(rhsInfo); }
-
-                contact = contact.GetNext();
-            }
-        }
-
-        public void EndContact(Contact contact)
-        {
-            while (contact != null)
-            {
-                var lhsInfo = new ContactInfo();
-                var rhsInfo = new ContactInfo();
-
-                lhsInfo.contact = contact;
-                rhsInfo.contact = contact;
-
-                lhsInfo.fixtureType = FixtureType.A;
-                rhsInfo.fixtureType = FixtureType.B;
-
-                var lhsGo = contact.GetFixtureA().GetBody().GetUserData() as GameObject;
-                var rhsGo = contact.GetFixtureB().GetBody().GetUserData() as GameObject;
-
-                lhsInfo.other = rhsGo;
-                rhsInfo.other = lhsGo;
-
-                if (lhsGo != null) { lhsGo.EndContact(lhsInfo); }
-                if (rhsGo != null) { rhsGo.EndContact(rhsInfo); }
-
-                contact = contact.GetNext();
-            }
-        }
-
-        public void PreSolve(Contact contact, ref Manifold oldManifold)
-        {
-        }
-
-        public void PostSolve(Contact contact, ref ContactImpulse impulse)
-        {
-        }
-
-        #endregion
     }
 }

@@ -29,6 +29,10 @@ namespace Squircle.Physics
     {
         public scBodyType bodyType;
         public scTransform transform;
+        public float linearDamping;
+        public float angularDamping;
+
+        public object userData;
     }
 
     public class scBody
@@ -36,6 +40,11 @@ namespace Squircle.Physics
         public IList<scBodyPart> bodyParts;
         public scBodyType bodyType;
         public scTransform transform;
+        public Vector2 linearVelocity;
+        public float linearDamping;
+        public float angularDamping;
+
+        public object userData;
 
         public scBody()
         {

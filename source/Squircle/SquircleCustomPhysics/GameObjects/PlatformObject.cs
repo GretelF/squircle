@@ -24,15 +24,6 @@ namespace Squircle
         private Vector2 _dimensions;
         private Texture2D _texture;
 
-        [DebugData(Ignore = true)]
-        public Body Body { get; set; }
-
-        public override Vector2 Pos
-        {
-            get { return Game.level.ConvertFromBox2D(Body.Position); }
-            set { Body.Position = Game.level.ConvertToBox2D(value); }
-        }
-
         public Vector2 PreviousPos { get; set; }
 
         public override Vector2 Dimensions
@@ -66,7 +57,7 @@ namespace Squircle
         public bool IsAtTarget { get { return Pos.EpsilonCompare(Target, 0.25f); } }
 
         [DebugData]
-        public float TargetDistance { get { return Vector2.Distance(Pos, Target); } }
+        public float TargetDistance { get { return Vector2.Distance(Body.transform.position, Target); } }
 
         /// <summary>
         /// In seconds.
@@ -103,7 +94,7 @@ namespace Squircle
                 if (CurrentFadeTime > FadeTime)
                 {
                     CurrentFadeTime = FadeTime;
-                    Body.SetActive(true);
+//                    Body.SetActive(true);
                     DisableFading();
                 }
             };
@@ -155,6 +146,7 @@ namespace Squircle
 
             section.IfOptionExists("toggleWaypointEvent", opt => Game.Events[opt].addListener(onToggleWaypointEvent));
 
+#if false
             var bodyDef = new BodyDef();
             var fixtureDef = new FixtureDef();
             var shape = new PolygonShape();
@@ -166,6 +158,7 @@ namespace Squircle
             bodyDef.active = State.IsActive;
             Body = Game.level.World.CreateBody(bodyDef);
             Body.CreateFixture(fixtureDef);
+#endif
 
             section.IfOptionExists("waypointStart",
                 opt => WaypointStart = opt.AsVector2(),
@@ -204,8 +197,8 @@ namespace Squircle
             {
                 if (!WasAtTarget)
                 {
-                    Body.SetLinearVelocity(Vector2.Zero);
-                    Pos = Target;
+                    Body.linearVelocity = Vector2.Zero;
+                    Body.transform.position = Target;
                     WasAtTarget = true;
                 }
                 return;
@@ -216,7 +209,7 @@ namespace Squircle
             diff.Normalize();
             var velocity = diff * MovementSpeed;
 
-            Body.SetLinearVelocity(Game.level.ConvertToBox2D(velocity));
+            Body.linearVelocity = velocity;
         }
 
         private void UpdateDetails(GameTime gameTime)
@@ -231,7 +224,7 @@ namespace Squircle
                              pos,
                              null,
                              DrawColor,
-                             Body.Rotation,
+                             Body.transform.rotation.radians,
                              new Vector2(_texture.Width / 2, _texture.Height / 2),
                              1.0f,
                              SpriteEffects.None,
@@ -278,7 +271,7 @@ namespace Squircle
         {
             CurrentFadeTime = FadeTime;
             FadeState = Squircle.FadeState.FadeOut;
-            Body.SetActive(false);
+//            Body.SetActive(false);
         }
     }
 }

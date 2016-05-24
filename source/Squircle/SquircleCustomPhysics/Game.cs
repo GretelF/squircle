@@ -103,8 +103,6 @@ namespace Squircle
         public InputHandler InputHandler { get; set; }
         public GameState GameState { get; set; }
 
-        public PhysicsDebugDraw PhysicsDebugDrawer { get; set; }
-
         public StringBuilder DebugInfo { get; set; }
 
         public bool LoadingScreenDrawn { get; set; }
@@ -114,9 +112,6 @@ namespace Squircle
         public AudioManager Audio { get; set; }
 
         public Vector2 ViewportDimensions { get; set; }
-
-        public scPhysicsWorld physicsWorld;
-        public scPhysicsWorldDebugRenderer physicsWorldDebugRenderer;
         
         public Vector2 DebugCameraPosition;
         public bool UseDebugCamera = true;
@@ -145,10 +140,6 @@ namespace Squircle
                 Audio = new AudioManager(this);
                 Audio.Initialize(section);
             });
-
-            physicsWorld = new scPhysicsWorld();
-            physicsWorldDebugRenderer = new scPhysicsWorldDebugRenderer();
-            physicsWorldDebugRenderer.world = physicsWorld;
         }
 
         /// <summary>
@@ -172,45 +163,12 @@ namespace Squircle
             Events["ui.show"].addListener(OnUIShow);
             Events["ui.close"].addListener(OnUIClose);
 
-            PhysicsDebugDrawer = new PhysicsDebugDraw();
-            PhysicsDebugDrawer.Level = level;
-
-            PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.AABB);
-            PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.CenterOfMass);
-            PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.Joint);
-            PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.Pair);
-            PhysicsDebugDrawer.AppendFlags(DebugDrawFlags.Shape);
-
             level.Initialize(gameConfig["Levels"][level.Name]);
 
             base.Initialize();
 
             GameState.SetInMenu();
 
-            {
-                var circleshape = new scCircleShape();
-                circleshape.radius = 75;
-                var bodyPartDescription = new scBodyPartDescription();
-                bodyPartDescription.shape = circleshape;
-                var bodyDescription = new scBodyDescription();
-                bodyDescription.bodyType = scBodyType.Static;
-                bodyDescription.transform.position = new Vector2(-150, 0);
-                var bodyPartDescriptions = new List<scBodyPartDescription>();
-                bodyPartDescriptions.Add(bodyPartDescription);
-                var body = physicsWorld.createBody(bodyDescription, bodyPartDescriptions);
-            }
-
-            {
-                var rectangleshape = scRectangleShape.fromLocalPositionAndHalfExtents(new Vector2(0, 0), new Vector2(75, 30));
-                var bodyPartDescription = new scBodyPartDescription();
-                bodyPartDescription.shape = rectangleshape;
-                var bodyDescription = new scBodyDescription();
-                bodyDescription.bodyType = scBodyType.Static;
-                bodyDescription.transform.position = new Vector2(150, 0);
-                var bodyPartDescriptions = new List<scBodyPartDescription>();
-                bodyPartDescriptions.Add(bodyPartDescription);
-                var body = physicsWorld.createBody(bodyDescription, bodyPartDescriptions);
-            }
         }
 
         /// <summary>
@@ -221,7 +179,6 @@ namespace Squircle
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            PhysicsDebugDrawer.spriteBatch = spriteBatch;
             debugFont = Content.Load<SpriteFont>(gameConfig.GlobalSection["debugFont"]);
 
             if (Audio != null)
@@ -301,19 +258,6 @@ namespace Squircle
                 drawVisualHelpers.CycleForward();
             }
 
-            foreach (var body in physicsWorld.bodies)
-            {
-                var rotationAmountPerSecond = scAngle.FromDegrees(45);
-
-                if(InputHandler.IsDown(Keys.Left))
-                {
-                    body.transform.rotation -= rotationAmountPerSecond * dt;
-                }
-                if(InputHandler.IsDown(Keys.Right))
-                {
-                    body.transform.rotation += rotationAmountPerSecond * dt;
-                }
-            }
 
             level.Update(gameTime);
 
@@ -396,7 +340,6 @@ namespace Squircle
 
             //if (drawPhysics)
             {
-                physicsWorldDebugRenderer.Draw(spriteBatch);
                 DrawOnScreen("Drawing physical world");
             }
 
@@ -529,7 +472,6 @@ namespace Squircle
 
         private void onEndLevel(String data)
         {
-            physicsWorld.bodies.Clear();
             StartLoadingLevel(data);
         }
 

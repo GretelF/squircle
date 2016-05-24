@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Squircle.Physics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +13,7 @@ using System.Text;
 
 namespace Squircle
 {
-    public class Square : Player
+    public class Square : GameObject
     {
         private string textureName;
         private Texture2D squareTexture;
@@ -23,7 +24,7 @@ namespace Squircle
             get
             {
                 return JumpingEnabled
-                    && Math.Abs(Body.GetLinearVelocity().Y) <= JumpThreshold;
+                    && Math.Abs(Body.linearVelocity.Y) <= JumpThreshold;
             }
         }
         public bool JumpingEnabled { get; set; }
@@ -58,13 +59,37 @@ namespace Squircle
             base.Initialize(section);
 
             textureName = section["texture"];
-            var pos = section["position"].AsVector2();
+            var position = section["position"].AsVector2();
             SideLength = section["sideLength"];
             Speed = section["speed"];
             MaxSpeed = section["maxSpeed"];
             JumpImpulse = section["jumpImpulse"];
             JumpThreshold = section["jumpThreshold"];
 
+            var bodyDescription = new scBodyDescription();
+            bodyDescription.bodyType = scBodyType.Kinematic;
+            bodyDescription.transform.position = position;
+            bodyDescription.linearDamping = section["linearDamping"];
+            bodyDescription.angularDamping = section["angularDamping"];
+            bodyDescription.userData = this;
+
+            IList<scBodyPartDescription> bodyPartDescriptions = new List<scBodyPartDescription>();
+            var bodyPartDescription = new scBodyPartDescription();
+
+            var shape = new scRectangleShape();
+            var offset = SideLength / 2;
+            shape.vertices[0] = new Vector2(-offset, -offset);
+            shape.vertices[1] = new Vector2( offset, -offset);
+            shape.vertices[2] = new Vector2( offset,  offset);
+            shape.vertices[3] = new Vector2(-offset,  offset);
+
+            bodyPartDescription.shape = shape;
+
+            bodyPartDescriptions.Add(bodyPartDescription);
+
+            Body = Game.level.World.createBody(bodyDescription, bodyPartDescriptions);
+
+#if false
             var bodyDef = new BodyDef();
             bodyDef.type = BodyType.Dynamic;
 
@@ -76,7 +101,7 @@ namespace Squircle
 
             bodyDef.userData = this;
 
-            Body = Game.level.World.CreateBody(bodyDef);
+            Body = Game.level.World.createBody(bodyDef);
 
             var shape = new PolygonShape();
             var offset = SideLength / 2;
@@ -94,6 +119,7 @@ namespace Squircle
             fixture.shape = shape;
             fixture.friction = section["friction"];
             Body.CreateFixture(fixture);
+#endif
         }
 
         public override void PrePhysicsUpdate(GameTime gameTime)
@@ -109,7 +135,9 @@ namespace Squircle
                 tempPos.X = -Speed;
             if ((input.IsDown(Keys.Up) || input.IsDown(Buttons.RightShoulder)) && CanJump)
             {
-                Body.ApplyLinearImpulse(new Vector2(0.0f, -JumpImpulse), Body.GetPosition());
+#if false
+                Body.ApplyLinearImpulse(new Vector2(0.0f, -JumpImpulse), Pos);
+#endif
             }
             JumpingEnabled = false;
 
@@ -122,14 +150,14 @@ namespace Squircle
                 Game.Events["playerButtonRelease"].trigger(Name);
             }
 
-            var velocity = Body.GetLinearVelocity() + tempPos;
+            var velocity = Body.linearVelocity + tempPos;
 
             if (Math.Abs(velocity.X) >= MaxSpeed)
             {
                 velocity.X = Math.Sign(velocity.X) * MaxSpeed;
             }
 
-            Body.SetLinearVelocity(velocity);
+            Body.linearVelocity = velocity;
         }
 
         public override void Update(GameTime gameTime)
@@ -140,6 +168,7 @@ namespace Squircle
 
         private void UpdateAbilityToJump()
         {
+#if false
             for (var contact = Body.GetContactList(); contact != null; contact = contact.Next)
             {
                 if (!contact.Contact.IsTouching()) { continue; }
@@ -171,11 +200,12 @@ namespace Squircle
                     JumpingEnabled = true;
                 }
             }
+#endif
         }
        
         public override void Draw (SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(squareTexture, Pos, null, Color.White, Body.Rotation, new Vector2(SideLength / 2, SideLength / 2), 1.0f, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(squareTexture, Pos, null, Color.White, Body.transform.rotation.radians, new Vector2(SideLength / 2, SideLength / 2), 1.0f, SpriteEffects.None, 0.0f);
         }
     }
 }
