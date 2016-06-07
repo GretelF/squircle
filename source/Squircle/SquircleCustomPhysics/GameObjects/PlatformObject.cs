@@ -154,6 +154,7 @@ namespace Squircle
             bodyPartDescription.shape = shape;
             bodyDescription.transform.position = section["position"].AsVector2();
             Body = Game.level.World.createBody(bodyDescription, bodyPartDescription);
+            Body.owner = this;
 
             section.IfOptionExists("waypointStart",
                 opt => WaypointStart = opt.AsVector2(),
@@ -207,13 +208,8 @@ namespace Squircle
             Body.linearVelocity = velocity;
         }
 
-        private void UpdateDetails(GameTime gameTime)
-        {
-        }
-
         public override void Draw(SpriteBatch spriteBatch)
         {
-
             var pos = Pos;
             spriteBatch.Draw(_texture,
                              pos,

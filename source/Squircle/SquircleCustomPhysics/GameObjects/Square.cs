@@ -82,6 +82,7 @@ namespace Squircle
             bodyPartDescription.density = section["density"];
 
             Body = Game.level.World.createBody(bodyDescription, bodyPartDescription);
+            Body.owner = this;
         }
 
         public override void PrePhysicsUpdate(GameTime gameTime)

@@ -69,7 +69,7 @@ namespace Squircle
             bodyPartDescription.friction = section["friction"];
             
             Body = Game.level.World.createBody(bodyDescription, bodyPartDescription);
-
+            Body.owner = this;
 
         }
 

@@ -42,6 +42,8 @@ namespace Squircle.Physics
 
     public class scBody
     {
+        public GameObject owner;
+
         public IList<scBodyPart> bodyParts;
         public scBodyType bodyType;
         public scTransform transform;

@@ -83,6 +83,7 @@ namespace Squircle
             bodyPartDescription.isTrigger = true;
             bodyDescription.transform.position = pos;
             Body = Game.level.World.createBody(bodyDescription, bodyPartDescription);
+            Body.owner = this;
         }
 
 #if false
