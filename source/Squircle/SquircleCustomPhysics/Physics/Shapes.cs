@@ -70,6 +70,11 @@ namespace Squircle.Physics
             return rectangleShape;
         }
 
+        static public scRectangleShape fromHalfExtents(Vector2 halfExtents)
+        {
+            return fromLocalPositionAndHalfExtents(Vector2.Zero, halfExtents);
+        }
+
     }
 
     /// <summary>

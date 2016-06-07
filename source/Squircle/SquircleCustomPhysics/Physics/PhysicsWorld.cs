@@ -9,6 +9,8 @@ namespace Squircle.Physics
     public class scPhysicsWorld
     {
         public IList<scBody> bodies;
+        public DRectangle worldBounds;
+        public DRectangle viewBounds;
 
         public scPhysicsWorld()
         {
@@ -32,6 +34,13 @@ namespace Squircle.Physics
 
             bodies.Add(body);
             return body;
+        }
+
+        public scBody createBody(scBodyDescription description, scBodyPartDescription bodyPartDescription)
+        {
+            var parts = new List<scBodyPartDescription>();
+            parts.Add(bodyPartDescription);
+            return createBody(description, parts);
         }
 
         public bool removeBody(scBody body)

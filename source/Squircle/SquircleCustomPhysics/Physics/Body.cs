@@ -15,8 +15,12 @@ namespace Squircle.Physics
 
     public struct scBodyPartDescription
     {
+        public float restitution;
+        public float friction;
+        public float density;
         public scShape shape;
         public object userData;
+        public bool isTrigger;
     }
 
     public class scBodyPart
@@ -29,6 +33,7 @@ namespace Squircle.Physics
     {
         public scBodyType bodyType;
         public scTransform transform;
+        public float inertiaScale;
         public float linearDamping;
         public float angularDamping;
 

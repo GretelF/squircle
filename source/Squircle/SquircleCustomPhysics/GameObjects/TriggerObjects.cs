@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using Box2D.XNA;
 using Configuration;
+using Squircle.Physics;
 
 namespace Squircle
 {
@@ -73,19 +74,15 @@ namespace Squircle
             {
                 _leaveEventData = section["leaveEventData"];
             }
-#if false
-            var bodyDef = new BodyDef();
-            bodyDef.userData = this;
-            var fixtureDef = new FixtureDef();
-            var shape = new PolygonShape();
-            shape.SetAsBox(Game.level.ConvertToBox2D(_dim.X / 2), Game.level.ConvertToBox2D(_dim.Y / 2));
-            fixtureDef.shape = shape;
-            fixtureDef.isSensor = true;
-            fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground };
-            bodyDef.position = Game.level.ConvertToBox2D(pos);
-            Body = Game.level.World.CreateBody(bodyDef);
-            Body.CreateFixture(fixtureDef);
-#endif
+
+            var bodyDescription = new scBodyDescription();
+            bodyDescription.userData = this;
+            var bodyPartDescription = new scBodyPartDescription();
+            var shape = scRectangleShape.fromLocalPositionAndHalfExtents(Vector2.Zero, _dim / 2);
+            bodyPartDescription.shape = shape;
+            bodyPartDescription.isTrigger = true;
+            bodyDescription.transform.position = pos;
+            Body = Game.level.World.createBody(bodyDescription, bodyPartDescription);
         }
 
 #if false

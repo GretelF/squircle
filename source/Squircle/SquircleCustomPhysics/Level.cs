@@ -28,7 +28,6 @@ namespace Squircle
         public Square square;
         public Circle circle;
         public IList<GameObject> GameObjects { get; set; }
-        public scBody playerBounds { get; set; }
         public UserInterface.MainWindow Menu { get; set; }
         public float PhysicsScale { get; set; }
         public float GroundFriction { get; set; }
@@ -73,7 +72,7 @@ namespace Squircle
             camera.ViewBounds = levelConfig["Camera"]["viewBounds"].AsRectangle();
             camera.MaxMoveSpeed = levelConfig["Camera"]["maxMoveSpeed"];
 
-            playerBounds = CreatePhysicalViewBounds();
+            CreatePhysicalViewBounds();
 
             var gameObjectsConfig = ConfigFile.FromFile(levelConfig.GlobalSection["objects"]);
 
@@ -208,8 +207,7 @@ namespace Squircle
 
             camera.Update(gameTime);
 
-            playerBounds.transform.position = camera.Position;
-
+            World.viewBounds.TopLeft = camera.Position;
             
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -246,38 +244,6 @@ namespace Squircle
             }
         }
 
-        public void DrawPhysicalContacts(SpriteBatch spriteBatch)
-        {
-#if false
-            var numContacts = 0;
-            var contact = World.GetContactList();
-            var drawingSize = new Vector2(4.0f, 4.0f);
-            while (contact != null)
-            {
-                ++numContacts;
-
-                Manifold manifold;
-                contact.GetManifold(out manifold);
-
-                WorldManifold worldManifold;
-                contact.GetWorldManifold(out worldManifold);
-
-                for (int i = 0; i < manifold._pointCount; i++)
-                {
-                    var point = worldManifold._points[i];
-                    spriteBatch.FillRectangle(point - drawingSize / 2, drawingSize, Microsoft.Xna.Framework.Color.Lime);
-                }
-
-                contact = contact.GetNext();
-            }
-
-            if (game.drawDebugData.IsVerbose)
-            {
-                game.DrawOnScreen("Physical contacts: " + numContacts.ToString());
-            }
-#endif
-        }
-
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             spriteBatch.Draw(background, new Vector2(0.0f, 0.0f), Microsoft.Xna.Framework.Color.White);
@@ -290,7 +256,6 @@ namespace Squircle
             if (game.drawPhysics)
             {
                 physicsWorldDebugRenderer.Draw(spriteBatch);
-                DrawPhysicalContacts(spriteBatch);
             }
         }
 
@@ -302,55 +267,13 @@ namespace Squircle
             }
         }
 
-        private scBody CreatePhysicalViewBounds()
+        private void CreatePhysicalViewBounds()
         {
-            var bodyDescription = new scBodyDescription();
-            bodyDescription.bodyType = scBodyType.Kinematic;
-
-            IList<scBodyPartDescription> bodyPartDescriptions = new List<scBodyPartDescription>();
-            var bodyPartDescription = new scBodyPartDescription();
-
-            // the shape should probably not(!) be a rectangle, because we want circle 
-            // and square to be inside and not outside of it. So it should probably consist of vour edge shapes.
-            var shape = new scRectangleShape();
             var viewport = game.GraphicsDevice.Viewport;
-            var X = viewport.Width / 2;
-            var Y = viewport.Height / 2;
-            shape.vertices[0] = new Vector2(-X, -Y);
-            shape.vertices[1] = new Vector2( X, -Y);
-            shape.vertices[2] = new Vector2( X,  Y);
-            shape.vertices[3] = new Vector2(-X,  Y);
-            bodyPartDescription.shape = shape;
-            bodyPartDescriptions.Add(bodyPartDescription);
+            var halfwidth = viewport.Width / 2;
+            var halfheight = viewport.Height / 2;
 
-            var body = World.createBody(bodyDescription, bodyPartDescriptions);
-
-#if false
-            var bodyDef = new BodyDef();
-            bodyDef.type = BodyType.Static;
-            var body = World.CreateBody(bodyDef);
-            var edges = new EdgeShape[]{new EdgeShape(), new EdgeShape(), new EdgeShape(), new EdgeShape()};
-
-            var viewport = game.GraphicsDevice.Viewport;
-
-            var X = ConvertToBox2D(viewport.Width / 2);
-            var Y = ConvertToBox2D(viewport.Height / 2);
-            edges[0].Set(new Vector2(-X, -Y), new Vector2(+X, -Y));
-            edges[1].Set(new Vector2(+X, -Y), new Vector2(+X, +Y));
-            edges[2].Set(new Vector2(+X, +Y), new Vector2(-X, +Y));
-            edges[3].Set(new Vector2(-X, +Y), new Vector2(-X, -Y));
-
-            foreach (var edge in edges)
-            {
-                var fixtureDef = new FixtureDef();
-                fixtureDef.shape = edge;
-                fixtureDef.friction = 0.0f;
-                body.CreateFixture(fixtureDef);
-            }
-
-            return body;
-#endif
-            return null;
+            World.viewBounds = new DRectangle(-halfwidth, -halfheight, viewport.Width, viewport.Height);
         }
 
         public GameObject GetGameObject(string name)

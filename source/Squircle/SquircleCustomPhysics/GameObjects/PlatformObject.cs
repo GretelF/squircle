@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using Box2D.XNA;
 using Configuration;
+using Squircle.Physics;
 
 namespace Squircle
 {
@@ -146,19 +147,13 @@ namespace Squircle
 
             section.IfOptionExists("toggleWaypointEvent", opt => Game.Events[opt].addListener(onToggleWaypointEvent));
 
-#if false
-            var bodyDef = new BodyDef();
-            var fixtureDef = new FixtureDef();
-            var shape = new PolygonShape();
-            shape.SetAsBox(Game.level.ConvertToBox2D(Dimensions.X / 2), Game.level.ConvertToBox2D(Dimensions.Y / 2));
-            fixtureDef.shape = shape;
-            fixtureDef.userData = new LevelElementInfo() { type = LevelElementType.Ground };
-            bodyDef.type = BodyType.Kinematic;
-            bodyDef.position = Game.level.ConvertToBox2D(section["position"].AsVector2());
-            bodyDef.active = State.IsActive;
-            Body = Game.level.World.CreateBody(bodyDef);
-            Body.CreateFixture(fixtureDef);
-#endif
+            var bodyDescription = new scBodyDescription();
+            bodyDescription.userData = this;
+            var bodyPartDescription = new scBodyPartDescription();
+            var shape = scRectangleShape.fromLocalPositionAndHalfExtents(Vector2.Zero, Dimensions / 2);
+            bodyPartDescription.shape = shape;
+            bodyDescription.transform.position = section["position"].AsVector2();
+            Body = Game.level.World.createBody(bodyDescription, bodyPartDescription);
 
             section.IfOptionExists("waypointStart",
                 opt => WaypointStart = opt.AsVector2(),

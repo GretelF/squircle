@@ -28,7 +28,7 @@ namespace Squircle
 
         private struct EdgeInfo
         {
-            public EdgeShape shape;
+            public scEdgeShape shape;
             public bool isVertical;
         }
 
@@ -78,35 +78,36 @@ namespace Squircle
                     var vertexB = vertices[i];
 
                     var edgeInfo = new EdgeInfo();
-                    edgeInfo.shape = new EdgeShape();
+                    edgeInfo.shape = new scEdgeShape();
                     edgeInfo.isVertical = vertexA.X == vertexB.X;
-                    edgeInfo.shape.Set(vertexA, vertexB);
+                    edgeInfo.shape.start = vertexA;
+                    edgeInfo.shape.end = vertexB;
                     edges.Add(edgeInfo);
                     
                 }
 
                 IList<scBodyPartDescription> bodyPartDescriptions = new List<scBodyPartDescription>();
 
-#if false
+
                 foreach (var edge in edges)
                 {
-                    var fixture = new FixtureDef();
+                    var bodyPartDescription = new scBodyPartDescription();
                     var elementInfo = new LevelElementInfo();
-                    fixture.shape = edge.shape;
+                    bodyPartDescription.shape = edge.shape;
                     if (edge.isVertical)
                     {
-                        fixture.friction = 0.0f;
+                        bodyPartDescription.friction = 0.0f;
                         elementInfo.type = LevelElementType.Wall;
                     }
                     else
                     {
-                        fixture.friction = level.GroundFriction;
+                        bodyPartDescription.friction = level.GroundFriction;
                         elementInfo.type = LevelElementType.Ground;
                     }
-                    fixture.userData = elementInfo;
-                    body.CreateFixture(fixture);
+                    bodyPartDescription.userData = elementInfo;
+                    bodyPartDescriptions.Add(bodyPartDescription);
                 }
-#endif
+
                 var bodyDescription = new scBodyDescription();
                 bodyDescription.bodyType = scBodyType.Static;
 

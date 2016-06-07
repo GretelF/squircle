@@ -69,57 +69,19 @@ namespace Squircle
             var bodyDescription = new scBodyDescription();
             bodyDescription.bodyType = scBodyType.Kinematic;
             bodyDescription.transform.position = position;
+            bodyDescription.inertiaScale = section["inertiaScale"];
             bodyDescription.linearDamping = section["linearDamping"];
             bodyDescription.angularDamping = section["angularDamping"];
             bodyDescription.userData = this;
 
-            IList<scBodyPartDescription> bodyPartDescriptions = new List<scBodyPartDescription>();
             var bodyPartDescription = new scBodyPartDescription();
 
-            var shape = new scRectangleShape();
-            var offset = SideLength / 2;
-            shape.vertices[0] = new Vector2(-offset, -offset);
-            shape.vertices[1] = new Vector2( offset, -offset);
-            shape.vertices[2] = new Vector2( offset,  offset);
-            shape.vertices[3] = new Vector2(-offset,  offset);
+            bodyPartDescription.shape = scRectangleShape.fromHalfExtents(new Vector2(SideLength / 2));
+            bodyPartDescription.friction = section["friction"];
+            bodyPartDescription.restitution = section["restitution"];
+            bodyPartDescription.density = section["density"];
 
-            bodyPartDescription.shape = shape;
-
-            bodyPartDescriptions.Add(bodyPartDescription);
-
-            Body = Game.level.World.createBody(bodyDescription, bodyPartDescriptions);
-
-#if false
-            var bodyDef = new BodyDef();
-            bodyDef.type = BodyType.Dynamic;
-
-            bodyDef.angle = 0;
-            bodyDef.position = Game.level.ConvertToBox2D(pos);
-            bodyDef.inertiaScale = section["inertiaScale"];
-            bodyDef.linearDamping = section["linearDamping"];
-            bodyDef.angularDamping = section["angularDamping"];
-
-            bodyDef.userData = this;
-
-            Body = Game.level.World.createBody(bodyDef);
-
-            var shape = new PolygonShape();
-            var offset = SideLength / 2;
-            shape.Set(new Vector2[]{
-                Game.level.ConvertToBox2D(new Vector2(-offset, -offset)),
-                Game.level.ConvertToBox2D(new Vector2(offset, -offset)),
-                Game.level.ConvertToBox2D(new Vector2(offset, offset)),
-                Game.level.ConvertToBox2D(new Vector2(-offset, offset))
-                }
-            , 4);
-
-            var fixture = new FixtureDef();
-            fixture.restitution = section["restitution"];
-            fixture.density = section["density"];
-            fixture.shape = shape;
-            fixture.friction = section["friction"];
-            Body.CreateFixture(fixture);
-#endif
+            Body = Game.level.World.createBody(bodyDescription, bodyPartDescription);
         }
 
         public override void PrePhysicsUpdate(GameTime gameTime)

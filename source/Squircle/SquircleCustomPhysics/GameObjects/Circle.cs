@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Squircle.Physics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,30 +48,29 @@ namespace Squircle
             textureName = section["texture"];
             circlePos = section["position"].AsVector2();
             Radius = section["radius"];
-            MaxTorque = section["torque"];
-#if false
-            var bodyDef = new BodyDef();
-            bodyDef.type = BodyType.Dynamic;
 
-            bodyDef.position = Game.level.ConvertToBox2D(circlePos);
-            bodyDef.inertiaScale = section["inertiaScale"];
-            bodyDef.linearDamping = section["linearDamping"];
-            bodyDef.angularDamping = section["angularDamping"];
+            var bodyDescription = new scBodyDescription();
+            bodyDescription.bodyType = scBodyType.Kinematic;
 
-            bodyDef.userData = this;
+            bodyDescription.transform.position = circlePos;
+            bodyDescription.inertiaScale = section["inertiaScale"];
+            bodyDescription.linearDamping = section["linearDamping"];
+            bodyDescription.angularDamping = section["angularDamping"];
 
-            Body = Game.level.World.CreateBody(bodyDef);
+            bodyDescription.userData = this;
 
-            var shape = new CircleShape();
-            shape._radius = Game.level.ConvertToBox2D(Radius);
+            var shape = new scCircleShape();
+            shape.radius = Radius;
 
-            var fixture = new FixtureDef();
-            fixture.restitution = section["restitution"];
-            fixture.density = section["density"];
-            fixture.shape = shape;
-            fixture.friction = section["friction"];
-            Body.CreateFixture(fixture);
-#endif
+            var bodyPartDescription = new scBodyPartDescription();
+            bodyPartDescription.restitution = section["restitution"];
+            bodyPartDescription.density = section["density"];
+            bodyPartDescription.shape = shape;
+            bodyPartDescription.friction = section["friction"];
+            
+            Body = Game.level.World.createBody(bodyDescription, bodyPartDescription);
+
+
         }
 
         public override void PrePhysicsUpdate(GameTime gameTime)
