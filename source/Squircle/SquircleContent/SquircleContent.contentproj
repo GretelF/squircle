@@ -91,6 +91,10 @@
       <Name>circle_level_03</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="player\testsquare.cfg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Name>testsquare</Name>
+    </None>
     <None Include="player\square.cfg">
       <Name>square</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

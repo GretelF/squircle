@@ -11,6 +11,7 @@ namespace Squircle.Physics
         public IList<scBody> bodies;
         public DRectangle worldBounds;
         public DRectangle viewBounds;
+        public Vector2 gravity = new Vector2(0, -9.81f);
 
         public scPhysicsWorld()
         {
@@ -23,7 +24,7 @@ namespace Squircle.Physics
             body.transform = description.transform;
             body.bodyType = description.bodyType;
 
-            foreach(var bodyPartDescription in bodyPartDescriptions)
+            foreach (var bodyPartDescription in bodyPartDescriptions)
             {
                 var bodyPart = new scBodyPart();
                 bodyPart.shape = bodyPartDescription.shape;
@@ -50,7 +51,20 @@ namespace Squircle.Physics
 
         public void simulate(GameTime gameTime)
         {
+            var dt = (float) gameTime.ElapsedGameTime.TotalSeconds;
+            var dynamicBodies = bodies.Where(b => b.owner != null);
 
+            foreach (var body in dynamicBodies)
+            {
+                var newTransform = body.transform;
+                // TODO: apply linear damping
+                body.linearVelocity += gravity * dt;
+                newTransform.position += body.linearVelocity * dt;
+                // TODO: apply rotation
+
+                //TODO: consider to let body apply it itself.
+                body.transform = newTransform;
+            }
         }
     }
 }

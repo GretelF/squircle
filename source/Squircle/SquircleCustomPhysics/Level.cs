@@ -52,6 +52,8 @@ namespace Squircle
                 PhysicsScale = physicsSection["scale"];
                 GroundFriction = physicsSection["groundFriction"];
                 World = new scPhysicsWorld();
+
+                physicsSection.IfOptionExists("gravity", o => World.gravity = o.AsVector2());
 //                physicsSection["gravity"].AsVector2(), physicsSection["doSleep"].AsBool()
 //                World.ContinuousPhysics = physicsSection["continuousPhysics"].AsBool();
 
@@ -113,7 +115,6 @@ namespace Squircle
                 if (opt.AsBool()) game.drawDebugData.SetNormal();
                 else game.drawDebugData.SetNone();
             });
-
             
             {
                 var circleshape = new scCircleShape();

@@ -334,11 +334,11 @@ namespace Squircle
                 null,
                 transform);
 
-            //level.Draw(spriteBatch, gameTime);
+            level.Draw(spriteBatch, gameTime);
 
             base.Draw(gameTime);
 
-            //if (drawPhysics)
+            if (drawPhysics)
             {
                 DrawOnScreen("Drawing physical world");
             }

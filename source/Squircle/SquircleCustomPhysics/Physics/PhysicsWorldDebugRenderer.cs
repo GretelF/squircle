@@ -34,6 +34,12 @@ namespace Squircle.Physics
         /// The color used to draw the body rotation arc.
         /// </summary>
         static public Color BodyTransformRotationColor { get { return Color.Magenta; } }
+        
+        /// <summary>
+        /// The color used to draw the body's linear velocity.
+        /// </summary>
+        static public Color BodyLinearVelocityColor { get { return Color.Cyan; } }
+
 
         //
         // Bounding Box
@@ -111,6 +117,10 @@ namespace Squircle.Physics
                 center.X = (int)(body.transform.position.X - center.Width/2.0f);
                 center.Y = (int)(body.transform.position.Y - center.Height/2.0f);
                 spriteBatch.FillRectangle(center, BodyTransformPositionColor);
+
+                // Draw linear velocity
+
+                spriteBatch.DrawLine(body.transform.position, body.transform.position + body.linearVelocity, BodyLinearVelocityColor);
             }
         }
 
