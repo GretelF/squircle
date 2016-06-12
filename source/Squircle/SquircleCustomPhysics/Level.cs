@@ -52,6 +52,7 @@ namespace Squircle
                 PhysicsScale = physicsSection["scale"];
                 GroundFriction = physicsSection["groundFriction"];
                 World = new scPhysicsWorld();
+                World.game = game;
 
                 physicsSection.IfOptionExists("gravity", o => World.gravity = o.AsVector2());
                 //                physicsSection["gravity"].AsVector2(), physicsSection["doSleep"].AsBool()

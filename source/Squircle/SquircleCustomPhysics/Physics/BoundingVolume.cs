@@ -22,13 +22,17 @@ namespace Squircle.Physics
         public float upperBorder { get { return position.Y - halfExtents.Y; } }
 
 
-
         public bool contains(scBoundingBox other)
         {
             var deltaUpperLeft = other.upperLeft - upperLeft;
             var deltaLowerRight = lowerRight - other.lowerRight;
 
             return deltaUpperLeft.X >= 0 && deltaUpperLeft.Y >= 0 && deltaLowerRight.X >= 0 && deltaLowerRight.Y >= 0;
+        }
+
+        public bool contains(Vector2 point)
+        {
+            return upperLeft.X <= point.X && upperLeft.Y <= point.Y && lowerRight.X >= point.X && lowerRight.Y >= point.Y;
         }
     }
 
@@ -76,6 +80,18 @@ namespace Squircle.Physics
             rectangle.Height = (int)size.Y;
 
             return rectangle;
+        }
+
+        public static bool overlaps(scBoundingBox first, scBoundingBox second)
+        {
+            return first.contains(second.upperLeft)
+                || first.contains(second.upperRight)
+                || first.contains(second.lowerLeft)
+                || first.contains(second.lowerRight)
+                || second.contains(first.upperLeft)
+                || second.contains(first.upperRight)
+                || second.contains(first.lowerLeft)
+                || second.contains(first.lowerRight);
         }
     }
 }

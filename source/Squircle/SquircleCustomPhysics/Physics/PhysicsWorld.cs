@@ -8,6 +8,7 @@ namespace Squircle.Physics
 {
     public class scPhysicsWorld
     {
+        public Game game;
         public IList<scBody> bodies;
         public DRectangle worldBounds;
         public scBoundingBox viewBounds;
@@ -67,6 +68,19 @@ namespace Squircle.Physics
             }
 
             moveIntoViewBounds(dynamicBodies);
+
+            foreach (var body in dynamicBodies)
+            {
+                var boundingBox = body.calculateBoundingBox();
+                foreach (var otherBody in bodies.Where(b => b != body))
+                {
+                    var otherBoundingBox = otherBody.calculateBoundingBox();
+                    if (scBoundingUtils.overlaps(boundingBox, otherBoundingBox))
+                    {
+                        //TODO intersection detection
+                    }
+                }
+            }
         }
 
         public void moveIntoViewBounds(IEnumerable<scBody> bodies)
