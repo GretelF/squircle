@@ -34,7 +34,7 @@ namespace Squircle.Physics
         /// The color used to draw the body rotation arc.
         /// </summary>
         static public Color BodyTransformRotationColor { get { return Color.Magenta; } }
-        
+
         /// <summary>
         /// The color used to draw the body's linear velocity.
         /// </summary>
@@ -82,6 +82,16 @@ namespace Squircle.Physics
         /// </summary>
         static public Color EdgeShapeColor { get { return Color.Honeydew; } }
 
+        //
+        // Camera
+        //
+
+        /// <summary>
+        /// The color used to draw the view bounds of the camera.
+        /// </summary>
+        static public Color ViewBoundsColor { get { return Color.Gray; } }
+
+
         #endregion Debug Drawing Constants
 
         public scPhysicsWorld world;
@@ -114,14 +124,17 @@ namespace Squircle.Physics
                 var center = new Rectangle();
                 center.Width = BodyTransformPositionExtents;
                 center.Height = BodyTransformPositionExtents;
-                center.X = (int)(body.transform.position.X - center.Width/2.0f);
-                center.Y = (int)(body.transform.position.Y - center.Height/2.0f);
+                center.X = (int)(body.transform.position.X - center.Width / 2.0f);
+                center.Y = (int)(body.transform.position.Y - center.Height / 2.0f);
                 spriteBatch.FillRectangle(center, BodyTransformPositionColor);
 
                 // Draw linear velocity
 
                 spriteBatch.DrawLine(body.transform.position, body.transform.position + body.linearVelocity, BodyLinearVelocityColor);
             }
+
+            // Draw view bounds
+            spriteBatch.DrawRectangle(scBoundingUtils.toXNARectangle(world.viewBounds), ViewBoundsColor);
         }
 
         public void DrawShape(SpriteBatch spriteBatch, scShape shape, scTransform transform)
@@ -137,7 +150,7 @@ namespace Squircle.Physics
                 case scShapeType.Rectangle:
                 {
                     var rectangle = (scRectangleShape)shape;
-                    
+
                     var A = transform.position + rectangle.vertices[0].Rotate(transform.rotation.radians);
                     var B = transform.position + rectangle.vertices[1].Rotate(transform.rotation.radians);
                     var C = transform.position + rectangle.vertices[2].Rotate(transform.rotation.radians);

@@ -10,6 +10,27 @@ namespace Squircle.Physics
     {
         public Vector2 position;
         public Vector2 halfExtents;
+
+        public Vector2 lowerLeft { get { return position - halfExtents; } }
+        public Vector2 upperRight { get { return position + halfExtents; } }
+        public Vector2 lowerRight { get { return position + new Vector2(+halfExtents.X, -halfExtents.Y); } }
+        public Vector2 upperLeft { get { return position + new Vector2(-halfExtents.X, +halfExtents.Y); } }
+
+        public float leftBorder { get { return position.X - halfExtents.X; } }
+        public float rightBorder { get { return position.X + halfExtents.X; } }
+        public float upperBorder { get { return position.Y + halfExtents.Y; } }
+        public float lowerBorder { get { return position.Y - halfExtents.Y; } }
+
+
+
+        public bool contains(scBoundingBox other)
+        {
+            var deltaLowerLeft = other.lowerLeft - lowerLeft;
+            var deltaUpperRight = upperRight - other.upperRight;
+
+            return deltaLowerLeft.X >= 0 && deltaLowerLeft.Y >= 0 && deltaUpperRight.X >= 0 && deltaUpperRight.Y >= 0;
+        }
+
     }
 
     public static class scBoundingUtils
@@ -35,13 +56,23 @@ namespace Squircle.Physics
         }
 
         public static scBoundingBox createFromBoundingVertices(Vector2 lower, Vector2 upper)
-        { 
+        {
             var boundingBox = new scBoundingBox();
             boundingBox.halfExtents = (upper - lower) / 2.0f;
             boundingBox.position = lower + boundingBox.halfExtents;
 
             return boundingBox;
         }
+
+        public static scBoundingBox createFromPositionAndHalfExtents(Vector2 position, Vector2 halfExtents)
+        {
+            var boundingBox = new scBoundingBox();
+            boundingBox.position = position;
+            boundingBox.halfExtents = halfExtents;
+
+            return boundingBox;
+        }
+
 
         public static Rectangle toXNARectangle(scBoundingBox boundingBox)
         {

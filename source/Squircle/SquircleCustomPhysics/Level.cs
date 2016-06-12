@@ -31,7 +31,7 @@ namespace Squircle
         public UserInterface.MainWindow Menu { get; set; }
         public float PhysicsScale { get; set; }
         public float GroundFriction { get; set; }
-        
+
         public string AmbientMusicCue { get; set; }
 
         public Level(Game game)
@@ -54,15 +54,15 @@ namespace Squircle
                 World = new scPhysicsWorld();
 
                 physicsSection.IfOptionExists("gravity", o => World.gravity = o.AsVector2());
-//                physicsSection["gravity"].AsVector2(), physicsSection["doSleep"].AsBool()
-//                World.ContinuousPhysics = physicsSection["continuousPhysics"].AsBool();
+                //                physicsSection["gravity"].AsVector2(), physicsSection["doSleep"].AsBool()
+                //                World.ContinuousPhysics = physicsSection["continuousPhysics"].AsBool();
 
                 physicsWorldDebugRenderer = new scPhysicsWorldDebugRenderer();
                 physicsWorldDebugRenderer.world = World;
             }
 
             LevelGenerator = new LevelGenerator(this);
-//            bodyList = LevelGenerator.generateLevel();
+            //            bodyList = LevelGenerator.generateLevel();
 
             var viewport = game.GraphicsDevice.Viewport;
 
@@ -107,15 +107,19 @@ namespace Squircle
             debugSection.IfOptionExists("drawPhysics", opt => game.drawPhysics = opt.AsBool());
             debugSection.IfOptionExists("drawVisualHelpers", opt =>
                 {
-                    if (opt.AsBool()) game.drawVisualHelpers.SetNormal();
-                    else              game.drawVisualHelpers.SetNone();
+                    if (opt.AsBool())
+                        game.drawVisualHelpers.SetNormal();
+                    else
+                        game.drawVisualHelpers.SetNone();
                 });
             debugSection.IfOptionExists("drawDebugData", opt =>
             {
-                if (opt.AsBool()) game.drawDebugData.SetNormal();
-                else game.drawDebugData.SetNone();
+                if (opt.AsBool())
+                    game.drawDebugData.SetNormal();
+                else
+                    game.drawDebugData.SetNone();
             });
-            
+
             {
                 var circleshape = new scCircleShape();
                 circleshape.radius = 75;
@@ -135,7 +139,7 @@ namespace Squircle
                 bodyPartDescription.shape = rectangleshape;
                 var bodyDescription = new scBodyDescription();
                 bodyDescription.bodyType = scBodyType.Static;
-                bodyDescription.transform.position = new Vector2(150, 0);
+                bodyDescription.transform.position = new Vector2(50, 150);
                 var bodyPartDescriptions = new List<scBodyPartDescription>();
                 bodyPartDescriptions.Add(bodyPartDescription);
                 var body = World.createBody(bodyDescription, bodyPartDescriptions);
@@ -208,19 +212,19 @@ namespace Squircle
 
             camera.Update(gameTime);
 
-            World.viewBounds.TopLeft = camera.Position;
-            
+            World.viewBounds.position = camera.Position;
+
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             foreach (var body in World.bodies)
             {
                 var rotationAmountPerSecond = scAngle.FromDegrees(45);
 
-                if(game.InputHandler.IsDown(Keys.Left))
+                if (game.InputHandler.IsDown(Keys.Left))
                 {
                     body.transform.rotation -= rotationAmountPerSecond * dt;
                 }
-                if(game.InputHandler.IsDown(Keys.Right))
+                if (game.InputHandler.IsDown(Keys.Right))
                 {
                     body.transform.rotation += rotationAmountPerSecond * dt;
                 }
@@ -274,17 +278,18 @@ namespace Squircle
             var halfwidth = viewport.Width / 2;
             var halfheight = viewport.Height / 2;
 
-            World.viewBounds = new DRectangle(-halfwidth, -halfheight, viewport.Width, viewport.Height);
+            World.viewBounds = scBoundingUtils.createFromPositionAndHalfExtents(new Vector2(-halfwidth, -halfheight), new Vector2(halfwidth, halfheight));
         }
 
         public GameObject GetGameObject(string name)
         {
-            try { return GameObjects.First(go => go.Name == name); }
-            catch(System.InvalidOperationException)
+            try
+            { return GameObjects.First(go => go.Name == name); }
+            catch (System.InvalidOperationException)
             {
                 return null;
             }
-            
+
         }
     }
 }

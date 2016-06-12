@@ -258,6 +258,11 @@ namespace Squircle
                 drawVisualHelpers.CycleForward();
             }
 
+            if (InputHandler.WasTriggered(Keys.F8))
+            {
+                UseDebugCamera = !UseDebugCamera;
+            }
+
 
             level.Update(gameTime);
 

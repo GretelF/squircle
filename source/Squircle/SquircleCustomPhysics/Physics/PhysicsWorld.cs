@@ -10,7 +10,7 @@ namespace Squircle.Physics
     {
         public IList<scBody> bodies;
         public DRectangle worldBounds;
-        public DRectangle viewBounds;
+        public scBoundingBox viewBounds;
         public Vector2 gravity = new Vector2(0, -9.81f);
 
         public scPhysicsWorld()
@@ -51,7 +51,7 @@ namespace Squircle.Physics
 
         public void simulate(GameTime gameTime)
         {
-            var dt = (float) gameTime.ElapsedGameTime.TotalSeconds;
+            var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
             var dynamicBodies = bodies.Where(b => b.owner != null);
 
             foreach (var body in dynamicBodies)
@@ -64,6 +64,45 @@ namespace Squircle.Physics
 
                 //TODO: consider to let body apply it itself.
                 body.transform = newTransform;
+
+
+
+            }
+
+            moveIntoViewBounds(dynamicBodies);
+        }
+
+        public void moveIntoViewBounds(IEnumerable<scBody> bodies)
+        {
+            var viewBoundsBoundingBox = scBoundingUtils.createFromBoundingVertices((Vector2)viewBounds.lowerLeft, (Vector2)viewBounds.upperRight);
+
+            foreach (var body in bodies)
+            {
+                var boundingBox = body.calculateBoundingBox();
+                if (!viewBoundsBoundingBox.contains(boundingBox))
+                {
+                    if (boundingBox.leftBorder < viewBoundsBoundingBox.leftBorder)
+                    {
+                        body.transform.position.X = viewBoundsBoundingBox.leftBorder + boundingBox.halfExtents.X;
+                    }
+
+                    if (boundingBox.rightBorder > viewBoundsBoundingBox.rightBorder)
+                    {
+                        body.transform.position.X = viewBoundsBoundingBox.rightBorder - boundingBox.halfExtents.X;
+                    }
+
+                    if (boundingBox.lowerBorder < viewBoundsBoundingBox.lowerBorder)
+                    {
+                        body.transform.position.Y = viewBoundsBoundingBox.lowerBorder + boundingBox.halfExtents.Y;
+                    }
+
+                    if (boundingBox.upperBorder > viewBoundsBoundingBox.upperBorder)
+                    {
+                        body.transform.position.Y = viewBoundsBoundingBox.upperBorder - boundingBox.halfExtents.Y;
+                    }
+
+                    body.linearVelocity = Vector2.Zero;
+                }
             }
         }
     }

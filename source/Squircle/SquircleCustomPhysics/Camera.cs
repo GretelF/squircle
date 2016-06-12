@@ -102,7 +102,7 @@ namespace Squircle
         public float Rotation { get; set; }
         public Vector2 Origin { get; set; }
         public float Scale { get; set; }
-        public Vector2 ScreenCenter { get; protected set; }
+        public Vector2 ScreenCenter { get { return new Vector2(_viewportWidth / 2.0f, _viewportHeight / 2.0f); } }
         public Matrix Transform { get; set; }
         public Vector2 Focus { get; set; }
         public float MoveSpeed { get; set; }
@@ -124,7 +124,7 @@ namespace Squircle
                 _focusBounds = new Rectangle((int)origin.X, (int)origin.Y, width, height);
             }
         }
-       
+
 
 
         #endregion
@@ -137,7 +137,6 @@ namespace Squircle
             _viewportWidth = Game.GraphicsDevice.Viewport.Width;
             _viewportHeight = Game.GraphicsDevice.Viewport.Height;
 
-            ScreenCenter = new Vector2(_viewportWidth / 2, _viewportHeight / 2);
             Scale = 1;
             MaxMoveSpeed = 1.25f;
             MoveSpeed = 1.25f;
@@ -150,6 +149,7 @@ namespace Squircle
             // Move the Camera to the position that it needs to go
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+
             Origin = ScreenCenter / Scale;
 
             var targetPos = CalculateTarget();
@@ -159,7 +159,7 @@ namespace Squircle
             _position.Y += MathHelper.Clamp((targetPos.Y - _position.Y) * MoveSpeed * dt, -MaxMoveSpeed, MaxMoveSpeed);
 
             base.Update(gameTime);
-            
+
             // Create the Transform used by any
             // spritebatch process
             Transform = Matrix.Identity *
