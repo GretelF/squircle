@@ -64,9 +64,6 @@ namespace Squircle.Physics
 
                 //TODO: consider to let body apply it itself.
                 body.transform = newTransform;
-
-
-
             }
 
             moveIntoViewBounds(dynamicBodies);
@@ -74,7 +71,7 @@ namespace Squircle.Physics
 
         public void moveIntoViewBounds(IEnumerable<scBody> bodies)
         {
-            var viewBoundsBoundingBox = scBoundingUtils.createFromBoundingVertices((Vector2)viewBounds.lowerLeft, (Vector2)viewBounds.upperRight);
+            var viewBoundsBoundingBox = scBoundingUtils.createFromBoundingVertices((Vector2)viewBounds.upperLeft, (Vector2)viewBounds.lowerRight);
 
             foreach (var body in bodies)
             {
@@ -91,14 +88,14 @@ namespace Squircle.Physics
                         body.transform.position.X = viewBoundsBoundingBox.rightBorder - boundingBox.halfExtents.X;
                     }
 
-                    if (boundingBox.lowerBorder < viewBoundsBoundingBox.lowerBorder)
+                    if (boundingBox.upperBorder < viewBoundsBoundingBox.upperBorder)
                     {
-                        body.transform.position.Y = viewBoundsBoundingBox.lowerBorder + boundingBox.halfExtents.Y;
+                        body.transform.position.Y = viewBoundsBoundingBox.upperBorder + boundingBox.halfExtents.Y;
                     }
 
-                    if (boundingBox.upperBorder > viewBoundsBoundingBox.upperBorder)
+                    if (boundingBox.lowerBorder > viewBoundsBoundingBox.lowerBorder)
                     {
-                        body.transform.position.Y = viewBoundsBoundingBox.upperBorder - boundingBox.halfExtents.Y;
+                        body.transform.position.Y = viewBoundsBoundingBox.lowerBorder - boundingBox.halfExtents.Y;
                     }
 
                     body.linearVelocity = Vector2.Zero;
