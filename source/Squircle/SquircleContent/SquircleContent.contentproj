@@ -83,6 +83,10 @@
       <Name>userInterface</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="player\testcircle.cfg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Name>testcircle</Name>
+    </None>
     <None Include="player\circle.cfg">
       <Name>circle</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

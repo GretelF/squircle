@@ -50,29 +50,38 @@ namespace Squircle.Physics
             return bodies.Remove(body);
         }
 
-        public void simulate(GameTime gameTime)
+        public void simulate(GameTime gameTime, Square square, Circle circle)
         {
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            var dynamicBodies = bodies.Where(b => b.owner != null);
 
-            foreach (var body in dynamicBodies)
+            var oldSquareTransform = square.Body.transform;
+            var oldCircleTransform = circle.Body.transform;
+
+            simulateMovement(square.Body, dt);
+            simulateMovement(circle.Body, dt);
+
+            moveIntoViewBounds(square.Body);
+            moveIntoViewBounds(circle.Body);
+
+            var otherBodies = bodies.Where(b => b != square.Body && b != circle.Body);
+
             {
-                var newTransform = body.transform;
-                // TODO: apply linear damping
-                body.linearVelocity += gravity * dt;
-                newTransform.position += body.linearVelocity * dt;
-                // TODO: apply rotation
+                var boundingBox = square.Body.calculateBoundingBox();
+                foreach (var otherBody in otherBodies)
+                {
+                    var otherBoundingBox = otherBody.calculateBoundingBox();
+                    if (scBoundingUtils.overlaps(boundingBox, otherBoundingBox))
+                    {
+                        //TODO intersection detection
 
-                //TODO: consider to let body apply it itself.
-                body.transform = newTransform;
+                    }
+                }
+
             }
-
-            moveIntoViewBounds(dynamicBodies);
-
-            foreach (var body in dynamicBodies)
+            
             {
-                var boundingBox = body.calculateBoundingBox();
-                foreach (var otherBody in bodies.Where(b => b != body))
+                var boundingBox = circle.Body.calculateBoundingBox();
+                foreach (var otherBody in otherBodies)
                 {
                     var otherBoundingBox = otherBody.calculateBoundingBox();
                     if (scBoundingUtils.overlaps(boundingBox, otherBoundingBox))
@@ -80,41 +89,61 @@ namespace Squircle.Physics
                         //TODO intersection detection
                     }
                 }
+
             }
+
+
+            detectAndResolveIntersection(square.Body, dt);
+            detectAndResolveIntersection(circle.Body, dt);
+
         }
 
-        public void moveIntoViewBounds(IEnumerable<scBody> bodies)
+        public void moveIntoViewBounds(scBody body)
         {
             var viewBoundsBoundingBox = scBoundingUtils.createFromBoundingVertices((Vector2)viewBounds.upperLeft, (Vector2)viewBounds.lowerRight);
 
-            foreach (var body in bodies)
+            var boundingBox = body.calculateBoundingBox();
+            if (!viewBoundsBoundingBox.contains(boundingBox))
             {
-                var boundingBox = body.calculateBoundingBox();
-                if (!viewBoundsBoundingBox.contains(boundingBox))
+                if (boundingBox.leftBorder < viewBoundsBoundingBox.leftBorder)
                 {
-                    if (boundingBox.leftBorder < viewBoundsBoundingBox.leftBorder)
-                    {
-                        body.transform.position.X = viewBoundsBoundingBox.leftBorder + boundingBox.halfExtents.X;
-                    }
-
-                    if (boundingBox.rightBorder > viewBoundsBoundingBox.rightBorder)
-                    {
-                        body.transform.position.X = viewBoundsBoundingBox.rightBorder - boundingBox.halfExtents.X;
-                    }
-
-                    if (boundingBox.upperBorder < viewBoundsBoundingBox.upperBorder)
-                    {
-                        body.transform.position.Y = viewBoundsBoundingBox.upperBorder + boundingBox.halfExtents.Y;
-                    }
-
-                    if (boundingBox.lowerBorder > viewBoundsBoundingBox.lowerBorder)
-                    {
-                        body.transform.position.Y = viewBoundsBoundingBox.lowerBorder - boundingBox.halfExtents.Y;
-                    }
-
-                    body.linearVelocity = Vector2.Zero;
+                    body.transform.position.X = viewBoundsBoundingBox.leftBorder + boundingBox.halfExtents.X;
                 }
+
+                if (boundingBox.rightBorder > viewBoundsBoundingBox.rightBorder)
+                {
+                    body.transform.position.X = viewBoundsBoundingBox.rightBorder - boundingBox.halfExtents.X;
+                }
+
+                if (boundingBox.upperBorder < viewBoundsBoundingBox.upperBorder)
+                {
+                    body.transform.position.Y = viewBoundsBoundingBox.upperBorder + boundingBox.halfExtents.Y;
+                }
+
+                if (boundingBox.lowerBorder > viewBoundsBoundingBox.lowerBorder)
+                {
+                    body.transform.position.Y = viewBoundsBoundingBox.lowerBorder - boundingBox.halfExtents.Y;
+                }
+
+                body.linearVelocity = Vector2.Zero;
             }
+        }
+
+        private void simulateMovement(scBody body, float dt)
+        {
+            var newTransform = body.transform;
+            // TODO: apply linear damping
+            body.linearVelocity += gravity * dt;
+            newTransform.position += body.linearVelocity * dt;
+            // TODO: apply rotation
+
+            body.transform = newTransform;
+        }
+
+        private void detectAndResolveIntersection(scBody body, float dt)
+        {
+
         }
     }
 }
+

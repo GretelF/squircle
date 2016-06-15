@@ -202,7 +202,7 @@ namespace Squircle
                 go.PrePhysicsUpdate(gameTime);
             }
 
-            World.simulate(gameTime);
+            World.simulate(gameTime, square, circle);
 
             foreach (var go in GameObjects)
             {
@@ -279,7 +279,7 @@ namespace Squircle
             var halfwidth = viewport.Width / 2;
             var halfheight = viewport.Height / 2;
 
-            World.viewBounds = scBoundingUtils.createFromPositionAndHalfExtents(new Vector2(-halfwidth, -halfheight), new Vector2(halfwidth, halfheight));
+            World.viewBounds = scBoundingUtils.createFromPositionAndHalfExtents(camera.Position, new Vector2(halfwidth, halfheight));
         }
 
         public GameObject GetGameObject(string name)

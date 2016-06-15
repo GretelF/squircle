@@ -19,7 +19,7 @@ namespace Squircle.Physics
         scBoundingBox getBoundingBox(scTransform transform);
     }
 
-    class scCircleShape : scShape
+    public class scCircleShape : scShape
     {
         public scShapeType ShapeType { get { return scShapeType.Circle; } }
         public float radius;
@@ -31,7 +31,7 @@ namespace Squircle.Physics
         }
     }
 
-    class scRectangleShape : scShape
+    public class scRectangleShape : scShape
     {
         public scShapeType ShapeType { get { return scShapeType.Rectangle; } }
         public readonly Vector2[] vertices = new Vector2[4];
@@ -81,7 +81,7 @@ namespace Squircle.Physics
     /// The normal can be constructed by taking the direction from start to end and rotate it 90 degrees counterclockwise.
     /// start and end positions are in local space of the body they are contained in.
     /// </summary>
-    class scEdgeShape : scShape
+    public class scEdgeShape : scShape
     {
         public scShapeType ShapeType { get { return scShapeType.Edge; } }
         public Vector2 start;
