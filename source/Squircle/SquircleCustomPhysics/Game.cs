@@ -134,7 +134,7 @@ namespace Squircle
             level.Name = "level_01";
             level.Menu.InitialWindowName = "mainWindow";
 
-            gameConfig = ConfigFile.FromFile("Content/level/game_experiments.cfg");
+            gameConfig = ConfigFile.FromFile("Content/level/game.cfg");
             gameConfig.IfSectionExists("Audio", section =>
             {
                 Audio = new AudioManager(this);
@@ -391,7 +391,7 @@ namespace Squircle
             foreach (var go in level.GameObjects)
             {
                 spriteBatch.FillRectangle(go.Pos - drawSize / 2, drawSize, Color.Red);
-                spriteBatch.DrawRectangle((Microsoft.Xna.Framework.Rectangle)go.CalculateBoundingBox(), Color.Red);
+                spriteBatch.DrawRectangle(scBoundingUtils.toXNARectangle(go.Body.calculateBoundingBox()), Color.Red);
             }
         }
 
@@ -430,7 +430,8 @@ namespace Squircle
                 }
 
                 var dimensions = debugFont.MeasureString(debugMessage);
-                var position = go.Pos - go.Dimensions / 2;
+                var boundingBox = go.Body.calculateBoundingBox();
+                var position = go.Pos - boundingBox.halfExtents;
                 position.Y -= dimensions.Y;
 
                 spriteBatch.DrawString(debugFont, debugMessage, position, Color.White);

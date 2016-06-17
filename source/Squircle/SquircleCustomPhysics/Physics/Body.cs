@@ -53,6 +53,9 @@ namespace Squircle.Physics
 
         public object userData;
 
+        public event Action<scBody> beginCollision;
+        public event Action<scBody> endCollision;
+
         public scBody()
         {
             bodyParts = new List<scBodyPart>();

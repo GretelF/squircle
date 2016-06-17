@@ -89,7 +89,9 @@ namespace Squircle.Physics
 
         public scBoundingBox getBoundingBox(scTransform transform)
         {
-            return scBoundingUtils.createFromBoundingVertices(start, end);
+            var transformedStart = scTransformUtils.applyTransform(transform, start);
+            var transformedEnd = scTransformUtils.applyTransform(transform, end);
+            return scBoundingUtils.createFromBoundingVertices(transformedStart, transformedEnd);
         }
     }
 }

@@ -42,11 +42,6 @@ namespace Squircle
             }
         }
 
-        public override Vector2 Dimensions
-        {
-            get { return new Vector2(SideLength, SideLength); }
-        }
-
         public Square(Game game) :  base(game) {}
 
         public override void LoadContent(ContentManager content)

@@ -14,6 +14,9 @@ namespace Squircle.Physics
         public scBoundingBox viewBounds;
         public Vector2 gravity = new Vector2(0, -9.81f);
 
+        public event Action<scBody> bodyAdded;
+        public event Action<scBody> bodyRemoved;
+
         public scPhysicsWorld()
         {
             bodies = new List<scBody>();
@@ -35,6 +38,10 @@ namespace Squircle.Physics
             }
 
             bodies.Add(body);
+            if (bodyAdded != null)
+            {
+                bodyAdded(body);
+            }
             return body;
         }
 
@@ -47,7 +54,15 @@ namespace Squircle.Physics
 
         public bool removeBody(scBody body)
         {
-            return bodies.Remove(body);
+            if (bodies.Remove(body))
+            {
+                if (bodyRemoved != null)
+                {
+                    bodyRemoved(body);
+                }
+                return true;
+            }
+            return false;
         }
 
         public void simulate(GameTime gameTime, Square square, Circle circle)
@@ -72,13 +87,25 @@ namespace Squircle.Physics
                     var otherBoundingBox = otherBody.calculateBoundingBox();
                     if (scBoundingUtils.overlaps(boundingBox, otherBoundingBox))
                     {
-                        //TODO intersection detection
+                        var squareDebugData = game.level.physicsWorldDebugRenderer.GetOrCreateDebugDataForBody(square.Body);
+                        squareDebugData.BodyBoundingBoxColor = Color.Lime;
 
+                        var otherDebugData = game.level.physicsWorldDebugRenderer.GetOrCreateDebugDataForBody(otherBody);
+                        otherDebugData.BodyBoundingBoxColor = Color.Lime;
+
+                        if (otherBody.bodyParts[0].shape.ShapeType == scShapeType.Edge)
+                        {
+                            if (scCollision.detectRectangleEdge(square.Body.transform, (scRectangleShape) square.Body.bodyParts[0].shape, 
+                                otherBody.transform, (scEdgeShape) otherBody.bodyParts[0].shape))
+                            {
+                                squareDebugData.BodyBoundingBoxColor = Color.Red;
+                                otherDebugData.BodyBoundingBoxColor = Color.Red;
+                            }
+                        }
                     }
                 }
-
             }
-            
+
             {
                 var boundingBox = circle.Body.calculateBoundingBox();
                 foreach (var otherBody in otherBodies)
@@ -86,6 +113,12 @@ namespace Squircle.Physics
                     var otherBoundingBox = otherBody.calculateBoundingBox();
                     if (scBoundingUtils.overlaps(boundingBox, otherBoundingBox))
                     {
+                        var circleDebugData = game.level.physicsWorldDebugRenderer.GetOrCreateDebugDataForBody(circle.Body);
+                        circleDebugData.BodyBoundingBoxColor = Color.Lime;
+
+                        var otherDebugData = game.level.physicsWorldDebugRenderer.GetOrCreateDebugDataForBody(otherBody);
+                        otherDebugData.BodyBoundingBoxColor = Color.Lime;
+
                         //TODO intersection detection
                     }
                 }

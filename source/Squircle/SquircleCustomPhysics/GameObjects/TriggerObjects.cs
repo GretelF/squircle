@@ -22,11 +22,6 @@ namespace Squircle
         private string _enterEventData;
         private string _leaveEventData;
 
-        public override Vector2 Dimensions
-        {
-            get { return _dim; }
-        }
-
         public override Texture2D Texture
         {
             get { return _texture; }
@@ -39,7 +34,8 @@ namespace Squircle
 
         public override void LoadContent(ContentManager content)
         {
-            if (_textureName == null) { return; }
+            if (_textureName == null)
+            { return; }
             _texture = content.Load<Texture2D>(_textureName);
         }
 
@@ -109,7 +105,8 @@ namespace Squircle
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (_texture == null) { return; }
+            if (_texture == null)
+            { return; }
 
             var pos = Pos - new Vector2(_texture.Width / 2, _texture.Height / 2);
             spriteBatch.Draw(_texture, pos, Microsoft.Xna.Framework.Color.White);
@@ -118,8 +115,6 @@ namespace Squircle
 
     public class ButtonObjectBase : GameObject
     {
-        public override Vector2 Dimensions { get { return new Vector2(ProximityRadius * 2); } }
-
         public override Texture2D Texture
         {
             get { return OnOffState.IsActive ? TextureOn : TextureOff; }
@@ -144,24 +139,13 @@ namespace Squircle
 
         public GameObject Master { get; set; }
 
-        public float ProximityRadius { get; set; }
-
-        [DebugData(Ignore = true)]
-        public float ProximityRadiusSquared { get { return ProximityRadius * ProximityRadius; } }
-
         public Event OnEvent { get; set; }
         public string OnEventData { get; set; }
 
         public Event OffEvent { get; set; }
         public string OffEventData { get; set; }
 
-        public bool IsMasterInProximity 
-        {
-            get
-            {
-                return Vector2.DistanceSquared(Pos, Master.Pos) <= ProximityRadiusSquared;
-            }
-        }
+        public bool IsMasterInProximity { get; set; }
 
         public ButtonObjectBase(Game game) : base(game)
         {
@@ -181,10 +165,23 @@ namespace Squircle
         {
             base.Initialize(section);
 
+            var bodyDescription = new scBodyDescription();
+            bodyDescription.bodyType = scBodyType.Static;
+            bodyDescription.transform.position = section["position"].AsVector2();
+            bodyDescription.userData = this;
+
+            var bodyPartDescription = new scBodyPartDescription();
+            bodyPartDescription.shape = new scCircleShape() { radius = section["proximityRadius"] };
+            bodyPartDescription.isTrigger = true;
+            bodyPartDescription.userData = this;
+
+            Body = Game.level.World.createBody(bodyDescription, bodyPartDescription);
+
+            Body.beginCollision += (other) => { if (other == Master.Body) IsMasterInProximity = true; };
+            Body.endCollision += (other) => { if (other == Master.Body) IsMasterInProximity = false; };
+
             TextureOnName = section["textureOn"];
             TextureOffName = section["textureOff"];
-//            Pos = section["position"].AsVector2();
-            ProximityRadius = section["proximityRadius"];
 
             string masterName = section["master"];
 
@@ -241,7 +238,7 @@ namespace Squircle
             if (!Game.drawVisualHelpers.IsNone)
             {
                 spriteBatch.DrawLine(Pos, Master.Pos, Color.Red);
-                spriteBatch.DrawCircle(Pos, ProximityRadius, 16, Color.Yellow);
+                spriteBatch.DrawCircle(Pos, ((scCircleShape)Body.bodyParts[0].shape).radius, 16, Color.Yellow);
             }
         }
 
@@ -274,11 +271,13 @@ namespace Squircle
 
             if (OnOffState.IsActive)
             {
-                if (OnEvent != null) OnEvent.trigger(OnEventData);
+                if (OnEvent != null)
+                    OnEvent.trigger(OnEventData);
             }
             else
             {
-                if (OffEvent != null) OffEvent.trigger(OffEventData);
+                if (OffEvent != null)
+                    OffEvent.trigger(OffEventData);
             }
         }
     }
@@ -331,11 +330,13 @@ namespace Squircle
 
             if (OnOffState.IsActive)
             {
-                if (OnEvent != null) OnEvent.trigger(OnEventData);
+                if (OnEvent != null)
+                    OnEvent.trigger(OnEventData);
             }
             else
             {
-                if (OffEvent != null) OffEvent.trigger(OffEventData);
+                if (OffEvent != null)
+                    OffEvent.trigger(OffEventData);
             }
         }
     }

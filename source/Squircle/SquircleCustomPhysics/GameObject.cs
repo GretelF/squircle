@@ -124,11 +124,6 @@ namespace Squircle
         [DebugData(Ignore = true)]
         public int DrawOrder { get; set; }
 
-        /// <summary>
-        /// X => Width, Y => Height
-        /// </summary>
-        public abstract Vector2 Dimensions { get; }
-
         public GameObject(Game game)
         {
             Game = game;
@@ -164,11 +159,6 @@ namespace Squircle
         {
         }
 #endif
-
-        public virtual DRectangle CalculateBoundingBox()
-        {
-            return new DRectangle(Pos - Dimensions / 2, Dimensions);
-        }
 
         public override string ToString()
         {

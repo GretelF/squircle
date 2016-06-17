@@ -32,6 +32,8 @@ namespace Squircle
         public float PhysicsScale { get; set; }
         public float GroundFriction { get; set; }
 
+        public scBody TESTEDGE;
+
         public string AmbientMusicCue { get; set; }
 
         public Level(Game game)
@@ -146,6 +148,21 @@ namespace Squircle
                 var body = World.createBody(bodyDescription, bodyPartDescriptions);
             }
 
+            {
+                var edgeshape = new scEdgeShape();
+                edgeshape.start = new Vector2(-20, -40);
+                edgeshape.end = new Vector2(20, 40);
+                var bodyPartDescription = new scBodyPartDescription();
+                bodyPartDescription.shape = edgeshape;
+                var bodyDescription = new scBodyDescription();
+                bodyDescription.bodyType = scBodyType.Static;
+                bodyDescription.transform.position = new Vector2(100, 50);
+                var bodyPartDescriptions = new List<scBodyPartDescription>();
+                bodyPartDescriptions.Add(bodyPartDescription);
+                var body = World.createBody(bodyDescription, bodyPartDescriptions);
+                TESTEDGE = body;
+            }
+
         }
 
         private void InitializePlayers()
@@ -230,6 +247,24 @@ namespace Squircle
                     body.transform.rotation += rotationAmountPerSecond * dt;
                 }
             }
+
+            if (game.InputHandler.IsDown(Keys.I))
+            {
+                TESTEDGE.transform.position += new Vector2(0,-50)*dt;
+            }
+            if (game.InputHandler.IsDown(Keys.K))
+            {
+                TESTEDGE.transform.position += new Vector2(0,50)*dt;
+            }
+            if (game.InputHandler.IsDown(Keys.J))
+            {
+                TESTEDGE.transform.position += new Vector2(-50,0)*dt;
+            }
+            if (game.InputHandler.IsDown(Keys.L))
+            {
+                TESTEDGE.transform.position += new Vector2(50, 0)*dt;
+            }
+
 
         }
 

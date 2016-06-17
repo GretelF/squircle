@@ -112,4 +112,12 @@ namespace Squircle.Physics
 
         #endregion Operator overloads
     }
+
+    public static class scTransformUtils
+    {
+        public static Vector2 applyTransform(scTransform transform, Vector2 vector)
+        {
+            return transform.position + vector.Rotate(transform.rotation.radians);
+        }
+    }
 }

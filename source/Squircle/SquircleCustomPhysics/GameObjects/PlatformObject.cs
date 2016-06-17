@@ -27,11 +27,6 @@ namespace Squircle
 
         public Vector2 PreviousPos { get; set; }
 
-        public override Vector2 Dimensions
-        {
-            get { return _dimensions; }
-        }
-
         public State State { get; set; }
 
         [DebugData(Ignore = true)]
@@ -150,7 +145,7 @@ namespace Squircle
             var bodyDescription = new scBodyDescription();
             bodyDescription.userData = this;
             var bodyPartDescription = new scBodyPartDescription();
-            var shape = scRectangleShape.fromLocalPositionAndHalfExtents(Vector2.Zero, Dimensions / 2);
+            var shape = scRectangleShape.fromLocalPositionAndHalfExtents(Vector2.Zero, _dimensions / 2);
             bodyPartDescription.shape = shape;
             bodyDescription.transform.position = section["position"].AsVector2();
             Body = Game.level.World.createBody(bodyDescription, bodyPartDescription);
