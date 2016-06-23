@@ -33,6 +33,7 @@ namespace Squircle
         public float GroundFriction { get; set; }
 
         public scBody TESTEDGE;
+        public scBody TESTRECTANGLE;
 
         public string AmbientMusicCue { get; set; }
 
@@ -163,6 +164,19 @@ namespace Squircle
                 TESTEDGE = body;
             }
 
+            {
+                var rectangleshape = scRectangleShape.fromLocalPositionAndHalfExtents(new Vector2(0, 0), new Vector2(40, 40));
+                var bodyPartDescription = new scBodyPartDescription();
+                bodyPartDescription.shape = rectangleshape;
+                var bodyDescription = new scBodyDescription();
+                bodyDescription.bodyType = scBodyType.Static;
+                bodyDescription.transform.position = new Vector2(200, 50);
+                var bodyPartDescriptions = new List<scBodyPartDescription>();
+                bodyPartDescriptions.Add(bodyPartDescription);
+                var body = World.createBody(bodyDescription, bodyPartDescriptions);
+                TESTRECTANGLE = body;
+            }
+
         }
 
         private void InitializePlayers()
@@ -250,19 +264,37 @@ namespace Squircle
 
             if (game.InputHandler.IsDown(Keys.I))
             {
-                TESTEDGE.transform.position += new Vector2(0,-50)*dt;
+                TESTEDGE.transform.position += new Vector2(0, -50) * dt;
             }
             if (game.InputHandler.IsDown(Keys.K))
             {
-                TESTEDGE.transform.position += new Vector2(0,50)*dt;
+                TESTEDGE.transform.position += new Vector2(0, 50) * dt;
             }
             if (game.InputHandler.IsDown(Keys.J))
             {
-                TESTEDGE.transform.position += new Vector2(-50,0)*dt;
+                TESTEDGE.transform.position += new Vector2(-50, 0) * dt;
             }
             if (game.InputHandler.IsDown(Keys.L))
             {
-                TESTEDGE.transform.position += new Vector2(50, 0)*dt;
+                TESTEDGE.transform.position += new Vector2(50, 0) * dt;
+            }
+
+            
+            if (game.InputHandler.IsDown(Keys.T))
+            {
+                TESTRECTANGLE.transform.position += new Vector2(0, -50) * dt;
+            }
+            if (game.InputHandler.IsDown(Keys.G))
+            {
+                TESTRECTANGLE.transform.position += new Vector2(0, 50) * dt;
+            }
+            if (game.InputHandler.IsDown(Keys.F))
+            {
+                TESTRECTANGLE.transform.position += new Vector2(-50, 0) * dt;
+            }
+            if (game.InputHandler.IsDown(Keys.H))
+            {
+                TESTRECTANGLE.transform.position += new Vector2(50, 0) * dt;
             }
 
 

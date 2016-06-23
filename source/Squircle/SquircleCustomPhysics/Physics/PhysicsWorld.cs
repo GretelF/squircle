@@ -95,8 +95,18 @@ namespace Squircle.Physics
 
                         if (otherBody.bodyParts[0].shape.ShapeType == scShapeType.Edge)
                         {
-                            if (scCollision.detectRectangleEdge(square.Body.transform, (scRectangleShape) square.Body.bodyParts[0].shape, 
-                                otherBody.transform, (scEdgeShape) otherBody.bodyParts[0].shape))
+                            if (scCollision.detectRectangleEdge(square.Body.transform, (scRectangleShape)square.Body.bodyParts[0].shape,
+                                otherBody.transform, (scEdgeShape)otherBody.bodyParts[0].shape))
+                            {
+                                squareDebugData.BodyBoundingBoxColor = Color.Red;
+                                otherDebugData.BodyBoundingBoxColor = Color.Red;
+                            }
+                        }
+
+                        if (otherBody.bodyParts[0].shape.ShapeType == scShapeType.Rectangle)
+                        {
+                            if (scCollision.detectRectangleRectangle(square.Body.transform, (scRectangleShape)square.Body.bodyParts[0].shape,
+                                otherBody.transform, (scRectangleShape)otherBody.bodyParts[0].shape))
                             {
                                 squareDebugData.BodyBoundingBoxColor = Color.Red;
                                 otherDebugData.BodyBoundingBoxColor = Color.Red;
@@ -119,16 +129,30 @@ namespace Squircle.Physics
                         var otherDebugData = game.level.physicsWorldDebugRenderer.GetOrCreateDebugDataForBody(otherBody);
                         otherDebugData.BodyBoundingBoxColor = Color.Lime;
 
-                        //TODO intersection detection
+                        if (otherBody.bodyParts[0].shape.ShapeType == scShapeType.Edge)
+                        {
+                            if (scCollision.detectCircleEdge(circle.Body.transform, (scCircleShape)circle.Body.bodyParts[0].shape,
+                                otherBody.transform, (scEdgeShape)otherBody.bodyParts[0].shape))
+                            {
+                                circleDebugData.BodyBoundingBoxColor = Color.Red;
+                                otherDebugData.BodyBoundingBoxColor = Color.Red;
+                            }
+                        }
+                        if (otherBody.bodyParts[0].shape.ShapeType == scShapeType.Rectangle)
+                        {
+                            if (scCollision.detectCircleRectangle(circle.Body.transform, (scCircleShape)circle.Body.bodyParts[0].shape,
+                                otherBody.transform, (scRectangleShape)otherBody.bodyParts[0].shape))
+                            {
+                                circleDebugData.BodyBoundingBoxColor = Color.Red;
+                                otherDebugData.BodyBoundingBoxColor = Color.Red;
+                            }
+                        }
                     }
                 }
-
             }
-
 
             detectAndResolveIntersection(square.Body, dt);
             detectAndResolveIntersection(circle.Body, dt);
-
         }
 
         public void moveIntoViewBounds(scBody body)
